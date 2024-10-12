@@ -1,2 +1,2 @@
 # ExploreNow
-A Travel App
+A Travel App with your friends.
