@@ -11,7 +11,8 @@ import SwiftUI
 struct LBTASwiftUIFirebaseApp: App {
     var body: some Scene {
         WindowGroup {
-            MainMessagesView()
+            //MainMessagesView()
+            SignUpView()
         }
     }
 }
