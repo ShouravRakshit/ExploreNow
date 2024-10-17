@@ -16,7 +16,6 @@ struct SignUpView: View
     // Example text field state
     @State private var name             = ""
     @State private var email            = ""
-    @State private var username         = ""
     @State private var password         = ""
     @State private var confirm_password = ""
     @State private var isPasswordVisible = false //State for toggling password visibility
@@ -29,13 +28,14 @@ struct SignUpView: View
     @State private var navigateToHome = false
     @State private var navigateToLogin = false
     @State private var username_available = false
+    @Binding var currentView: LBTASwiftUIFirebaseApp.CurrentView // Binding to currentView
+    @Binding var username: String 
     
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
     
     var body: some View
     {
-        NavigationView{
         VStack
         {
             Button(action: {
@@ -89,6 +89,7 @@ struct SignUpView: View
                     RoundedRectangle(cornerRadius: 15) // Rounded border
                         .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
                 )
+                .autocapitalization(.none) // Prevent first letter from being capitalized
                 .frame(width: 335) // Set a fixed width for the TextField
                 .padding(.top, 20) // Space above the text field
                 .onChange(of: username) {
@@ -271,14 +272,10 @@ struct SignUpView: View
                     .frame(width: 350) // Same width as TextField
                     .background(Color(red: 140/255, green: 82/255, blue: 255/255)) // Button color
                     .cornerRadius(15) // Rounded corners
-                    .font(.system(size: 20)) // Button font size
             }
                 
             .padding(.top, 15) // Space above the button
             // This NavigationLink is always present in the view hierarchy
-            NavigationLink(destination: MainMessagesView(), isActive: $navigateToHome) {
-                EmptyView()
-            }
         
             
             // "Already have an account? Login" text
@@ -303,7 +300,6 @@ struct SignUpView: View
             Spacer() // Pushes content to the top
         }
         //.padding()
-    }
 }
         
            
@@ -409,7 +405,7 @@ struct SignUpView: View
                         "name": name
                         ]
                         // Save user data under the user's UID
-                    db.collection("users").document(uid).setData(userData)
+                        db.collection("users").document(uid).setData(userData)
                         { error in
                         if let error = error
                             {
@@ -424,6 +420,7 @@ struct SignUpView: View
                                 {
                                 print("Navigating to home...")
                                 navigateToHome = true
+                                currentView = .suggestProfilePic
                                 }
                             }
                         }
@@ -436,10 +433,10 @@ struct SignUpView: View
 
 
 // Preview for SignUpView
-struct SignUpView_Previews: PreviewProvider
-    {
-    static var previews: some View
-        {
-        SignUpView()
-        }
-    }
+//struct SignUpView_Previews: PreviewProvider
+//    {
+//    static var previews: some View
+//        {
+//        SignUpView()
+//        }
+//    }

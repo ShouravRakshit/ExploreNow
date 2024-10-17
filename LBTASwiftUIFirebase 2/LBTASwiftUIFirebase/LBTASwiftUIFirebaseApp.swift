@@ -6,13 +6,33 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct LBTASwiftUIFirebaseApp: App {
+    @State private var currentView: CurrentView = .signUp
+    @State private var username: String = ""
+    
+    enum CurrentView {
+        case signUp
+        case suggestProfilePic
+        case mainMessages
+    }
+    
+    // Initialize Firebase in the app's init method
+    init() {
+        FirebaseApp.configure() // Configure Firebase here
+    }
+    
     var body: some Scene {
         WindowGroup {
-            //MainMessagesView()
-            SignUpView()
+            if currentView == .signUp {
+                SignUpView(currentView: $currentView, username: $username) // Pass as a binding
+            } else if currentView == .suggestProfilePic {
+                SuggestProfilePicView(currentView: $currentView, username: username) // Pass the username directly
+            } else {
+                MainMessagesView() // This will have its own navigation
+            }
         }
     }
 }
