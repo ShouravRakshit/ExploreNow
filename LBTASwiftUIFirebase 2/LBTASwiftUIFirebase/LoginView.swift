@@ -26,7 +26,8 @@ struct LoginView: View {
     @State var shouldShowImagePicker = false
     @State var image: UIImage?
     @State var loginStatusMessage = ""
-    
+    @Binding var currentView: LBTASwiftUIFirebaseApp.CurrentView // Binding to currentView
+
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
     
