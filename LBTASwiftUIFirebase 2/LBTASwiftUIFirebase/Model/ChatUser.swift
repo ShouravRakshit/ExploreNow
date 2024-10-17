@@ -12,12 +12,14 @@ struct ChatUser: Identifiable {
 
     let uid: String
     let email: String
+    let username: String
     let profileImageUrl: String
     var blockedUsers: [String]
 
     init(data: [String: Any]) {
-        self.uid = data["uid"] as? String ?? ""
+        self.uid = data["username"] as? String ?? ""
         self.email = data["email"] as? String ?? ""
+        self.username = data["username"] as? String ?? ""
         self.profileImageUrl = data["profileImageUrl"] as? String ?? ""
         self.blockedUsers = data["blockedUsers"] as? [String] ?? []
     }
