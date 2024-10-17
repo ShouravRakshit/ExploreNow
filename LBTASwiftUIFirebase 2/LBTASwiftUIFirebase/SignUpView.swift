@@ -255,7 +255,8 @@ struct SignUpView: View
                     .cornerRadius(15) // Rounded corners
                     .font(.system(size: 20)) // Button font size
             }
-            .padding(.top, 35) // Space above the button
+                
+            .padding(.top, 15) // Space above the button
             // This NavigationLink is always present in the view hierarchy
             NavigationLink(destination: MainMessagesView(), isActive: $navigateToHome) {
                 EmptyView()
@@ -350,7 +351,7 @@ struct SignUpView: View
                         }
                     guard let uid = result?.user.uid else { return }
                     print("Successfully created user: \(result?.user.uid ?? "")")
-                    self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
+                    //self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
                         
                     // Create a reference to the Firestore database
                     let db = Firestore.firestore()
