@@ -28,6 +28,7 @@ struct SignUpView: View
     @State private var hasSpecialCharacter: Bool = false
     @State private var navigateToHome = false
     @State private var navigateToLogin = false
+    @State private var username_available = false
     
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
@@ -90,6 +91,23 @@ struct SignUpView: View
                 )
                 .frame(width: 335) // Set a fixed width for the TextField
                 .padding(.top, 20) // Space above the text field
+                .onChange(of: username) {
+                    isUsernameAvailable ()
+                }
+            
+            if username.count > 0
+            {
+                HStack
+                {
+                    Text(username_available ? "✅" : "❌")
+                        .foregroundColor(username_available ? .green : .red)
+                    Text(username_available ? "Username is available" : "Username is taken")
+                        .foregroundColor(.black)
+                        .frame(width: 250, alignment: .leading) // Fixed width for text
+                }
+                .frame(maxWidth: .infinity, alignment: .center) // Center the entire VStack
+                .padding(.top, 5)
+            }
             
             // Rounded TextField
             TextField("Email Address", text: $email) // Example text field
@@ -288,19 +306,41 @@ struct SignUpView: View
     }
 }
         
-     
-            private func isValidEmailDomain(_ email: String) -> Bool {
-                // Check if the email contains "@" and get the domain part
-                guard let domain = email.split(separator: "@").last else { return false }
-                return validDomains.contains(String(domain))
+           
+    private func isUsernameAvailable()
+        {
+        let db = Firestore.firestore()
+        
+        db.collection("users").whereField("username", isEqualTo: username).getDocuments
+                { querySnapshot, error in
+                if let error = error
+                    {
+                    print("Error checking username: \(error)")
+                    self.username_available = false // Set to false on error
+                    return
+                    }
+                
+                // Update the variable based on query result
+                self.username_available = querySnapshot?.isEmpty ?? true // True if empty (available), false if taken
+                print("Username availability updated: \(self.username_available)")
+                }
+        }
+        
+    
+        private func isValidEmailDomain(_ email: String) -> Bool
+            {
+            // Check if the email contains "@" and get the domain part
+            guard let domain = email.split(separator: "@").last else { return false }
+            return validDomains.contains(String(domain))
             }
 
-            private func isValidPassword(_ password: String) -> Bool {
-                // Check for at least 6 characters, at least one number, and at least one special character
-                isLengthValid = password.count >= 8
-                hasUppercase = password.range(of: "[A-Z]", options: .regularExpression) != nil
-                hasSpecialCharacter = password.range(of: "[^A-Za-z0-9]", options: .regularExpression) != nil
-                return isLengthValid && hasUppercase && hasSpecialCharacter
+        private func isValidPassword(_ password: String) -> Bool
+            {
+            // Check for at least 6 characters, at least one number, and at least one special character
+            isLengthValid = password.count >= 8
+            hasUppercase = password.range(of: "[A-Z]", options: .regularExpression) != nil
+            hasSpecialCharacter = password.range(of: "[^A-Za-z0-9]", options: .regularExpression) != nil
+            return isLengthValid && hasUppercase && hasSpecialCharacter
             }
             
         private func validatePassword(_ newValue: String)
@@ -341,6 +381,11 @@ struct SignUpView: View
                     return
                     }
                 
+                if !username_available{
+                    loginStatusMessage = "Username is not available"
+                    return
+                }
+                
                 FirebaseManager.shared.auth.createUser(withEmail: email, password: password)
                     { result, err in
                     if let err = err
@@ -360,7 +405,8 @@ struct SignUpView: View
                     let userData: [String: Any] =
                         [
                         "username": username,
-                        "email": email
+                        "email": email,
+                        "name": name
                         ]
                         // Save user data under the user's UID
                     db.collection("users").document(uid).setData(userData)
