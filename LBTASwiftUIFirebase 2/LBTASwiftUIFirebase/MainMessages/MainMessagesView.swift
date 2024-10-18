@@ -12,23 +12,25 @@ class MainMessagesViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var chatUser: ChatUser?
     @Published var isUserCurrentlyLoggedOut = false
+    @State private var showUserDetail = false
+    
 
     init() {
-        checkUserLoggedOut()
+        
         fetchCurrentUser()
     }
 
-    private func checkUserLoggedOut() {
-        DispatchQueue.main.async {
-            self.isUserCurrentlyLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
-        }
-    }
+    
 
     func fetchCurrentUser() {
+        print ("Fetching current user")
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
             self.errorMessage = "Could not find Firebase UID"
+            print ("Could not find Firebase UID")
             return
         }
+        
+        print ("UID: \(uid)")
 
         FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
             if let error = error {
@@ -46,6 +48,7 @@ class MainMessagesViewModel: ObservableObject {
     }
 
     func handleSignOut() {
+        print ("Signing out user in handleSignOut")
         do {
             try FirebaseManager.shared.auth.signOut()
             isUserCurrentlyLoggedOut = true
@@ -92,6 +95,8 @@ struct MainMessagesView: View {
     @State private var shouldNavigateToChatLogView = false
     @State private var shouldShowChangePasswordConfirmation = false
     @State private var shouldShowNewMessageScreen = false
+    @EnvironmentObject var appState: AppState
+
     @ObservedObject private var vm = MainMessagesViewModel()
     @State private var selectedChatUser: ChatUser? // Store the selected user for navigation
 
@@ -107,8 +112,19 @@ struct MainMessagesView: View {
             }
             .overlay(newMessageButton, alignment: .bottom)
             .navigationBarHidden(true)
+            
         }
     }
+    
+    private func handleSignOut() {
+        do {
+            try FirebaseManager.shared.auth.signOut()
+            appState.isLoggedIn = false // Update authentication state
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError.localizedDescription)
+        }
+    }
+
 
     private var customNavBar: some View {
         HStack(spacing: 16) {
@@ -152,7 +168,7 @@ struct MainMessagesView: View {
                     shouldShowChangePasswordConfirmation.toggle()
                 }),
                 .destructive(Text("Sign Out"), action: {
-                    vm.handleSignOut()
+                    handleSignOut()
                 }),
                 .destructive(Text("Delete Account"), action: {
                     showDeleteAccountConfirmation()
@@ -160,12 +176,7 @@ struct MainMessagesView: View {
                 .cancel()
             ])
         }
-        .fullScreenCover(isPresented: $vm.isUserCurrentlyLoggedOut) {
-            LoginView(didCompleteLoginProcess: {
-                self.vm.isUserCurrentlyLoggedOut = false
-                self.vm.fetchCurrentUser()
-            })
-        }
+        
         .alert(isPresented: $shouldShowChangePasswordConfirmation) {
             Alert(
                 title: Text("Change Password"),
@@ -196,7 +207,7 @@ struct MainMessagesView: View {
                 switch result {
                 case .success:
                     print("Account deleted successfully.")
-                    vm.handleSignOut()
+                    handleSignOut()
                 case .failure(let error):
                     print("Failed to delete account:", error.localizedDescription)
                 }
@@ -265,7 +276,7 @@ struct MainMessagesView: View {
                 self.selectedChatUser = user // Set the selected user
                 self.shouldNavigateToChatLogView = true // Navigate to ChatLogView
                 self.shouldShowNewMessageScreen = false // Dismiss the SearchUserView
-            })
+            }).environmentObject(appState)
         }
     }
 }

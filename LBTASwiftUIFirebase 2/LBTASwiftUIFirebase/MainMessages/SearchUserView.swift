@@ -39,7 +39,7 @@ struct SearchUserView: View {
                                 .cornerRadius(25)
 
                             VStack(alignment: .leading) {
-                                Text(user.email)
+                                Text(user.username)
                                     .font(.headline)
                                 Text("Some other info") // Additional user info
                                     .font(.subheadline)
@@ -78,6 +78,12 @@ struct SearchUserView: View {
 
             // Initially set filteredUsers to all users
             self.filteredUsers = self.users
+            
+            // Print out the usernames of each user
+            for user in self.users
+                {
+                print("Username: \(user.username)")
+                }
         }
     }
 

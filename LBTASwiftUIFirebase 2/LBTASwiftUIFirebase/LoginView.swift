@@ -8,134 +8,157 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
-import FirebaseStorage
-import FirebaseFirestore
+//import FirebaseStorage
+//import FirebaseFirestore
+
+extension Color {
+    static let customPurple = Color(red: 140/255, green: 82/255, blue: 255/255, opacity: 0.81)
+}
 
 struct LoginView: View {
     
-    let didCompleteLoginProcess: () -> ()
-    
+//    let didCompleteLoginProcess: () -> ()
+    @EnvironmentObject var appState: AppState
     @State private var isLoginMode = false
     @State private var email = ""
     @State private var password = ""
     @State private var isPasswordVisible = false // State for toggling password visibility
-    @State var shouldShowImagePicker = false
-    @State var image: UIImage?
+//    @State var shouldShowImagePicker = false
+//    @State var image: UIImage?
     @State var loginStatusMessage = ""
-    
+//    @State private var navigateToSignUp = false
+//    @State private var showSignUpView = false
+    @State private var showSignUpView = false
+
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
     
     var body: some View {
         NavigationView {
-            ScrollView {
-                VStack(spacing: 16) {
-                    Picker(selection: $isLoginMode, label: Text("Picker here")) {
-                        Text("Login").tag(true)
-                        Text("Create Account").tag(false)
-                    }
-                    .pickerStyle(SegmentedPickerStyle())
+            VStack {
+                VStack      {
+                    Spacer()
+                        .frame(height: 1) // Adjust this value to move the image higher or lower
                     
-                    if !isLoginMode {
-                        Button {
-                            shouldShowImagePicker.toggle()
-                        } label: {
-                            VStack {
-                                if let image = self.image {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .frame(width: 128, height: 128)
-                                        .scaledToFill()
-                                        .cornerRadius(64)
-                                } else {
-                                    Image(systemName: "person.fill")
-                                        .font(.system(size: 64))
-                                        .padding()
-                                        .foregroundColor(Color(.label))
-                                }
-                            }
-                            .overlay(RoundedRectangle(cornerRadius: 64).stroke(Color.black, lineWidth: 3))
-                        }
-                    }
+                    Image("Explore")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: UIScreen.main.bounds.width * 0.75) // Adjusted to 60% of screen width
                     
-                    Group {
-                        TextField("Email", text: $email)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .onChange(of: email) { newValue in
-                                if !isValidEmailDomain(newValue) {
-                                    loginStatusMessage = "Please enter a valid email from popular domains."
-                                } else {
-                                    loginStatusMessage = ""
-                                }
-                            }
-                        
-                        ZStack(alignment: .trailing) {
-                            if isPasswordVisible {
-                                TextField("Password", text: $password) // Use TextField for visible password
-                                    .padding(12)
-                                    .background(Color.white)
-                                    .cornerRadius(8)
-                            } else {
-                                SecureField("Password", text: $password) // Use SecureField for hidden password
-                                    .padding(12)
-                                    .background(Color.white)
-                                    .cornerRadius(8)
-                            }
-                            
-                            // Toggle Button
-                            Button(action: {
-                                isPasswordVisible.toggle() // Toggle password visibility
-                            }) {
-                                Image(systemName: isPasswordVisible ? "eye.slash" : "eye") // Change icon based on visibility
-                                    .foregroundColor(.gray)
-                                    .padding(.trailing, 12) // Add some spacing to the right of the button
-                            }
-                        }
-                    }
-                    
-                    Button {
-                        handleAction()
-                    } label: {
-                        HStack {
-                            Spacer()
-                            Text(isLoginMode ? "Log In" : "Create Account")
-                                .foregroundColor(.white)
-                                .padding(.vertical, 10)
-                                .font(.system(size: 14, weight: .semibold))
-                            Spacer()
-                        }
-                        .background(Color.blue)
-                        .cornerRadius(8)
-                    }
-                    
-                    if isLoginMode {
-                        Button(action: {
-                            resetPassword()
-                        }) {
-                            Text("Forgot Password?")
-                                .foregroundColor(.blue)
-                                .padding()
-                        }
-                    }
-                    
-                    Text(self.loginStatusMessage)
-                        .foregroundColor(.red)
+                    Spacer()
                 }
-                .padding()
+                .frame(height: UIScreen.main.bounds.height * 0.3) // Increased to 40% of screen height
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                ScrollView {
+                    VStack{
+                        Group {
+                            TextField("Email", text: $email)
+                                .keyboardType(.emailAddress)
+                                .autocapitalization(.none)
+                                .padding(12)
+                                .background(Color.white)
+                                .frame(width: 350)
+                                .frame(height: 50)
+                                .cornerRadius(35)
+                                .onChange(of: email) { newValue in
+                                    if !isValidEmailDomain(newValue) {
+                                        loginStatusMessage = "Please enter a valid email from popular domains."
+                                    } else {
+                                        loginStatusMessage = ""
+                                    }
+                                }.padding(.bottom, 25)
+                                .padding(.top, 35)
+                            
+                            
+                            ZStack(alignment: .trailing) {
+                                if isPasswordVisible {
+                                    TextField("Password", text: $password) // Use TextField for visible password
+                                        .padding(12)
+                                        .background(Color.white)
+                                        .frame(width: 350)
+                                        .frame(height: 50)
+                                        .cornerRadius(35)
+                                } else {
+                                    SecureField("Password", text: $password) // Use SecureField for hidden password
+                                        .padding(12)
+                                        .frame(width: 350)
+                                        .frame(height: 50)
+                                        .background(Color.white)
+                                        .cornerRadius(35)
+                                }
+                                
+                                // Toggle Button
+                                Button(action: {
+                                    isPasswordVisible.toggle() // Toggle password visibility
+                                }) {
+                                    Image(systemName: isPasswordVisible ? "eye.slash" : "eye") // Change icon based on visibility
+                                        .foregroundColor(.gray)
+                                        .padding(.trailing, 12) // Add some spacing to the right of the button
+                                }
+                            }.padding(.bottom, 35)
+                        }
+                        
+                        Button {
+                            handleAction()
+                        } label:
+                        {
+                            HStack {
+                                
+                                Text("Login")
+                                    .foregroundColor(.black) // Black text to match the design
+                                    .font(.system(size: 16, weight: .bold)) // Keep a bold font
+                                    .padding(.vertical, 18) // Adjust vertical padding for button height
+                                    .frame(width: 130) // Set a fixed width for a square-like button
+                                    .background(Color.white) // White background to match the design
+                                    .cornerRadius(16) // Adjust corner radius for square-like shape
+                                    .shadow(color: .gray, radius: 5, x: 0, y: 2) // Optional shadow fo
+                                
+                            }.frame(maxWidth: .infinity) // Center the button within its container
+                                .padding(.horizontal, 20) //// Padding around the button for screen edges
+                            
+                        }
+                        
+                        if !isLoginMode
+                        {
+                            HStack
+                            {
+                                Text("Don't have an account? ")
+                                    .foregroundColor(.black)
+                                
+                                Text("Sign up")
+                                    .underline() // Underline the text
+                                    .foregroundColor(.black) // Change color to indicate it's a link
+                                    .onTapGesture {
+                                        showSignUpView = true // Set the variable to true when tapped
+                                    }
+                                
+                            }
+                            .padding(.top, 50)
+                            
+                        }
+                        
+                        Text(self.loginStatusMessage)
+                            .foregroundColor(.red)
+                    }
+                    .padding()
+                    
+                    
+                }
+                
+                .background(Color.customPurple)
+                .navigationViewStyle(StackNavigationViewStyle())
+                
+                .fullScreenCover(isPresented: $showSignUpView){
+                    SignUpView()
+                            .environmentObject(appState) // Pass appState to SignUpView
+                        
+                    }
+                
             }
-            .navigationTitle(isLoginMode ? "Log In" : "Create Account")
-            .background(LinearGradient(gradient: Gradient(colors: [Color(.purple).opacity(0.5), Color(.purple).opacity(0.2)]), startPoint: .top, endPoint: .bottom)
-                            .ignoresSafeArea())
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
-            ImagePicker(image: $image)
         }
     }
+    
     
     private func isValidEmailDomain(_ email: String) -> Bool {
         // Check if the email contains "@" and get the domain part
@@ -144,11 +167,7 @@ struct LoginView: View {
     }
     
     private func handleAction() {
-        if isLoginMode {
             loginUser()
-        } else {
-            createNewAccount()
-        }
     }
     
     private func loginUser() {
@@ -165,72 +184,77 @@ struct LoginView: View {
             }
             print("Successfully logged in as user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully logged in as user: \(result?.user.uid ?? "")"
-            self.didCompleteLoginProcess()
+            // Update authentication state
+                    DispatchQueue.main.async {
+                        self.appState.isLoggedIn = true
+                    }
         }
     }
     
-    private func createNewAccount() {
-        if !isValidEmailDomain(email) {
-            loginStatusMessage = "Please enter a valid email from popular domains."
-            return
-        }
-        
-        if !isValidPassword(password) {
-            loginStatusMessage = "Password must be at least 6 characters, including a number and a special character."
-            return
-        }
-        
-        if self.image == nil {
-            self.loginStatusMessage = "You must select an avatar image."
-            return
-        }
-        
-        FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, err in
-            if let err = err {
-                print("Failed to create user: ", err)
-                self.loginStatusMessage = "Failed to create user: \(err.localizedDescription)"
-                return
-            }
-            print("Successfully created user: \(result?.user.uid ?? "")")
-            self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
-            self.persistImageToStorage()
-        }
-    }
+//    private func createNewAccount() {
+//        if !isValidEmailDomain(email) {
+//            loginStatusMessage = "Please enter a valid email from popular domains."
+//            return
+//        }
+//        
+//        if !isValidPassword(password) {
+//            loginStatusMessage = "Password must be at least 6 characters, including a number and a special character."
+//            return
+//        }
+//        
+//        if self.image == nil {
+//            self.loginStatusMessage = "You must select an avatar image."
+//            return
+//        }
+//  
+//        
+//        FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, err in
+//            if let err = err {
+//                print("Failed to create user: ", err)
+//                self.loginStatusMessage = "Failed to create user: \(err.localizedDescription)"
+//                return
+//            }
+//            print("Successfully created user: \(result?.user.uid ?? "")")
+//            self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
+//            self.persistImageToStorage()
+            
+//        }
+//    }
+//    
+//    private func persistImageToStorage() {
+//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+//        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
+//        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
+//        ref.putData(imageData, metadata: nil) { metadata, err in
+//            if let err = err {
+//                self.loginStatusMessage = "Failed to push image to Storage: \(err.localizedDescription)"
+//                return
+//            }
+//            ref.downloadURL { url, err in
+//                if let err = err {
+//                    self.loginStatusMessage = "Failed to retrieve downloadURL: \(err.localizedDescription)"
+//                    return
+//                }
+//                guard let url = url else { return }
+//                self.storeUserInformation(imageProfileUrl: url)
+//            }
+//        }
+//    }
     
-    private func persistImageToStorage() {
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
-        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
-        ref.putData(imageData, metadata: nil) { metadata, err in
-            if let err = err {
-                self.loginStatusMessage = "Failed to push image to Storage: \(err.localizedDescription)"
-                return
-            }
-            ref.downloadURL { url, err in
-                if let err = err {
-                    self.loginStatusMessage = "Failed to retrieve downloadURL: \(err.localizedDescription)"
-                    return
-                }
-                guard let url = url else { return }
-                self.storeUserInformation(imageProfileUrl: url)
-            }
-        }
-    }
-    
-    private func storeUserInformation(imageProfileUrl: URL) {
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        let userData = ["email": self.email, "uid": uid, "profileImageUrl": imageProfileUrl.absoluteString]
-        FirebaseManager.shared.firestore.collection("users")
-            .document(uid).setData(userData) { err in
-                if let err = err {
-                    print(err)
-                    self.loginStatusMessage = "\(err.localizedDescription)"
-                    return
-                }
-                print("User information successfully stored.")
-                self.didCompleteLoginProcess()
-            }
-    }
+//    private func storeUserInformation(imageProfileUrl: URL) {
+//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+//        let userData = ["email": self.email, "uid": uid, "profileImageUrl": imageProfileUrl.absoluteString]
+//        FirebaseManager.shared.firestore.collection("users")
+//            .document(uid).setData(userData) { err in
+//                if let err = err {
+//                    print(err)
+//                    self.loginStatusMessage = "\(err.localizedDescription)"
+//                    return
+//                }
+//                print("User information successfully stored.")
+//                self.didCompleteLoginProcess()
+//            }
+//    }
     
     private func isValidPassword(_ password: String) -> Bool {
         // Check for at least 6 characters, at least one number, and at least one special character
