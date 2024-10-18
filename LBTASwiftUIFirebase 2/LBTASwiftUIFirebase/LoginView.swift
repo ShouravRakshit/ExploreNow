@@ -8,8 +8,8 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
-import FirebaseStorage
-import FirebaseFirestore
+//import FirebaseStorage
+//import FirebaseFirestore
 
 extension Color {
     static let customPurple = Color(red: 140/255, green: 82/255, blue: 255/255, opacity: 0.81)
@@ -17,16 +17,18 @@ extension Color {
 
 struct LoginView: View {
     
-    let didCompleteLoginProcess: () -> ()
-    
-    @State private var isLoginMode = true
+//    let didCompleteLoginProcess: () -> ()
+    @EnvironmentObject var appState: AppState
+    @State private var isLoginMode = false
     @State private var email = ""
     @State private var password = ""
     @State private var isPasswordVisible = false // State for toggling password visibility
-    @State var shouldShowImagePicker = false
-    @State var image: UIImage?
+//    @State var shouldShowImagePicker = false
+//    @State var image: UIImage?
     @State var loginStatusMessage = ""
-    @State private var navigateToSignUp = false
+//    @State private var navigateToSignUp = false
+//    @State private var showSignUpView = false
+    @State private var showSignUpView = false
 
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
@@ -117,7 +119,7 @@ struct LoginView: View {
                             
                         }
                         
-                        if isLoginMode
+                        if !isLoginMode
                         {
                             HStack
                             {
@@ -128,11 +130,12 @@ struct LoginView: View {
                                     .underline() // Underline the text
                                     .foregroundColor(.black) // Change color to indicate it's a link
                                     .onTapGesture {
-                                        navigateToSignUp = true // Set the variable to true when tapped
+                                        showSignUpView = true // Set the variable to true when tapped
                                     }
                                 
                             }
                             .padding(.top, 50)
+                            
                         }
                         
                         Text(self.loginStatusMessage)
@@ -145,19 +148,11 @@ struct LoginView: View {
                 
                 .background(Color.customPurple)
                 .navigationViewStyle(StackNavigationViewStyle())
-                .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil)
-                {
-                    ImagePicker(image: $image)
-                }
-                .fullScreenCover(isPresented: $navigateToSignUp)
-                    {
-                    SignUpView(didCompleteSignUp:
-                        {
-                        // Handle successful sign up, then navigate to SuggestProfilePic
-                        didCompleteLoginProcess()
-                        navigateToSignUp = false
-                        print ("Calling did complete login process")
-                        })
+                
+                .fullScreenCover(isPresented: $showSignUpView){
+                    SignUpView()
+                            .environmentObject(appState) // Pass appState to SignUpView
+                        
                     }
                 
             }
@@ -172,11 +167,7 @@ struct LoginView: View {
     }
     
     private func handleAction() {
-        if isLoginMode {
             loginUser()
-        } else {
-            createNewAccount()
-        }
     }
     
     private func loginUser() {
@@ -193,40 +184,43 @@ struct LoginView: View {
             }
             print("Successfully logged in as user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully logged in as user: \(result?.user.uid ?? "")"
-            self.didCompleteLoginProcess()
+            // Update authentication state
+                    DispatchQueue.main.async {
+                        self.appState.isLoggedIn = true
+                    }
         }
     }
     
-    private func createNewAccount() {
-        if !isValidEmailDomain(email) {
-            loginStatusMessage = "Please enter a valid email from popular domains."
-            return
-        }
-        
-        if !isValidPassword(password) {
-            loginStatusMessage = "Password must be at least 6 characters, including a number and a special character."
-            return
-        }
-        
-        if self.image == nil {
-            self.loginStatusMessage = "You must select an avatar image."
-            return
-        }
-  
-        
-        FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, err in
-            if let err = err {
-                print("Failed to create user: ", err)
-                self.loginStatusMessage = "Failed to create user: \(err.localizedDescription)"
-                return
-            }
-            print("Successfully created user: \(result?.user.uid ?? "")")
-            self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
+//    private func createNewAccount() {
+//        if !isValidEmailDomain(email) {
+//            loginStatusMessage = "Please enter a valid email from popular domains."
+//            return
+//        }
+//        
+//        if !isValidPassword(password) {
+//            loginStatusMessage = "Password must be at least 6 characters, including a number and a special character."
+//            return
+//        }
+//        
+//        if self.image == nil {
+//            self.loginStatusMessage = "You must select an avatar image."
+//            return
+//        }
+//  
+//        
+//        FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, err in
+//            if let err = err {
+//                print("Failed to create user: ", err)
+//                self.loginStatusMessage = "Failed to create user: \(err.localizedDescription)"
+//                return
+//            }
+//            print("Successfully created user: \(result?.user.uid ?? "")")
+//            self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
 //            self.persistImageToStorage()
             
-        }
-    }
-    
+//        }
+//    }
+//    
 //    private func persistImageToStorage() {
 //        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
 //        let ref = FirebaseManager.shared.storage.reference(withPath: uid)

@@ -26,12 +26,14 @@ struct SignUpView: View
     @State private var isLengthValid: Bool = false
     @State private var hasUppercase: Bool = false
     @State private var hasSpecialCharacter: Bool = false
-    @State private var navigateToHome = false
-    @State private var navigateToLogin = false
+//    @State private var navigateToHome = false
+//    @State private var navigateToLogin = false
     @State private var username_available = false
     @State private var username = ""
     @State private var navigateToProfilePic = false
-    let didCompleteSignUp: () -> Void
+    @EnvironmentObject var appState: AppState
+
+//    let didCompleteSignUp: () -> Void
     
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
@@ -285,8 +287,10 @@ struct SignUpView: View
                             // Action for login navigation
                             print("Login tapped")
                             // Navigate to login view (you would implement this based on your navigation logic)
-                            navigateToLogin = true
+//                            navigateToLogin = true
+//                            presentationMode.wrappedValue.dismiss()
                             presentationMode.wrappedValue.dismiss()
+
                         }
                 }
                 .padding(.top, 10) // Space above this text
@@ -294,10 +298,8 @@ struct SignUpView: View
                 
                 Spacer() // Pushes content to the top
                 .fullScreenCover(isPresented: $navigateToProfilePic) {
-                      SuggestProfilePicView(username: username, didCompleteProfilePicSelection: {
-                          // Pass the username back to the LoginView
-                          didCompleteSignUp() // This goes back to the LoginView with the username
-                      })
+                    SuggestProfilePicView(username: username)
+                            .environmentObject(appState)
                   }
                 
             }
@@ -419,12 +421,9 @@ struct SignUpView: View
                             {
                             print("Successfully saved user data to Firestore")
                             // Navigation link to the HomeView, activated by the state variable
-                            DispatchQueue.main.async
-                                {
-                                print("Navigating to profile pic view...")
-                                navigateToHome = true
-                                navigateToProfilePic = true
-                                }
+                            DispatchQueue.main.async {
+                                                navigateToProfilePic = true
+                                            }
                             }
                         }
                         

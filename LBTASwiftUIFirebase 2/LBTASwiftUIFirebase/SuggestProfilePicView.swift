@@ -13,17 +13,19 @@ import FirebaseFirestore
 struct SuggestProfilePicView: View
     {
     @State var image: UIImage?
-    @State var navigateToMainMessages = false
-    @State private var user: User? // State variable to hold the retrieved user
+//    @State var navigateToMainMessages = false
+//    @State private var user: User? // State variable to hold the retrieved user
     @State var statusMessage = ""
     @State var shouldShowImagePicker = false
-    @Environment(\.presentationMode) var presentationMode
+//    @State private var navigateToProfilePic = false
+    @EnvironmentObject var appState: AppState
+
+//    @Environment(\.presentationMode) var presentationMode
     
     var username: String // Accept username as a parameter
-    let didCompleteProfilePicSelection: () -> Void
+//    let didCompleteProfilePicSelection: () -> Void
     
-    var body: some View
-        {
+    var body: some View{
         VStack
             {
             Text("Welcome, \(username)") // Use the username in the view
@@ -93,8 +95,7 @@ struct SuggestProfilePicView: View
                 .padding(.top, 50)
                 .underline() // Underline the text
                 .onTapGesture {
-                    self.navigateToMainMessages = true
-                    didCompleteProfilePicSelection ()
+                    self.appState.isLoggedIn = true
                 }
             Spacer() // Pushes content to the top
             }
@@ -140,9 +141,10 @@ struct SuggestProfilePicView: View
                     return
                 }
                 print("Profile image URL successfully stored.")
-                self.navigateToMainMessages = true
-                // self.didCompleteLoginProcess() // Uncomment if needed
-                didCompleteProfilePicSelection()
+                // Update authentication state
+                            DispatchQueue.main.async {
+                                self.appState.isLoggedIn = true
+                            }
             }
         }
     

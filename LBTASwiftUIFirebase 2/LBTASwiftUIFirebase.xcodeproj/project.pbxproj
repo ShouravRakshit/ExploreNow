@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C132B7B2CC219C70087408A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7A2CC219C00087408A /* AppState.swift */; };
+		2C132B7D2CC22A770087408A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7C2CC22A700087408A /* ContentView.swift */; };
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
 		81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E5B2CB31F12005BE180 /* LoginView.swift */; };
 		81447E5E2CB31F14005BE180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E5D2CB31F14005BE180 /* Assets.xcassets */; };
@@ -31,6 +33,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2C132B7A2CC219C00087408A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
 		81447E5B2CB31F12005BE180 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -86,6 +90,8 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				2C132B7C2CC22A700087408A /* ContentView.swift */,
+				2C132B7A2CC219C00087408A /* AppState.swift */,
 				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
 				B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */,
 				B02A96AA2CC0AC21008B6E8B /* Info.plist */,
@@ -247,7 +253,9 @@
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
 				81447EA82CB4BCD0005BE180 /* HelloWorldView.swift in Sources */,
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
+				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
+				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				81447E6F2CB3306C005BE180 /* ImagePicker.swift in Sources */,
 				B01DE7132CC199A000C158DD /* MainMessagesView.swift in Sources */,
