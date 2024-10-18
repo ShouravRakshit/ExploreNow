@@ -7,36 +7,36 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAuth
 
 @main
 struct LBTASwiftUIFirebaseApp: App {
-    @State private var currentView: CurrentView = .loginView
-    @State private var username: String = ""
-    
-    enum CurrentView {
-        case signUp
-        case suggestProfilePic
-        case mainMessages
-        case loginView
-    }
     
     // Initialize Firebase in the app's init method
     init() {
         FirebaseApp.configure() // Configure Firebase here
+       
     }
+    
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some Scene {
         WindowGroup {
-            if currentView == .loginView{
-                LoginView(currentView: $currentView)()
-            }
-            if currentView == .signUp {
-                SignUpView(currentView: $currentView, username: $username) // Pass as a binding
-            } else if currentView == .suggestProfilePic {
-                SuggestProfilePicView(currentView: $currentView, username: username) // Pass the username directly
-            } else {
-                MainMessagesView() // This will have its own navigation
-            }
+            MainMessagesView()
+                .onChange(of: scenePhase) { newPhase in
+                        switch newPhase {
+                        case .background:
+                            // Sign out the user when the app enters the background
+                            do {
+                                try Auth.auth().signOut()
+                                print("User signed out")
+                            } catch let signOutError as NSError {
+                                print("Error signing out: %@", signOutError.localizedDescription)
+                            }
+                        default:
+                            break
+                        }
+                    }
         }
     }
 }

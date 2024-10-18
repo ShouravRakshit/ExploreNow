@@ -17,8 +17,10 @@ struct SuggestProfilePicView: View
     @State private var user: User? // State variable to hold the retrieved user
     @State var statusMessage = ""
     @State var shouldShowImagePicker = false
-    @Binding var currentView: LBTASwiftUIFirebaseApp.CurrentView
+    @Environment(\.presentationMode) var presentationMode
+    
     var username: String // Accept username as a parameter
+    let didCompleteProfilePicSelection: () -> Void
     
     var body: some View
         {
@@ -92,7 +94,7 @@ struct SuggestProfilePicView: View
                 .underline() // Underline the text
                 .onTapGesture {
                     self.navigateToMainMessages = true
-                    currentView = .mainMessages
+                    didCompleteProfilePicSelection ()
                 }
             Spacer() // Pushes content to the top
             }
@@ -100,6 +102,7 @@ struct SuggestProfilePicView: View
             .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
                 ImagePicker(image: $image)
             }
+
         }
     
     private func persistImageToStorage() {
@@ -138,8 +141,8 @@ struct SuggestProfilePicView: View
                 }
                 print("Profile image URL successfully stored.")
                 self.navigateToMainMessages = true
-                currentView = .mainMessages
                 // self.didCompleteLoginProcess() // Uncomment if needed
+                didCompleteProfilePicSelection()
             }
         }
     

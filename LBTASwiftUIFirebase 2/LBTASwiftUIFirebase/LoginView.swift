@@ -26,128 +26,144 @@ struct LoginView: View {
     @State var shouldShowImagePicker = false
     @State var image: UIImage?
     @State var loginStatusMessage = ""
-    @Binding var currentView: LBTASwiftUIFirebaseApp.CurrentView // Binding to currentView
+    @State private var navigateToSignUp = false
 
     // Popular email domains
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
     
     var body: some View {
-        VStack      {
-                       Spacer()
-                           .frame(height: 1) // Adjust this value to move the image higher or lower
-                       
-                       Image("Explore")
-                           .resizable()
-                           .scaledToFit()
-                           .frame(width: UIScreen.main.bounds.width * 0.75) // Adjusted to 60% of screen width
-                       
-                       Spacer()
-                   }
-                   .frame(height: UIScreen.main.bounds.height * 0.3) // Increased to 40% of screen height
-                   .frame(maxWidth: .infinity)
-                   .background(Color.white)
-            ScrollView {
-                VStack{
-                    Group {
-                        TextField("Email", text: $email)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-                            .padding(12)
-                            .background(Color.white)
-                            .frame(width: 350)
-                            .frame(height: 50)
-                            .cornerRadius(35)
-                            .onChange(of: email) { newValue in
-                                if !isValidEmailDomain(newValue) {
-                                    loginStatusMessage = "Please enter a valid email from popular domains."
-                                } else {
-                                    loginStatusMessage = ""
-                                }
-                            }.padding(.bottom, 25)
-                            .padding(.top, 35)
-                        
-                        
-                        ZStack(alignment: .trailing) {
-                            if isPasswordVisible {
-                                TextField("Password", text: $password) // Use TextField for visible password
-                                    .padding(12)
-                                    .background(Color.white)
-                                    .frame(width: 350)
-                                    .frame(height: 50)
-                                    .cornerRadius(35)
-                            } else {
-                                SecureField("Password", text: $password) // Use SecureField for hidden password
-                                    .padding(12)
-                                    .frame(width: 350)
-                                    .frame(height: 50)
-                                    .background(Color.white)
-                                    .cornerRadius(35)
-                            }
-                            
-                            // Toggle Button
-                            Button(action: {
-                                isPasswordVisible.toggle() // Toggle password visibility
-                            }) {
-                                Image(systemName: isPasswordVisible ? "eye.slash" : "eye") // Change icon based on visibility
-                                    .foregroundColor(.gray)
-                                    .padding(.trailing, 12) // Add some spacing to the right of the button
-                            }
-                        }.padding(.bottom, 35)
-                    }
+        NavigationView {
+            VStack {
+                VStack      {
+                    Spacer()
+                        .frame(height: 1) // Adjust this value to move the image higher or lower
                     
-                    Button {
-                        handleAction()
-                    } label: {
-                        HStack {
-                            
-                            Text("Login")
-                                .foregroundColor(.black) // Black text to match the design
-                                        .font(.system(size: 16, weight: .bold)) // Keep a bold font
-                                        .padding(.vertical, 18) // Adjust vertical padding for button height
-                                        .frame(width: 130) // Set a fixed width for a square-like button
-                                        .background(Color.white) // White background to match the design
-                                        .cornerRadius(16) // Adjust corner radius for square-like shape
-                                        .shadow(color: .gray, radius: 5, x: 0, y: 2) // Optional shadow fo
-                                
-                        }.frame(maxWidth: .infinity) // Center the button within its container
-                            .padding(.horizontal, 20) //// Padding around the button for screen edges
-
-                        
-
-                    }
+                    Image("Explore")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: UIScreen.main.bounds.width * 0.75) // Adjusted to 60% of screen width
                     
-                    if isLoginMode {
-                        Button(action: {
-                            resetPassword()
-                        }) {
-                            Text("Don't have an account? Sign up")
-                                .foregroundColor(.black)
-                                .padding(.top, 50)
-                        }
-                    }
-                    
-                    Text(self.loginStatusMessage)
-                        .foregroundColor(.red)
+                    Spacer()
                 }
-                .padding()
+                .frame(height: UIScreen.main.bounds.height * 0.3) // Increased to 40% of screen height
+                .frame(maxWidth: .infinity)
+                .background(Color.white)
+                ScrollView {
+                    VStack{
+                        Group {
+                            TextField("Email", text: $email)
+                                .keyboardType(.emailAddress)
+                                .autocapitalization(.none)
+                                .padding(12)
+                                .background(Color.white)
+                                .frame(width: 350)
+                                .frame(height: 50)
+                                .cornerRadius(35)
+                                .onChange(of: email) { newValue in
+                                    if !isValidEmailDomain(newValue) {
+                                        loginStatusMessage = "Please enter a valid email from popular domains."
+                                    } else {
+                                        loginStatusMessage = ""
+                                    }
+                                }.padding(.bottom, 25)
+                                .padding(.top, 35)
+                            
+                            
+                            ZStack(alignment: .trailing) {
+                                if isPasswordVisible {
+                                    TextField("Password", text: $password) // Use TextField for visible password
+                                        .padding(12)
+                                        .background(Color.white)
+                                        .frame(width: 350)
+                                        .frame(height: 50)
+                                        .cornerRadius(35)
+                                } else {
+                                    SecureField("Password", text: $password) // Use SecureField for hidden password
+                                        .padding(12)
+                                        .frame(width: 350)
+                                        .frame(height: 50)
+                                        .background(Color.white)
+                                        .cornerRadius(35)
+                                }
+                                
+                                // Toggle Button
+                                Button(action: {
+                                    isPasswordVisible.toggle() // Toggle password visibility
+                                }) {
+                                    Image(systemName: isPasswordVisible ? "eye.slash" : "eye") // Change icon based on visibility
+                                        .foregroundColor(.gray)
+                                        .padding(.trailing, 12) // Add some spacing to the right of the button
+                                }
+                            }.padding(.bottom, 35)
+                        }
+                        
+                        Button {
+                            handleAction()
+                        } label:
+                        {
+                            HStack {
+                                
+                                Text("Login")
+                                    .foregroundColor(.black) // Black text to match the design
+                                    .font(.system(size: 16, weight: .bold)) // Keep a bold font
+                                    .padding(.vertical, 18) // Adjust vertical padding for button height
+                                    .frame(width: 130) // Set a fixed width for a square-like button
+                                    .background(Color.white) // White background to match the design
+                                    .cornerRadius(16) // Adjust corner radius for square-like shape
+                                    .shadow(color: .gray, radius: 5, x: 0, y: 2) // Optional shadow fo
+                                
+                            }.frame(maxWidth: .infinity) // Center the button within its container
+                                .padding(.horizontal, 20) //// Padding around the button for screen edges
+                            
+                        }
+                        
+                        if isLoginMode
+                        {
+                            HStack
+                            {
+                                Text("Don't have an account? ")
+                                    .foregroundColor(.black)
+                                
+                                Text("Sign up")
+                                    .underline() // Underline the text
+                                    .foregroundColor(.black) // Change color to indicate it's a link
+                                    .onTapGesture {
+                                        navigateToSignUp = true // Set the variable to true when tapped
+                                    }
+                                
+                            }
+                            .padding(.top, 50)
+                        }
+                        
+                        Text(self.loginStatusMessage)
+                            .foregroundColor(.red)
+                    }
+                    .padding()
+                    
+                    
+                }
                 
-
+                .background(Color.customPurple)
+                .navigationViewStyle(StackNavigationViewStyle())
+                .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil)
+                {
+                    ImagePicker(image: $image)
+                }
+                .fullScreenCover(isPresented: $navigateToSignUp)
+                    {
+                    SignUpView(didCompleteSignUp:
+                        {
+                        // Handle successful sign up, then navigate to SuggestProfilePic
+                        didCompleteLoginProcess()
+                        navigateToSignUp = false
+                        print ("Calling did complete login process")
+                        })
+                    }
+                
             }
-        // Background color of the app
-//            .background(
-//                LinearGradient(gradient: Gradient(colors: [
-//                    Color(red: 0.4, green: 0.8, blue: 1.0),  // Light blue (sky-like)
-//                    Color(red: 0.6, green: 0.6, blue: 1.0),  // Soft purple
-//                    Color(red: 1.0, green: 0.8, blue: 0.6),  // Warm peach
-//                    Color(red: 0.6, green: 1.0, blue: 0.6)   // Mint green (refreshing and lively)
-//                ]), startPoint: .topLeading, endPoint: .bottomTrailing)
-//            )
-            .background(Color.customPurple)
-            .navigationViewStyle(StackNavigationViewStyle())
-            .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
-                ImagePicker(image: $image)
         }
     }
+    
     
     private func isValidEmailDomain(_ email: String) -> Bool {
         // Check if the email contains "@" and get the domain part
@@ -196,6 +212,7 @@ struct LoginView: View {
             self.loginStatusMessage = "You must select an avatar image."
             return
         }
+  
         
         FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, err in
             if let err = err {
@@ -206,6 +223,7 @@ struct LoginView: View {
             print("Successfully created user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
 //            self.persistImageToStorage()
+            
         }
     }
     

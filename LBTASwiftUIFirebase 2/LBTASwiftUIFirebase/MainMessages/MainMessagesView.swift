@@ -12,6 +12,8 @@ class MainMessagesViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var chatUser: ChatUser?
     @Published var isUserCurrentlyLoggedOut = false
+    @State private var showUserDetail = false
+    
 
     init() {
         checkUserLoggedOut()
@@ -22,13 +24,22 @@ class MainMessagesViewModel: ObservableObject {
         DispatchQueue.main.async {
             self.isUserCurrentlyLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
         }
+        print("Is user currently logged out: \(self.isUserCurrentlyLoggedOut)")
+        if !self.isUserCurrentlyLoggedOut{
+           //handleSignOut ()
+        }
     }
 
     func fetchCurrentUser() {
+        print ("Fetching current user")
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
             self.errorMessage = "Could not find Firebase UID"
+            print ("Could not find Firebase UID")
+            self.isUserCurrentlyLoggedOut = true
             return
         }
+        
+        print ("UID: \(uid)")
 
         FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
             if let error = error {
@@ -46,6 +57,7 @@ class MainMessagesViewModel: ObservableObject {
     }
 
     func handleSignOut() {
+        print ("Signing out user in handleSignOut")
         do {
             try FirebaseManager.shared.auth.signOut()
             isUserCurrentlyLoggedOut = true
@@ -107,6 +119,7 @@ struct MainMessagesView: View {
             }
             .overlay(newMessageButton, alignment: .bottom)
             .navigationBarHidden(true)
+            
         }
     }
 
