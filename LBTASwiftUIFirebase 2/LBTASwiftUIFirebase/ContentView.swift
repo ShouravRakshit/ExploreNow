@@ -8,17 +8,19 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject var appState: AppState
+//    @EnvironmentObject var appState: AppState
 
     var body: some View {
-        Group {
-            if appState.isLoggedIn {
-                MainMessagesView()
-                    .environmentObject(appState)
-            } else {
-                LoginView()
-                    .environmentObject(appState)
-            }
-        }
+//        Group {
+//            if appState.isLoggedIn {
+//                MainMessagesView()
+//                    .environmentObject(appState)
+//            } else {
+//                LoginView()
+//                    .environmentObject(appState)
+//            }
+//        }
+        MapControllerRepresentable()
+            .edgesIgnoringSafeArea(.all) // Optional: To make it full screen
     }
 }

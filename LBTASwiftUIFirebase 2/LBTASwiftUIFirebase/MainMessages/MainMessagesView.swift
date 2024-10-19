@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import MapKit
 
 class MainMessagesViewModel: ObservableObject {
     @Published var errorMessage = ""
@@ -160,6 +161,36 @@ struct MainMessagesView: View {
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(Color(.label))
             }
+            
+            
+//            Spacer()
+//            NavigationLink(destination: MapControllerWrapper()) {
+//                Text("Go to Map")
+//                    .font(.title2)
+//                    .foregroundColor(.white)
+//                    .padding()
+//                    .background(Color.blue)
+//                    .cornerRadius(10)
+//            }
+            
+            Button(action: {
+                // Present MapController when the button is tapped
+                let mapController = MapController()
+                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+                    let window = windowScene.windows.first
+                    window?.rootViewController?.present(mapController, animated: true, completion: nil)
+                }
+            }) {
+                Text("Go to Map")
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .padding()
+                    .background(Color.blue)
+                    .cornerRadius(10)
+            }
+
+
+
         }
         .padding()
         .actionSheet(isPresented: $shouldShowLogOutOptions) {
@@ -197,6 +228,8 @@ struct MainMessagesView: View {
             )
         }
     }
+    
+
 
     private func showDeleteAccountConfirmation() {
         let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
