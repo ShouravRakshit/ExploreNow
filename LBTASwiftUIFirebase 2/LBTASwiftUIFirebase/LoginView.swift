@@ -151,7 +151,7 @@ struct LoginView: View {
                 
                 .fullScreenCover(isPresented: $showSignUpView){
                     SignUpView()
-                            .environmentObject(appState) // Pass appState to SignUpView
+                            .environmentObject(appState) // Pass appState to Sign Up link
                         
                     }
                 
@@ -184,7 +184,7 @@ struct LoginView: View {
             }
             print("Successfully logged in as user: \(result?.user.uid ?? "")")
             self.loginStatusMessage = "Successfully logged in as user: \(result?.user.uid ?? "")"
-            // Update authentication state
+            // Updating authentication state
                     DispatchQueue.main.async {
                         self.appState.isLoggedIn = true
                     }

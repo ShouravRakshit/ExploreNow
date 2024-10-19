@@ -96,6 +96,7 @@ struct SuggestProfilePicView: View
                 .underline() // Underline the text
                 .onTapGesture {
                     self.appState.isLoggedIn = true
+                    // Navigate to the main messages view since you are skipping the profile picture
                 }
             Spacer() // Pushes content to the top
             }

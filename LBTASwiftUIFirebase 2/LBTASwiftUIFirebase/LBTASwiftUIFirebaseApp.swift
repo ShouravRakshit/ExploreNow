@@ -56,7 +56,7 @@ struct LBTASwiftUIFirebaseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appState) // Inject AppState into the environment
+                .environmentObject(appState) // Makes appState available to all child views.
         }
     }
 }
