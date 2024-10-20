@@ -95,6 +95,7 @@ struct MainMessagesView: View {
     @State private var shouldNavigateToChatLogView = false
     @State private var shouldShowChangePasswordConfirmation = false
     @State private var shouldShowNewMessageScreen = false
+
     @EnvironmentObject var appState: AppState
 
     @ObservedObject private var vm = MainMessagesViewModel()
@@ -128,14 +129,17 @@ struct MainMessagesView: View {
 
     private var customNavBar: some View {
         HStack(spacing: 16) {
-            WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
-                .resizable()
-                .scaledToFill()
-                .frame(width: 50, height: 50)
-                .clipped()
-                .cornerRadius(44)
-                .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
-                .shadow(radius: 5)
+            // wrapping the Profile Image in NavigationLink
+            NavigationLink(destination: ProfileView()) {
+                    WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 50, height: 50)
+                        .clipped()
+                        .cornerRadius(44)
+                        .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+                        .shadow(radius: 5)
+                }
 
             VStack(alignment: .leading, spacing: 4) {
                 let email = vm.chatUser?.email.replacingOccurrences(of: "@gmail.com", with: "") ?? ""
