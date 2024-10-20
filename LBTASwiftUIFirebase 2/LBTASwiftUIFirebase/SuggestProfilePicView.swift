@@ -13,22 +13,16 @@ import FirebaseFirestore
 struct SuggestProfilePicView: View
     {
     @State var image: UIImage?
-//    @State var navigateToMainMessages = false
-//    @State private var user: User? // State variable to hold the retrieved user
+
     @State var statusMessage = ""
     @State var shouldShowImagePicker = false
-//    @State private var navigateToProfilePic = false
     @EnvironmentObject var appState: AppState
-
-//    @Environment(\.presentationMode) var presentationMode
-    
     var username: String // Accept username as a parameter
-//    let didCompleteProfilePicSelection: () -> Void
     
     var body: some View{
         VStack
             {
-            Text("Welcome, \(username)") // Use the username in the view
+            Text("Welcome, \(username)") // Use the name in the view
                 .padding(.top, 50)
                 .font(.custom("Sansation-Regular", size: 35)) // Use Sansation font
                 .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF

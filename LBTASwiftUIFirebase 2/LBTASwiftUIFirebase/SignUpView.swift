@@ -303,7 +303,6 @@ struct SignUpView: View
                   }
                 
             }
-            
         }
 }
         

@@ -129,23 +129,26 @@ struct MainMessagesView: View {
 
     private var customNavBar: some View {
         HStack(spacing: 16) {
-            // wrapping the Profile Image in NavigationLink
-            NavigationLink(destination: ProfileView()) {
-                    WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 50, height: 50)
-                        .clipped()
-                        .cornerRadius(44)
-                        .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
-                        .shadow(radius: 5)
-                }
+           
+            NavigationLink(destination: ProfileView(profileImageUrl: vm.chatUser?.profileImageUrl
+                                                   , name: vm.chatUser?.name ?? "")) {
+                WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 50, height: 50)
+                    .clipped()
+                    .cornerRadius(44)
+                    .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+                    .shadow(radius: 5)
+            }
 
             VStack(alignment: .leading, spacing: 4) {
-                let email = vm.chatUser?.email.replacingOccurrences(of: "@gmail.com", with: "") ?? ""
-                Text(email)
+                let name = vm.chatUser?.name ?? ""
+                Text(name)
                     .font(.system(size: 24, weight: .bold))
-
+                    .onAppear {
+                                print("Name fetched from Firestore is \(name)")
+                            }
                 HStack {
                     Circle()
                         .foregroundColor(.green)

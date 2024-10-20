@@ -10,6 +10,7 @@
 		2C132B7B2CC219C70087408A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7A2CC219C00087408A /* AppState.swift */; };
 		2C132B7D2CC22A770087408A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7C2CC22A700087408A /* ContentView.swift */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
+		2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */; };
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
 		81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E5B2CB31F12005BE180 /* LoginView.swift */; };
 		81447E5E2CB31F14005BE180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E5D2CB31F14005BE180 /* Assets.xcassets */; };
@@ -37,6 +38,7 @@
 		2C132B7A2CC219C00087408A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
 		81447E5B2CB31F12005BE180 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -144,6 +146,7 @@
 		81447E802CB42349005BE180 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */,
 				81447E812CB42371005BE180 /* ChatUser.swift */,
 			);
 			path = Model;
@@ -260,6 +263,7 @@
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
+				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,
 				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				81447E6F2CB3306C005BE180 /* ImagePicker.swift in Sources */,
 				B01DE7132CC199A000C158DD /* MainMessagesView.swift in Sources */,

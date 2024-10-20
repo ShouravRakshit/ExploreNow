@@ -17,17 +17,12 @@ extension Color {
 
 struct LoginView: View {
     
-//    let didCompleteLoginProcess: () -> ()
     @EnvironmentObject var appState: AppState
     @State private var isLoginMode = false
     @State private var email = ""
     @State private var password = ""
     @State private var isPasswordVisible = false // State for toggling password visibility
-//    @State var shouldShowImagePicker = false
-//    @State var image: UIImage?
     @State var loginStatusMessage = ""
-//    @State private var navigateToSignUp = false
-//    @State private var showSignUpView = false
     @State private var showSignUpView = false
 
     // Popular email domains
@@ -190,71 +185,6 @@ struct LoginView: View {
                     }
         }
     }
-    
-//    private func createNewAccount() {
-//        if !isValidEmailDomain(email) {
-//            loginStatusMessage = "Please enter a valid email from popular domains."
-//            return
-//        }
-//        
-//        if !isValidPassword(password) {
-//            loginStatusMessage = "Password must be at least 6 characters, including a number and a special character."
-//            return
-//        }
-//        
-//        if self.image == nil {
-//            self.loginStatusMessage = "You must select an avatar image."
-//            return
-//        }
-//  
-//        
-//        FirebaseManager.shared.auth.createUser(withEmail: email, password: password) { result, err in
-//            if let err = err {
-//                print("Failed to create user: ", err)
-//                self.loginStatusMessage = "Failed to create user: \(err.localizedDescription)"
-//                return
-//            }
-//            print("Successfully created user: \(result?.user.uid ?? "")")
-//            self.loginStatusMessage = "Successfully created user: \(result?.user.uid ?? "")"
-//            self.persistImageToStorage()
-            
-//        }
-//    }
-//    
-//    private func persistImageToStorage() {
-//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-//        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
-//        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
-//        ref.putData(imageData, metadata: nil) { metadata, err in
-//            if let err = err {
-//                self.loginStatusMessage = "Failed to push image to Storage: \(err.localizedDescription)"
-//                return
-//            }
-//            ref.downloadURL { url, err in
-//                if let err = err {
-//                    self.loginStatusMessage = "Failed to retrieve downloadURL: \(err.localizedDescription)"
-//                    return
-//                }
-//                guard let url = url else { return }
-//                self.storeUserInformation(imageProfileUrl: url)
-//            }
-//        }
-//    }
-    
-//    private func storeUserInformation(imageProfileUrl: URL) {
-//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-//        let userData = ["email": self.email, "uid": uid, "profileImageUrl": imageProfileUrl.absoluteString]
-//        FirebaseManager.shared.firestore.collection("users")
-//            .document(uid).setData(userData) { err in
-//                if let err = err {
-//                    print(err)
-//                    self.loginStatusMessage = "\(err.localizedDescription)"
-//                    return
-//                }
-//                print("User information successfully stored.")
-//                self.didCompleteLoginProcess()
-//            }
-//    }
     
     private func isValidPassword(_ password: String) -> Bool {
         // Check for at least 6 characters, at least one number, and at least one special character
