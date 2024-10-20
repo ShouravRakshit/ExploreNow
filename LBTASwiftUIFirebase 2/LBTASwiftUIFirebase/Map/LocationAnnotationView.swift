@@ -14,22 +14,34 @@ The annotation view that represents the event.
 */
 import MapKit
 
-private let eventClusterID = "eventCluster"
+private let locationClusterID = "locationCluster"
 
 /// - Tag: EventAnnotationView
-class EventAnnotationView: MKMarkerAnnotationView {
+class LocationAnnotationView: MKMarkerAnnotationView {
 
-    static let ReuseID = "eventAnnotation"
+    static let ReuseID = "locationAnnotation"
 
     /// - Tag: ClusterIdentifier
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
-        clusteringIdentifier = eventClusterID
+        clusteringIdentifier = locationClusterID
     }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+//    private func configure() {
+//        canShowCallout = true
+//        
+//        image = UIImage(named: "location_annotation") ?? UIImage(systemName: "mappin.circle.fill")
+//        
+//        frame.size = CGSize(width: 40, height: 40)
+//        centerOffset = CGPoint(x: 0, y: -20)
+//        
+//        let button = UIButton(type: .detailDisclosure)
+//        rightCalloutAccessoryView = button
+//    }
 
     override func prepareForDisplay() {
         super.prepareForDisplay()

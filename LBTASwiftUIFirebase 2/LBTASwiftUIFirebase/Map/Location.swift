@@ -1,30 +1,7 @@
-//
-//  EventLocation.swift
-//  LBTASwiftUIFirebase
-//
-//  Created by Saadman Rahman on 2024-10-18.
-//
-
-
-//import SwiftUI
-//import MapKit
-//
-//struct EventLocation: Identifiable {
-////    let id = UUID()
-//    let coordinate: CLLocationCoordinate2D
-//}
-//
-//class EventAnnotation: NSObject, MKAnnotation {
-//    let coordinate: CLLocationCoordinate2D
-//    
-//    init(coordinate: CLLocationCoordinate2D) {
-//        self.coordinate = coordinate
-//    }
-//}
 
 import MapKit
 
-class Event: NSObject, Decodable, MKAnnotation {
+class Location: NSObject, Decodable, MKAnnotation {
     
     private var latitude: CLLocationDegrees = 0
     private var longitude: CLLocationDegrees = 0

@@ -32,8 +32,8 @@ class ClusterAnnotationView: MKAnnotationView {
         super.prepareForDisplay()
         
         if let cluster = annotation as? MKClusterAnnotation {
-            let totalEvents = cluster.memberAnnotations.count
-            image = drawCluster(count: totalEvents)
+            let totalLocations = cluster.memberAnnotations.count
+            image = drawCluster(count: totalLocations)
             displayPriority = .defaultHigh
         }
     }
