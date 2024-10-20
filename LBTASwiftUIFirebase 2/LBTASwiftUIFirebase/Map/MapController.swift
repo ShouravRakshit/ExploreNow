@@ -48,35 +48,44 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }
 
     private func setupUI() {
-        view.addSubview(containerView)
-        containerView.addSubview(searchBar)
-        containerView.addSubview(mapView)
+        view.addSubview(mapView) // Add only the map view to fill the entire screen
 
+        // Set the delegate and search bar properties
         searchBar.delegate = mapSearchController
         searchBar.placeholder = "Search for places"
 
-        // Use Auto Layout to position containerView
-        containerView.translatesAutoresizingMaskIntoConstraints = false
+        // Customize the search bar
+        searchBar.backgroundImage = UIImage() // Remove the default background
+        searchBar.layer.cornerRadius = 20 // Rounded edges
+        searchBar.clipsToBounds = true // Ensure the rounded corners are applied
+        searchBar.backgroundColor = UIColor.clear // Make background transparent
+
+        // Adjust the text field appearance
+        if let textField = searchBar.value(forKey: "searchField") as? UITextField {
+            textField.layer.cornerRadius = 20 // Rounded edges
+            textField.clipsToBounds = true // Ensure the corners are applied
+            textField.backgroundColor = UIColor.white.withAlphaComponent(0.8) // Optional: semi-transparent
+            textField.borderStyle = .roundedRect // Add rounded borders
+            textField.textColor = .black // Set text color
+        }
+
+        // Use Auto Layout to position the search bar
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(searchBar) // Add search bar on top of the map view
+
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16), // Add some padding
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
         ])
 
-        // Use Auto Layout to position searchBar and mapView within containerView
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        // Use Auto Layout for the map view to fill the entire screen
         mapView.translatesAutoresizingMaskIntoConstraints = false
-
         NSLayoutConstraint.activate([
-            searchBar.topAnchor.constraint(equalTo: containerView.topAnchor),
-            searchBar.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            searchBar.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-
-            mapView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
-            mapView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            mapView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            mapView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+            mapView.topAnchor.constraint(equalTo: view.topAnchor),
+            mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
 
