@@ -31,18 +31,6 @@ class LocationAnnotationView: MKMarkerAnnotationView {
         fatalError("init(coder:) has not been implemented")
     }
     
-//    private func configure() {
-//        canShowCallout = true
-//        
-//        image = UIImage(named: "location_annotation") ?? UIImage(systemName: "mappin.circle.fill")
-//        
-//        frame.size = CGSize(width: 40, height: 40)
-//        centerOffset = CGPoint(x: 0, y: -20)
-//        
-//        let button = UIButton(type: .detailDisclosure)
-//        rightCalloutAccessoryView = button
-//    }
-
     override func prepareForDisplay() {
         super.prepareForDisplay()
         displayPriority = .defaultHigh
