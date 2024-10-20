@@ -17,12 +17,12 @@ struct SuggestProfilePicView: View
     @State var statusMessage = ""
     @State var shouldShowImagePicker = false
     @EnvironmentObject var appState: AppState
-    var username: String // Accept username as a parameter
+    var name: String // Accept name as a parameter
     
     var body: some View{
         VStack
             {
-            Text("Welcome, \(username)") // Use the name in the view
+            Text("Welcome, \(name)") // Use the name in the view
                 .padding(.top, 50)
                 .font(.custom("Sansation-Regular", size: 35)) // Use Sansation font
                 .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF

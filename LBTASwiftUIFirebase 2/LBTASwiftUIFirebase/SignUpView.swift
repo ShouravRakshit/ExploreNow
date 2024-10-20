@@ -117,6 +117,7 @@ struct SignUpView: View
                     )
                     .frame(width: 335) // Set a fixed width for the TextField
                     .padding(.top, 20) // Space above the text field
+                    .autocapitalization(.none) // Prevent first letter from being capitalized
                 
                 
                 ZStack(alignment: .trailing) {
@@ -298,7 +299,7 @@ struct SignUpView: View
                 
                 Spacer() // Pushes content to the top
                 .fullScreenCover(isPresented: $navigateToProfilePic) {
-                    SuggestProfilePicView(username: username)
+                    SuggestProfilePicView(name: name)
                             .environmentObject(appState)
                   }
                 
