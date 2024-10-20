@@ -20,7 +20,17 @@ struct ContentView: View {
 //                    .environmentObject(appState)
 //            }
 //        }
-        MapControllerRepresentable()
-            .edgesIgnoringSafeArea(.all) // Optional: To make it full screen
+        MapViewControllerWrapper()
+            .edgesIgnoringSafeArea(.all)
+    }
+}
+
+struct MapViewControllerWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> MapController {
+        return MapController() // Initialize the view controller
+    }
+
+    func updateUIViewController(_ uiViewController: MapController, context: Context) {
+        // No update needed in this example
     }
 }

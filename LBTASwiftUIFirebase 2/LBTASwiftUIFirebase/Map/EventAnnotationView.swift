@@ -35,6 +35,10 @@ class EventAnnotationView: MKMarkerAnnotationView {
         super.prepareForDisplay()
         displayPriority = .defaultHigh
         markerTintColor = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 0.81)
-        glyphImage = #imageLiteral(resourceName: "event") // Use a generic event image
+        if let eventImage = UIImage(named: "event") {
+            glyphImage = eventImage
+        } else {
+            print("Warning: 'event' image not found.")
+        }
     }
 }

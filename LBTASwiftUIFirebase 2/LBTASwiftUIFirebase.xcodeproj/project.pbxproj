@@ -7,11 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		10E35B2F2CC3AA8800F6F7DD /* ClusterAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B292CC3AA8800F6F7DD /* ClusterAnnotationView.swift */; };
+		10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */; };
 		10E35B302CC3AA8800F6F7DD /* Event.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2A2CC3AA8800F6F7DD /* Event.swift */; };
 		10E35B312CC3AA8800F6F7DD /* EventAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2B2CC3AA8800F6F7DD /* EventAnnotationView.swift */; };
 		10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2C2CC3AA8800F6F7DD /* MapController.swift */; };
-		10E35B352CC3ADD700F6F7DD /* MapControllerRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B342CC3ADD700F6F7DD /* MapControllerRepresentable.swift */; };
 		2C132B7B2CC219C70087408A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7A2CC219C00087408A /* AppState.swift */; };
 		2C132B7D2CC22A770087408A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7C2CC22A700087408A /* ContentView.swift */; };
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
@@ -38,11 +37,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		10E35B292CC3AA8800F6F7DD /* ClusterAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterAnnotationView.swift; sourceTree = "<group>"; };
+		10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterAnnotationView.swift; sourceTree = "<group>"; };
 		10E35B2A2CC3AA8800F6F7DD /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
 		10E35B2B2CC3AA8800F6F7DD /* EventAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventAnnotationView.swift; sourceTree = "<group>"; };
 		10E35B2C2CC3AA8800F6F7DD /* MapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
-		10E35B342CC3ADD700F6F7DD /* MapControllerRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapControllerRepresentable.swift; sourceTree = "<group>"; };
 		2C132B7A2CC219C00087408A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -84,8 +82,7 @@
 		10E35B2E2CC3AA8800F6F7DD /* Map */ = {
 			isa = PBXGroup;
 			children = (
-				10E35B342CC3ADD700F6F7DD /* MapControllerRepresentable.swift */,
-				10E35B292CC3AA8800F6F7DD /* ClusterAnnotationView.swift */,
+				10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */,
 				10E35B2A2CC3AA8800F6F7DD /* Event.swift */,
 				10E35B2B2CC3AA8800F6F7DD /* EventAnnotationView.swift */,
 				10E35B2C2CC3AA8800F6F7DD /* MapController.swift */,
@@ -272,13 +269,12 @@
 				81447E8A2CB46497005BE180 /* ChatLogView.swift in Sources */,
 				81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */,
 				81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */,
+				10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
 				81447EA82CB4BCD0005BE180 /* HelloWorldView.swift in Sources */,
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
-				10E35B352CC3ADD700F6F7DD /* MapControllerRepresentable.swift in Sources */,
-				10E35B2F2CC3AA8800F6F7DD /* ClusterAnnotationView.swift in Sources */,
 				10E35B302CC3AA8800F6F7DD /* Event.swift in Sources */,
 				10E35B312CC3AA8800F6F7DD /* EventAnnotationView.swift in Sources */,
 				10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */,

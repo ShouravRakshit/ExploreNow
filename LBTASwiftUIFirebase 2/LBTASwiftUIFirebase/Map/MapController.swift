@@ -11,7 +11,9 @@ import UIKit
 
 class MapController: UIViewController {
 
-    @IBOutlet private weak var mapView: MKMapView!
+//    @IBOutlet private weak var mapView: MKMapView!
+    private let mapView = MKMapView() // Initialize map view programmatically
+
     private var userTrackingButton: MKUserTrackingButton!
     private var scaleView: MKScaleView!
     
@@ -27,30 +29,9 @@ class MapController: UIViewController {
         CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522)     // Paris
     ]
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        setupCompassButton()
-//        setupUserTrackingButtonAndScaleView()
-//        registerAnnotationViewClasses()
-//        
-//        locationManager.delegate = self
-//        locationManager.requestWhenInUseAuthorization()
-//        locationManager.startUpdatingLocation()
-//
-//        loadEventAnnotations()
-//    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupMapView()
-        setupConstraints()
-    }
-
-    private func setupMapView() {
-//        mapView = MKMapView()
-//        view.addSubview(mapView)
-
+        setupMapView()     // Has been added for after removing IBOutlet
         setupCompassButton()
         setupUserTrackingButtonAndScaleView()
         registerAnnotationViewClasses()
@@ -62,15 +43,24 @@ class MapController: UIViewController {
         loadEventAnnotations()
     }
     
-    private func setupConstraints() {
+    private func setupMapView() {
+        view.addSubview(mapView) // Add map view to the main view
+
+        // Configure the map view's appearance and behavior
+        mapView.delegate = self
+        mapView.showsUserLocation = true
+
+        // Use Auto Layout constraints to position the map view
         mapView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             mapView.topAnchor.constraint(equalTo: view.topAnchor),
+            mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
     }
+
+    
 
 
     
@@ -122,25 +112,6 @@ class MapController: UIViewController {
 extension MapController: MKMapViewDelegate {
     
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        //        if let cluster = annotation as? MKClusterAnnotation {
-        //            print("Cluster annotation detected")
-        //
-        //            let identifier = MKMapViewDefaultClusterAnnotationViewReuseIdentifier
-        //            var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? ClusterAnnotationView
-        //            if view == nil {
-        //                view = ClusterAnnotationView(annotation: cluster, reuseIdentifier: identifier)
-        //            }
-        //            return view
-        //        } else if annotation is EventAnnotation {
-        //            let identifier = "event"
-        //            var view = mapView.dequeueReusableAnnotationView(withIdentifier: identifier) as? MKMarkerAnnotationView
-        //            if view == nil {
-        //                view = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: identifier)
-        //                view?.markerTintColor = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 0.81)
-        //            }
-        //            return view
-        //        }
-        //        return nil
         
         guard let annotation = annotation as? Event else { return nil }
         
