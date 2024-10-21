@@ -209,13 +209,13 @@ extension MapController: MapSearchControllerDelegate {
                             }
                             return false
                         }
-                        view.alpha = hasVisibleMembers ? 1.0 : 0.2
+//                        view.alpha = hasVisibleMembers ? 1.0 : 0.2
                         view.isEnabled = hasVisibleMembers
                     }
                 } else if let location = annotation as? Location {
                     // Handle regular location annotations
                     let isInRegion = annotationsInRegion.contains(location)
-                    view.alpha = isInRegion ? 1.0 : 0.2
+//                    view.alpha = isInRegion ? 1.0 : 0.2
                     view.isEnabled = isInRegion
                 }
             }
