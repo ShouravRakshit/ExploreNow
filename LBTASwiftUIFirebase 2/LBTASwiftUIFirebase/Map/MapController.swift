@@ -52,17 +52,13 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }()
     
     func resetAnnotationViews() {
-        for annotation in mapView.annotations {
-            if let view = mapView.view(for: annotation) {
-                // Skip user location annotation
-                if annotation is MKUserLocation {
-                    continue
-                }
-                
-                view.alpha = 1.0
-                view.isEnabled = true
-            }
-        }
+        
+        // Remove all annotations except user location
+        mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
+        
+        // Re-add all original annotations to restore clustering
+//        mapView.addAnnotations(allAnnotations)
+        loadLocationAnnotations()
     }
 
 
@@ -91,6 +87,9 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
 
     private func setupUI() {
         view.addSubview(mapView) // Add only the map view to fill the entire screen
+        mapView.delegate = self
+        mapView.showsUserLocation = true
+        
         
         dimmingView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(dimmingView)
@@ -179,13 +178,6 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
     }
         
-    // Add this to your searchBar delegate methods or create a new method
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        resetAnnotationViews()
-        searchBar.text = ""
-        searchBar.resignFirstResponder()
-    }
-
 
 }
 
@@ -200,15 +192,6 @@ extension MapController: MapSearchControllerDelegate {
             return region.contains(coordinate: annotation.coordinate)
         }
         
-        // Instead of removing all annotations and adding new ones,
-        // update visibility using annotation alpha
-//        for annotation in allAnnotations {
-//            if let view = mapView.view(for: annotation) {
-//                let isInRegion = annotationsInRegion.contains(annotation)
-//                view.alpha = isInRegion ? 1.0 : 0.2  // Make out-of-region annotations semi-transparent
-//                view.isEnabled = isInRegion  // Disable interaction for out-of-region annotations
-//            }
-//        }
         for annotation in mapView.annotations {
             if let view = mapView.view(for: annotation) {
                 // Skip user location annotation
@@ -314,13 +297,17 @@ extension MapController: UISearchBarDelegate {
         searchBar.showsCancelButton = false
         return true
     }
-}
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        // Let the search controller handle its UI cleanup
+        mapSearchController.searchBarCancelButtonClicked(searchBar)
+        
+        // Reset map view's annotations without modifying them
+        mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
+//        mapView.addAnnotations(allAnnotations)
+        loadLocationAnnotations()
+        
+        searchBar.resignFirstResponder()
+    }
 
-//extension MapController {
-//    override func viewDidLayoutSubviews() {
-//        super.viewDidLayoutSubviews()
-//        
-//        // Ensure search bar is always on top
-//        view.bringSubviewToFront(searchBar)
-//    }
-//}
+}
