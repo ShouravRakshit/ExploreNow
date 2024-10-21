@@ -24,9 +24,9 @@ struct ProfileView: View {
                     HStack {
                         Spacer()
                         NavigationLink(destination: SettingsPage(description: $description)) {
-                            Image(systemName: "gearshape")
+                            Image(systemName: "gearshape.fill")
                                 .font(.system(size: 30, weight: .bold))
-                                .foregroundColor(Color(red: 0.415, green: 0.105, blue: 0.605))
+                                .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
                         }
                     }
                     .padding(.horizontal)
@@ -84,7 +84,7 @@ struct ProfileView: View {
                                 PostCard(postId: post).padding(.top, 10)
                             }
                         }
-                        .padding()
+                        .padding(.horizontal, 2)
                     }
                 }
                 .navigationBarHidden(true)
@@ -111,7 +111,7 @@ struct PostCard: View {
             .padding([.top, .trailing])
             
             Rectangle()
-                .fill(Color.gray.opacity(0.2))
+                .fill(Color(red: 217/255, green: 217/255, blue: 217/255)) // Fill with #D9D9D9
                 .frame(height: 172)
                 .padding(.horizontal, 10)
                 .padding(.top, 6)
