@@ -13,78 +13,83 @@ struct ProfileView: View {
     @State private var description = "Travel Blogger DM for collabs" // Editable from Settings
     @State private var postCount = 600
     @State private var friendsCount = 1100
-    @State private var posts = Array(1...2) // Dummy posts array
+    @State private var posts = Array(1...5) // Dummy posts array
     var profileImageUrl: String? // getting the profile image URL
     var name: String // getting the name
 
     var body: some View {
-        NavigationView {
-            VStack(alignment: .leading) {
-                // Profile Info Section
-                HStack {
-                    WebImage(url: URL(string: profileImageUrl ?? ""))
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 80, height: 80)
-                        .clipped()
-                        .cornerRadius(40)
-                        .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color(.label), lineWidth: 1))
-                    
-                    Spacer()
-                    
-                    // Post and Friends Counts
-                    VStack {
-                        Text("\(postCount)")
-                            .font(.system(size: 20, weight: .bold))
-                        Text("Posts")
-                            .font(.system(size: 12))
-                    }
-                    
-                    Spacer()
-                    
-                    VStack {
-                        Text("\(friendsCount)")
-                            .font(.system(size: 20, weight: .bold))
-                        Text("Friends")
-                            .font(.system(size: 12))
-                    }
-                    
-                    Spacer()
-                    
-                    // Settings Icon
-                    NavigationLink(destination: SettingsPage(description: $description)) {
-                        Image(systemName: "gearshape")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(Color(red: 0.415, green: 0.105, blue: 0.605))
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top)
-                
-                // Username and Description
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(name)
-                        .font(.system(size: 24, weight: .bold))
-                    Text(description)
-                        .font(.system(size: 14))
-                        .foregroundColor(.gray)
-                }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                
-                // Posts Section
-                ScrollView {
-                    VStack {
-                        ForEach(posts, id: \.self) { post in
-                            PostCard(postId: post)
+            NavigationView {
+                VStack(alignment: .leading) {
+                    // Profile Info Section
+                    HStack {
+                        Spacer()
+                        NavigationLink(destination: SettingsPage(description: $description)) {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundColor(Color(red: 0.415, green: 0.105, blue: 0.605))
                         }
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top)
+
+                    // Profile Image and Counts Section
+                    HStack {
+                        WebImage(url: URL(string: profileImageUrl ?? ""))
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 80, height: 80)
+                            .clipped()
+                            .cornerRadius(40)
+                            .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
+
+                            .padding(.horizontal, 1)
+
+                        // Post Counts
+                        VStack {
+                            Text("\(postCount)")
+                                .font(.system(size: 20, weight: .bold))
+                            Text("Posts")
+                                .font(.system(size: 16))
+                        }.padding(.horizontal, 40)
+
+                        
+
+                        // Friends Counts
+                        VStack {
+                            Text("\(friendsCount)")
+                                .font(.system(size: 20, weight: .bold))
+                            Text("Friends")
+                                .font(.system(size: 16))
+                        }.padding(.horizontal, 10)
+
+                        Spacer()
+                    }
+                    .padding(.horizontal)
+
+                    // Username and Description
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(name)
+                            .font(.system(size: 24, weight: .bold))
+                        Text(description)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.black)
+                    }
+                    .padding(.horizontal, 21)
+                    .padding(.top, 8)
+
+                    // Posts Section
+                    ScrollView {
+                        VStack {
+                            ForEach(posts, id: \.self) { post in
+                                PostCard(postId: post).padding(.top, 10)
+                            }
+                        }
+                        .padding()
+                    }
                 }
+                .navigationBarHidden(true)
             }
-            .navigationBarHidden(true)
         }
-    }
 }
 
 // PostCard Component
@@ -93,7 +98,7 @@ struct PostCard: View {
     @State private var showingAlert = false
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             HStack {
                 Spacer()
                 Button(action: {
@@ -103,32 +108,38 @@ struct PostCard: View {
                         .foregroundColor(.gray)
                 }
             }
-            .padding()
+            .padding([.top, .trailing])
             
             Rectangle()
                 .fill(Color.gray.opacity(0.2))
-                .frame(height: 200)
-                .cornerRadius(10)
+                .frame(height: 172)
+                .padding(.horizontal, 10)
+                .padding(.top, 6)
             
             HStack {
                 Image(systemName: "mappin.and.ellipse")
                 Text("Location")
                 Spacer()
-                Image(systemName: "heart.fill")
-                Text("1.2k")
-                Spacer()
-                Image(systemName: "bubble.right")
-                Text("600")
+                    HStack(spacing: 10) {  // creating a separate HStack for the heart and comment with custom spacing
+                        Image(systemName: "heart.fill")
+                        Text("1.2k")
+                        Image(systemName: "bubble.right")
+                        Text("600")
+                    }
             }
             .font(.system(size: 14))
             .foregroundColor(.gray)
             .padding(.horizontal)
-            .padding(.bottom)
+            .padding(.bottom, 8)
+            .padding(.top, 5)
         }
         .background(Color.white)
         .cornerRadius(12)
         .shadow(radius: 5)
-        .padding(.vertical)
+        
+        // adding purple border
+        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
+        // giving the alert message before you delete the post.
         .alert(isPresented: $showingAlert) {
             Alert(
                 title: Text("Delete Post"),

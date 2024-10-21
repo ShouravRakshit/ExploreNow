@@ -8,8 +8,7 @@
 import SwiftUI
 import Firebase
 import FirebaseAuth
-//import FirebaseStorage
-//import FirebaseFirestore
+
 
 extension Color {
     static let customPurple = Color(red: 140/255, green: 82/255, blue: 255/255, opacity: 0.81)
