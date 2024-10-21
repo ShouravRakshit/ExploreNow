@@ -17,16 +17,18 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     private let locationManager = CLLocationManager()
     private var userTrackingButton: MKUserTrackingButton!
     private var scaleView: MKScaleView!
+    private let locationInfoScrollView = UIScrollView() // Add this
+    private var locationInfoViews: [LocationInfoView] = [] // To hold instances
 
     // Hardcoded event locations
-    private let eventLocations = [
-        CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194), // San Francisco
-        CLLocationCoordinate2D(latitude: 37.7755, longitude: -122.4200), // San Francisco
+    private let eventLocations:[(String, Double, CLLocationCoordinate2D)] = [
+        ("San Francisco", 2.9, CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)), // San Francisco
+        ("San Francisco", 3.1, CLLocationCoordinate2D(latitude: 37.7755, longitude: -122.4200)), // San Francisco
 
-        CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437), // Los Angeles
-        CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),  // New York
-        CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278),   // London
-        CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522)     // Paris
+        ("Los Angeles", 4.0, CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437)), // Los Angeles
+        ("New York", 3.5, CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),  // New York
+        ("London", 1.5, CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278)),   // London
+        ("Paris", 4.5, CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522))    // Paris
     ]
     
     private var allAnnotations: [Location] = [] // Add this to store all annotations
@@ -40,7 +42,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
 
 
     private func loadLocationAnnotations() {
-        let locationAnnotations = eventLocations.map { Location(coordinate: $0) }
+        let locationAnnotations = eventLocations.map { Location(name: $0, rating: $1, coordinate: $2) }
         allAnnotations = locationAnnotations
         mapView.addAnnotations(locationAnnotations)
     }
@@ -60,6 +62,11 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
 //        mapView.addAnnotations(allAnnotations)
         loadLocationAnnotations()
     }
+    
+    @objc private func mapTapped() {
+        locationInfoScrollView.isHidden = true // Hide the info scroll view when tapping on the map
+    }
+
 
 
     override func viewDidLoad() {
@@ -68,12 +75,17 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         setupCompassButton()
         setupUserTrackingButtonAndScaleView()
         registerAnnotationViewClasses()
+        setupLocationInfoScrollView()
 
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
 
         loadLocationAnnotations()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(mapTapped))
+        mapView.addGestureRecognizer(tapGesture) // Add tap gesture to the map view
+
     }
     
     override func viewDidLayoutSubviews() {
@@ -172,11 +184,111 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ])
     }
+    
+    private func setupLocationInfoScrollView() {
+        locationInfoScrollView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(locationInfoScrollView)
+
+        // Set constraints for the scroll view
+        NSLayoutConstraint.activate([
+            locationInfoScrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            locationInfoScrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            locationInfoScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            locationInfoScrollView.heightAnchor.constraint(equalToConstant: 100) // Adjust height as needed
+        ])
+
+        locationInfoScrollView.isHidden = true // Initially hidden
+    }
+
 
     private func registerAnnotationViewClasses() {
         mapView.register(LocationAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
     }
+    
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        if let cluster = view.annotation as? MKClusterAnnotation {
+            showClusterInfo(for: cluster)
+        } else if let locationAnnotation = view.annotation as? Location {
+            showLocationInfo(for: locationAnnotation)
+        }
+    }
+    
+    func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
+        locationInfoScrollView.isHidden = true // Hide the info view when deselecting
+    }
+    
+    private func showClusterInfo(for cluster: MKClusterAnnotation) {
+        // Remove any existing info views
+        for infoView in locationInfoViews {
+            infoView.removeFromSuperview()
+        }
+        locationInfoViews.removeAll()
+
+        // Create and configure a LocationInfoView for each member in the cluster
+        let clusterLocations = cluster.memberAnnotations.compactMap { $0 as? Location }
+        var previousInfoView: LocationInfoView?
+
+        for location in clusterLocations {
+            let infoView = LocationInfoView()
+            infoView.configure(with: location)
+            infoView.translatesAutoresizingMaskIntoConstraints = false
+            locationInfoScrollView.addSubview(infoView)
+            locationInfoViews.append(infoView)
+
+            // Set constraints for each info view
+            NSLayoutConstraint.activate([
+                infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
+                infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
+                infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 0.8) // Width for each info view
+            ])
+
+            // Position the info views horizontally
+            if let previous = previousInfoView {
+                infoView.leadingAnchor.constraint(equalTo: previous.trailingAnchor, constant: 16).isActive = true
+            } else {
+                infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor).isActive = true
+            }
+            
+            previousInfoView = infoView
+        }
+
+        // Set the trailing constraint for the last info view
+        if let lastInfoView = locationInfoViews.last {
+            lastInfoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor).isActive = true
+        }
+
+        locationInfoScrollView.contentSize = CGSize(width: (UIScreen.main.bounds.width - 32) * 0.8 * CGFloat(locationInfoViews.count) + CGFloat(16 * (locationInfoViews.count - 1)), height: 100) // Update content size
+        locationInfoScrollView.isHidden = false // Show the scroll view
+    }
+    
+    private func showLocationInfo(for location: Location) {
+        for infoView in locationInfoViews {
+            infoView.removeFromSuperview()
+        }
+        locationInfoViews.removeAll()
+        
+        let infoView = LocationInfoView()
+        infoView.configure(with: location)
+        locationInfoScrollView.addSubview(infoView)
+        locationInfoViews.append(infoView)
+        
+        infoView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Set constraints for single info view
+        NSLayoutConstraint.activate([
+            infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
+            infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
+            infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor),
+            infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor)
+        ])
+        
+        locationInfoScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 100)
+        locationInfoScrollView.isHidden = false // Show the scroll view
+    }
+
+
+
         
 
 }

@@ -5,6 +5,8 @@ class Location: NSObject, Decodable, MKAnnotation {
     
     private var latitude: CLLocationDegrees = 0
     private var longitude: CLLocationDegrees = 0
+    var name: String
+    var rating: Double
     
     // This property must be key-value observable, which the `@objc dynamic` attributes provide.
     @objc dynamic var coordinate: CLLocationCoordinate2D {
@@ -19,7 +21,10 @@ class Location: NSObject, Decodable, MKAnnotation {
         }
     }
     
-    init(coordinate: CLLocationCoordinate2D) {
+    init(name: String, rating: Double, coordinate: CLLocationCoordinate2D) {
+        self.name = name
+        self.rating = rating
+
         super.init()
         self.coordinate = coordinate
     }
