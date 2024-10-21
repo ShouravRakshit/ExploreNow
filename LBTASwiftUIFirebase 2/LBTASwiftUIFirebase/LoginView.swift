@@ -32,16 +32,16 @@ struct LoginView: View {
             VStack {
                 VStack      {
                     Spacer()
-                        .frame(height: 1) // Adjust this value to move the image higher or lower
+                        .frame(height: 1)
                     
                     Image("Explore")
-                        .resizable()
+//                        .frame(width:50, height: 50)
+//                        .resizable()
                         .scaledToFit()
-                        .frame(width: UIScreen.main.bounds.width * 0.75) // Adjusted to 60% of screen width
-                    
+                        .frame(width: UIScreen.main.bounds.width * 0.60) // Adjusted to 60% of screen width
                     Spacer()
                 }
-                .frame(height: UIScreen.main.bounds.height * 0.3) // Increased to 40% of screen height
+                .frame(height: UIScreen.main.bounds.height * 0.38) // Increased to 40% of screen height
                 .frame(maxWidth: .infinity)
                 .background(Color.white)
                 ScrollView {
@@ -54,7 +54,7 @@ struct LoginView: View {
                                 .background(Color.white)
                                 .frame(width: 350)
                                 .frame(height: 50)
-                                .cornerRadius(35)
+                                .cornerRadius(20)
                                 .onChange(of: email) { newValue in
                                     if !isValidEmailDomain(newValue) {
                                         loginStatusMessage = "Please enter a valid email from popular domains."
@@ -72,14 +72,14 @@ struct LoginView: View {
                                         .background(Color.white)
                                         .frame(width: 350)
                                         .frame(height: 50)
-                                        .cornerRadius(35)
+                                        .cornerRadius(20)
                                 } else {
                                     SecureField("Password", text: $password) // Use SecureField for hidden password
                                         .padding(12)
                                         .frame(width: 350)
                                         .frame(height: 50)
                                         .background(Color.white)
-                                        .cornerRadius(35)
+                                        .cornerRadius(20)
                                 }
                                 
                                 // Toggle Button
@@ -109,7 +109,7 @@ struct LoginView: View {
                                     .shadow(color: .gray, radius: 5, x: 0, y: 2) // Optional shadow fo
                                 
                             }.frame(maxWidth: .infinity) // Center the button within its container
-                                .padding(.horizontal, 20) //// Padding around the button for screen edges
+                                .padding(.horizontal, 20) // Padding around the button for screen edges
                             
                         }
                         
