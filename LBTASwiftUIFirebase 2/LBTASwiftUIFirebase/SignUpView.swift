@@ -14,6 +14,7 @@ import FirebaseFirestore
 struct SignUpView: View
 {
     @Environment(\.presentationMode) var presentationMode
+    
     // Example text field state
     @State private var name             = ""
     @State private var email            = ""
@@ -30,8 +31,9 @@ struct SignUpView: View
 //    @State private var navigateToLogin = false
     @State private var username_available = false
     @State private var username = ""
-    @State private var navigateToProfilePic = false
+    @State private var navigateToSuggestProfilePic = false
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var userManager: UserManager
 
 //    let didCompleteSignUp: () -> Void
     
@@ -298,9 +300,10 @@ struct SignUpView: View
                 
                 
                 Spacer() // Pushes content to the top
-                .fullScreenCover(isPresented: $navigateToProfilePic) {
-                    SuggestProfilePicView(name: name)
+                .fullScreenCover(isPresented: $navigateToSuggestProfilePic) {
+                    SuggestProfilePicView()
                             .environmentObject(appState)
+                            .environmentObject(userManager)
                   }
                 
             }
@@ -421,14 +424,20 @@ struct SignUpView: View
                             {
                             print("Successfully saved user data to Firestore")
                             // Navigation link to the HomeView, activated by the state variable
-                            DispatchQueue.main.async {
-                                                navigateToProfilePic = true
-                                            }
+                            // Initialize UserManager after successful signup
+                            DispatchQueue.main.async
+                                {
+                                // Now you can use userManager in your views or pass it to the environment
+                                userManager.fetchCurrentUser()
+                                // Navigate to the next view if needed
+                                navigateToSuggestProfilePic = true
+                                }
                             }
                         }
                         
                     }
             }
+    
         
         }
     

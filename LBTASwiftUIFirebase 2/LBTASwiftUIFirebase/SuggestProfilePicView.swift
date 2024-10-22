@@ -17,18 +17,28 @@ struct SuggestProfilePicView: View
     @State var statusMessage = ""
     @State var shouldShowImagePicker = false
     @EnvironmentObject var appState: AppState
-    var name: String // Accept name as a parameter
+    @EnvironmentObject var userManager: UserManager
+    
+    private var currentUser: User?
+        {
+        userManager.currentUser
+        }
+    
     
     var body: some View{
         VStack
             {
-            Text("Welcome, \(name)") // Use the name in the view
-                .padding(.top, 50)
-                .font(.custom("Sansation-Regular", size: 35)) // Use Sansation font
-                .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF
-            
-                .frame(maxWidth: .infinity) // Make it stretch to fill available width
-                .multilineTextAlignment(.center) // Center the text alignment
+            if let user = currentUser
+                {
+                Text("Welcome, \(user.name)")
+                    .padding(.top, 50)
+                    .font(.custom("Sansation-Regular", size: 35)) // Use Sansation font
+                    .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF
+                
+                    .frame(maxWidth: .infinity) // Make it stretch to fill available width
+                    .multilineTextAlignment(.center) // Center the text alignment
+                }
+
             
             ZStack
                 {
@@ -90,14 +100,15 @@ struct SuggestProfilePicView: View
                 .underline() // Underline the text
                 .onTapGesture {
                     self.appState.isLoggedIn = true
-                    // Navigate to the main messages view since you are skipping the profile picture
+                    // Navigate to the Home view since you are skipping the profile picture
                 }
             Spacer() // Pushes content to the top
             }
             
-            .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil) {
+            .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil)
+                {
                 ImagePicker(image: $image)
-            }
+                }
 
         }
     
@@ -139,6 +150,7 @@ struct SuggestProfilePicView: View
                 // Update authentication state
                             DispatchQueue.main.async {
                                 self.appState.isLoggedIn = true
+                                //Sends back to Home view page
                             }
             }
         }

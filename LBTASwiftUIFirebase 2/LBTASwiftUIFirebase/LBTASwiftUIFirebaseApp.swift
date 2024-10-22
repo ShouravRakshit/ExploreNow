@@ -13,6 +13,7 @@ import FirebaseCore
 struct LBTASwiftUIFirebaseApp: App {
     
     @StateObject var appState = AppState() // Initialize AppState
+    @StateObject private var userManager = UserManager()
     
     init() {
         FirebaseApp.configure() // Configuring Firebase here
@@ -21,7 +22,10 @@ struct LBTASwiftUIFirebaseApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(appState) // Makes appState available to all child views.
+                .environmentObject (appState) // Makes appState available to all child views.
+                .environmentObject (userManager)
         }
     }
+    
+    
 }

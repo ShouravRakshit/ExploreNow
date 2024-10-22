@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 
 
 struct ProfileView: View {
+    @EnvironmentObject var userManager: UserManager
     @State private var description = "Travel Blogger DM for collabs" // Editable from Settings
     @State private var postCount = 600
     @State private var friendsCount = 1100
@@ -18,76 +19,78 @@ struct ProfileView: View {
     var name: String // getting the name
 
     var body: some View {
+
             NavigationView {
-                VStack(alignment: .leading) {
-                    // Profile Info Section
-                    HStack {
-                        Spacer()
-                        NavigationLink(destination: SettingsPage(description: $description)) {
-                            Image(systemName: "gearshape.fill")
-                                .font(.system(size: 30, weight: .bold))
-                                .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
-                        }
-                    }
-                    .padding(.horizontal)
-                    .padding(.top)
-
-                    // Profile Image and Counts Section
-                    HStack {
-                        WebImage(url: URL(string: profileImageUrl ?? ""))
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 80, height: 80)
-                            .clipped()
-                            .cornerRadius(40)
-                            .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
-
-                            .padding(.horizontal, 1)
-
-                        // Post Counts
-                        VStack {
-                            Text("\(postCount)")
-                                .font(.system(size: 20, weight: .bold))
-                            Text("Posts")
-                                .font(.system(size: 16))
-                        }.padding(.horizontal, 40)
-
-                        
-
-                        // Friends Counts
-                        VStack {
-                            Text("\(friendsCount)")
-                                .font(.system(size: 20, weight: .bold))
-                            Text("Friends")
-                                .font(.system(size: 16))
-                        }.padding(.horizontal, 10)
-
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-
-                    // Username and Description
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(name)
-                            .font(.system(size: 24, weight: .bold))
-                        Text(description)
-                            .font(.system(size: 14, weight: .medium))
-                            .foregroundColor(.black)
-                    }
-                    .padding(.horizontal, 21)
-                    .padding(.top, 8)
-
-                    // Posts Section
-                    ScrollView {
-                        VStack {
-                            ForEach(posts, id: \.self) { post in
-                                PostCard(postId: post).padding(.top, 10)
+                    VStack(alignment: .leading) {
+                        // Profile Info Section
+                        HStack {
+                            Spacer()
+                            NavigationLink(destination: SettingsPage(description: $description)) {
+                                Image(systemName: "gearshape.fill")
+                                    .font(.system(size: 30, weight: .bold))
+                                    .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
                             }
                         }
-                        .padding(.horizontal, 2)
+                        .padding(.horizontal)
+                        .padding(.top)
+                        
+                        // Profile Image and Counts Section
+                        HStack {
+                            WebImage(url: URL(string: profileImageUrl ?? ""))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 80, height: 80)
+                                .clipped()
+                                .cornerRadius(40)
+                                .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
+                            
+                                .padding(.horizontal, 1)
+                            
+                            // Post Counts
+                            VStack {
+                                Text("\(postCount)")
+                                    .font(.system(size: 20, weight: .bold))
+                                Text("Posts")
+                                    .font(.system(size: 16))
+                            }.padding(.horizontal, 40)
+                            
+                            
+                            
+                            // Friends Counts
+                            VStack {
+                                Text("\(friendsCount)")
+                                    .font(.system(size: 20, weight: .bold))
+                                Text("Friends")
+                                    .font(.system(size: 16))
+                            }.padding(.horizontal, 10)
+                            
+                            Spacer()
+                        }
+                        .padding(.horizontal)
+                        
+                        // Username and Description
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(name)
+                                .font(.system(size: 24, weight: .bold))
+                            Text(description)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.black)
+                        }
+                        .padding(.horizontal, 21)
+                        .padding(.top, 8)
+                        
+                        // Posts Section
+                        ScrollView {
+                            VStack {
+                                ForEach(posts, id: \.self) { post in
+                                    PostCard(postId: post).padding(.top, 10)
+                                }
+                            }
+                            .padding(.horizontal, 2)
+                        }
                     }
-                }
-                .navigationBarHidden(true)
+                    .navigationBarHidden(true)
+                
             }
         }
 }

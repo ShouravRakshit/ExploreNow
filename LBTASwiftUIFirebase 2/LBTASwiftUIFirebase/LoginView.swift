@@ -17,6 +17,7 @@ extension Color {
 struct LoginView: View {
     
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var userManager: UserManager
     @State private var isLoginMode = false
     @State private var email = ""
     @State private var password = ""
@@ -146,7 +147,7 @@ struct LoginView: View {
                 .fullScreenCover(isPresented: $showSignUpView){
                     SignUpView()
                             .environmentObject(appState) // Pass appState to Sign Up link
-                        
+                            .environmentObject(userManager)
                     }
                 
             }

@@ -9,16 +9,23 @@ import SwiftUI
 
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
+    @EnvironmentObject var userManager: UserManager
 
     var body: some View {
         Group {
-            if appState.isLoggedIn {
-                MainMessagesView()
-                    .environmentObject(appState)
-            } else {
+            if appState.isLoggedIn
+                {
+                //MainMessagesView()
+                //    .environmentObject(appState)
+                NavBar ()
+                    .environmentObject (userManager)
+                }
+            else
+                {
                 LoginView()
-                    .environmentObject(appState)
-            }
+                    .environmentObject (appState)
+                    .environmentObject (userManager)
+                }
         }
     }
 }

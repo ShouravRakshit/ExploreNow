@@ -32,6 +32,10 @@
 		B02392912CBDD511007CC920 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B02392902CBDD511007CC920 /* GoogleService-Info.plist */; };
 		B02A96A92CC0AB81008B6E8B /* Sansation-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */; };
 		B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */; };
+		B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983942CC70D6F00E1CBE3 /* NavBar.swift */; };
+		B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */; };
+		B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */; };
+		B0F9839D2CC71D5B00E1CBE3 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -58,6 +62,10 @@
 		B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Sansation-Regular.ttf"; sourceTree = "<group>"; };
 		B02A96AA2CC0AC21008B6E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		B0F983942CC70D6F00E1CBE3 /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
+		B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
+		B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewTest.swift; sourceTree = "<group>"; };
+		B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +102,10 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
+				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
+				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
+				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
 				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
@@ -250,6 +262,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */,
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
 				81447EAC2CBC87E0005BE180 /* SearchUserView.swift in Sources */,
 				81447E8A2CB46497005BE180 /* ChatLogView.swift in Sources */,
@@ -258,9 +271,12 @@
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
 				81447EA82CB4BCD0005BE180 /* HelloWorldView.swift in Sources */,
+				B0F9839D2CC71D5B00E1CBE3 /* UserManager.swift in Sources */,
+				B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */,
 				2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */,
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
+				B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */,
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,
