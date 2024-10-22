@@ -46,6 +46,8 @@ struct ProfileView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
                             
                                 .padding(.horizontal, 1)
+                                .shadow(radius: 5)
+
                             
                             // Post Counts
                             VStack {

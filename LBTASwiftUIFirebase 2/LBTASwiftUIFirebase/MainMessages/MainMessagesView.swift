@@ -94,7 +94,7 @@ struct MainMessagesView: View {
     @State private var shouldShowLogOutOptions = false
     @State private var shouldNavigateToChatLogView = false
     @State private var shouldShowChangePasswordConfirmation = false
-    @State private var shouldShowNewMessageScreen = false
+//    @State private var shouldShowNewMessageScreen = false
 
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var userManager: UserManager
@@ -105,16 +105,20 @@ struct MainMessagesView: View {
         NavigationView {
             VStack {
                 customNavBar
-                messagesView
-
+                // Integrated SearchUserView
+                SearchUserView { user in
+                    self.selectedChatUser = user
+                    self.shouldNavigateToChatLogView = true
+                                }
+                .padding(.top, 1)
+                Spacer()
                 NavigationLink(destination: ChatLogView(chatUser: selectedChatUser), isActive: $shouldNavigateToChatLogView) {
                     EmptyView()
                 }
-            Spacer ()
             }
-            .overlay(newMessageButton, alignment: .bottom)
             .navigationBarHidden(true)
-            
+            .background(Color(.systemGray6))
+
         }
     }
     
@@ -138,7 +142,7 @@ struct MainMessagesView: View {
                     .frame(width: 50, height: 50)
                     .clipped()
                     .cornerRadius(44)
-                    .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+                    .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
                     .shadow(radius: 5)
             }
 
@@ -228,64 +232,64 @@ struct MainMessagesView: View {
         }
     }
 
-    private var messagesView: some View {
-        ScrollView {
-            ForEach(0..<10, id: \.self) { num in
-                VStack {
-                    NavigationLink(destination: Text("Destination")) {
-                        HStack(spacing: 16) {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 32))
-                                .padding(8)
-                                .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+//    private var messagesView: some View {
+//        ScrollView {
+//            ForEach(0..<10, id: \.self) { num in
+//                VStack {
+//                    NavigationLink(destination: Text("Destination")) {
+//                        HStack(spacing: 16) {
+//                            Image(systemName: "person.fill")
+//                                .font(.system(size: 32))
+//                                .padding(8)
+//                                .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
+//
+//                            VStack(alignment: .leading) {
+//                                Text("Username")
+//                                    .font(.system(size: 16, weight: .bold))
+//                                Text("Message sent to user")
+//                                    .font(.system(size: 14))
+//                                    .foregroundColor(Color(.lightGray))
+//                            }
+//                            Spacer()
+//                            Text("Today")
+//                                .font(.system(size: 14, weight: .semibold))
+//                        }
+//                    }
+//                    
+//                    Divider()
+//                        .padding(.vertical, 8)
+//                }
+//                .padding(.horizontal)
+//            }
+//            .padding(.bottom, 50)
+//        }
+//    }
 
-                            VStack(alignment: .leading) {
-                                Text("Username")
-                                    .font(.system(size: 16, weight: .bold))
-                                Text("Message sent to user")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(Color(.lightGray))
-                            }
-                            Spacer()
-                            Text("Today")
-                                .font(.system(size: 14, weight: .semibold))
-                        }
-                    }
-                    
-                    Divider()
-                        .padding(.vertical, 8)
-                }
-                .padding(.horizontal)
-            }
-            .padding(.bottom, 50)
-        }
-    }
-
-    private var newMessageButton: some View {
-        Button(action: {
-            shouldShowNewMessageScreen.toggle()
-        }) {
-            HStack {
-                Spacer()
-                Text("+ New Message")
-                    .font(.system(size: 16, weight: .bold))
-                Spacer()
-            }
-            .foregroundColor(.white)
-            .padding(.vertical)
-            .background(Color.blue)
-            .cornerRadius(32)
-            .padding(.horizontal)
-            .shadow(radius: 15)
-        }
-        .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
-            SearchUserView(didSelectUser: { user in
-                self.selectedChatUser = user // Set the selected user
-                self.shouldNavigateToChatLogView = true // Navigate to ChatLogView
-                self.shouldShowNewMessageScreen = false // Dismiss the SearchUserView
-            }).environmentObject(appState)
-        }
-    }
+//    private var newMessageButton: some View {
+//        Button(action: {
+//            shouldShowNewMessageScreen.toggle()
+//        }) {
+//            HStack {
+//                Spacer()
+//                Text("+ New Message")
+//                    .font(.system(size: 16, weight: .bold))
+//                Spacer()
+//            }
+//            .foregroundColor(.white)
+//            .padding(.vertical)
+//            .background(Color.blue)
+//            .cornerRadius(32)
+//            .padding(.horizontal)
+//            .shadow(radius: 15)
+//        }
+//        .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
+//            SearchUserView(didSelectUser: { user in
+//                self.selectedChatUser = user // Set the selected user
+//                self.shouldNavigateToChatLogView = true // Navigate to ChatLogView
+//                self.shouldShowNewMessageScreen = false // Dismiss the SearchUserView
+//            }).environmentObject(appState)
+//        }
+//    }
 }
 
 struct MainMessagesView_Previews: PreviewProvider {
