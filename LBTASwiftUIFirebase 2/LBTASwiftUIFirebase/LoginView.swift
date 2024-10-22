@@ -182,6 +182,8 @@ struct LoginView: View {
             // Updating authentication state
                     DispatchQueue.main.async {
                         self.appState.isLoggedIn = true
+                        //updates current user
+                        userManager.fetchCurrentUser()
                     }
         }
     }
