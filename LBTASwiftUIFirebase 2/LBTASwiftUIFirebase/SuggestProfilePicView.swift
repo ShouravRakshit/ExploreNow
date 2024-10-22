@@ -150,6 +150,8 @@ struct SuggestProfilePicView: View
                 // Update authentication state
                             DispatchQueue.main.async {
                                 self.appState.isLoggedIn = true
+                                //updates profileImageUrl field in currentUser
+                                userManager.fetchCurrentUser()
                                 //Sends back to Home view page
                             }
             }
