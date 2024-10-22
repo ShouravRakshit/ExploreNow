@@ -122,14 +122,15 @@ struct PostCard: View {
                 .padding(.top, 6)
             
             HStack {
-                Image(systemName: "mappin.and.ellipse")
-                Text("Location")
+                Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
+                Text("600")
+                
                 Spacer()
-                    HStack(spacing: 10) {  // creating a separate HStack for the heart and comment with custom spacing
-                        Image(systemName: "heart.fill")
+                    HStack(spacing: 10) {  // creating a separate HStack for the heart and location
+                        Image(systemName: "heart.fill").foregroundColor(Color.customPurple)
                         Text("1.2k")
-                        Image(systemName: "bubble.right")
-                        Text("600")
+                        Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
+                        Text("Location")
                     }
             }
             .font(.system(size: 14))

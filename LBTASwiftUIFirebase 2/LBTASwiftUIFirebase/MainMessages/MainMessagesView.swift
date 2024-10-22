@@ -15,37 +15,37 @@ class MainMessagesViewModel: ObservableObject {
     @State private var showUserDetail = false
     
 
-    init() {
-        
-        fetchCurrentUser()
-    }
+//    init() {
+//        
+//        fetchCurrentUser()
+//    }
 
     
 
-    func fetchCurrentUser() {
-        print ("Fetching current user")
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
-            self.errorMessage = "Could not find Firebase UID"
-            print ("Could not find Firebase UID")
-            return
-        }
-        
-        print ("UID: \(uid)")
-
-        FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
-            if let error = error {
-                self.errorMessage = "Failed to fetch current user: \(error.localizedDescription)"
-                return
-            }
-
-            guard let data = snapshot?.data() else {
-                self.errorMessage = "No data found"
-                return
-            }
-
-            self.chatUser = ChatUser(data: data)
-        }
-    }
+//    func fetchCurrentUser() {
+//        print ("Fetching current user")
+//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+//            self.errorMessage = "Could not find Firebase UID"
+//            print ("Could not find Firebase UID")
+//            return
+//        }
+//        
+//        print ("UID: \(uid)")
+//
+//        FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
+//            if let error = error {
+//                self.errorMessage = "Failed to fetch current user: \(error.localizedDescription)"
+//                return
+//            }
+//
+//            guard let data = snapshot?.data() else {
+//                self.errorMessage = "No data found"
+//                return
+//            }
+//
+//            self.chatUser = ChatUser(data: data)
+//        }
+//    }
 
     func handleSignOut() {
         print ("Signing out user in handleSignOut")
@@ -97,7 +97,7 @@ struct MainMessagesView: View {
     @State private var shouldShowNewMessageScreen = false
 
     @EnvironmentObject var appState: AppState
-
+    @EnvironmentObject var userManager: UserManager
     @ObservedObject private var vm = MainMessagesViewModel()
     @State private var selectedChatUser: ChatUser? // Store the selected user for navigation
 
@@ -131,8 +131,8 @@ struct MainMessagesView: View {
     private var customNavBar: some View {
         HStack(spacing: 16) {
            
-            NavigationLink(destination: ProfileView(profileImageUrl: vm.chatUser?.profileImageUrl, name: vm.chatUser?.name ?? "")) {
-                WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+            NavigationLink(destination: ProfileView(profileImageUrl: userManager.currentUser?.profileImageUrl, name: userManager.currentUser?.name ?? "")) {
+                WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
                     .resizable()
                     .scaledToFill()
                     .frame(width: 50, height: 50)
@@ -143,7 +143,7 @@ struct MainMessagesView: View {
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                let name = vm.chatUser?.name ?? ""
+                let name = userManager.currentUser?.name ?? ""
                 Text(name)
                     .font(.system(size: 24, weight: .bold))
                     .onAppear {
@@ -247,7 +247,7 @@ struct MainMessagesView: View {
                                     .foregroundColor(Color(.lightGray))
                             }
                             Spacer()
-                            Text("22d")
+                            Text("Today")
                                 .font(.system(size: 14, weight: .semibold))
                         }
                     }
