@@ -20,7 +20,8 @@ struct ProfileView: View {
 
     var body: some View {
 
-            NavigationView {
+            NavigationView
+                {
                     VStack(alignment: .leading) {
                         // Profile Info Section
                         HStack {
@@ -88,9 +89,10 @@ struct ProfileView: View {
                             }
                             .padding(.horizontal, 2)
                         }
+                    Spacer() 
                     }
                     .navigationBarHidden(true)
-                
+                    .background(Color.white) // Ensure the background is consistent
             }
         }
 }

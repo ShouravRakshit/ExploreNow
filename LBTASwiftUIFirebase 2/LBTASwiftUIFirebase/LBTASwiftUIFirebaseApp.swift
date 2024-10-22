@@ -17,6 +17,8 @@ struct LBTASwiftUIFirebaseApp: App {
     
     init() {
         FirebaseApp.configure() // Configuring Firebase here
+        UITabBar.appearance().backgroundColor = UIColor(hex: "#8C52FF")
+        UITabBar.appearance().unselectedItemTintColor = UIColor.white
     }
     
     var body: some Scene {

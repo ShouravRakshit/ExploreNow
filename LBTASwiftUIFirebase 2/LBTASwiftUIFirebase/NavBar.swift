@@ -14,8 +14,8 @@ struct NavBar: View {
 
     init()
         {
-        UITabBar.appearance().backgroundColor = UIColor(hex: "#8C52FF")
-            UITabBar.appearance().unselectedItemTintColor = UIColor.white
+        //UITabBar.appearance().backgroundColor = UIColor(hex: "#8C52FF")
+        //UITabBar.appearance().unselectedItemTintColor = UIColor.white
         
         }
     

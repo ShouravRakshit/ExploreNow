@@ -110,6 +110,7 @@ struct MainMessagesView: View {
                 NavigationLink(destination: ChatLogView(chatUser: selectedChatUser), isActive: $shouldNavigateToChatLogView) {
                     EmptyView()
                 }
+            Spacer ()
             }
             .overlay(newMessageButton, alignment: .bottom)
             .navigationBarHidden(true)
