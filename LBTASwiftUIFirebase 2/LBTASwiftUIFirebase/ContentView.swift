@@ -13,19 +13,34 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if appState.isLoggedIn
-                {
-                //MainMessagesView()
-                //    .environmentObject(appState)
-                NavBar ()
-                    .environmentObject (userManager)
-                }
-            else
-                {
+            if appState.isLoggedIn {
+                // The NavBar and potential MainMessagesView for logged-in users
+                NavBar()
+                    .environmentObject(userManager)
+                // You can choose to uncomment or modify MainMessagesView later
+                // MainMessagesView()
+                // .environmentObject(appState)
+                
+            } else {
+                // Show the login view if not logged in
                 LoginView()
-                    .environmentObject (appState)
-                    .environmentObject (userManager)
-                }
+                    .environmentObject(appState)
+                    .environmentObject(userManager)
+            }
+            // Include the MapViewControllerWrapper here for now
+            MapViewControllerWrapper()
+                .edgesIgnoringSafeArea(.all)
         }
     }
 }
+
+struct MapViewControllerWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> MapController {
+        return MapController() // Initialize the view controller
+    }
+
+    func updateUIViewController(_ uiViewController: MapController, context: Context) {
+        // Update the view controller if needed
+    }
+}
+

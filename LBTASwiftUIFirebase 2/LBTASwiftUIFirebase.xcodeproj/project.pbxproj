@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */; };
+		10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */; };
+		10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */; };
+		10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2A2CC3AA8800F6F7DD /* Location.swift */; };
+		10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */; };
+		10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2C2CC3AA8800F6F7DD /* MapController.swift */; };
 		2C132B7B2CC219C70087408A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7A2CC219C00087408A /* AppState.swift */; };
 		2C132B7D2CC22A770087408A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7C2CC22A700087408A /* ContentView.swift */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
@@ -42,6 +48,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfoView.swift; sourceTree = "<group>"; };
+		10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterAnnotationView.swift; sourceTree = "<group>"; };
+		10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchControllerDelegate.swift; sourceTree = "<group>"; };
+		10E35B2A2CC3AA8800F6F7DD /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
+		10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationAnnotationView.swift; sourceTree = "<group>"; };
+		10E35B2C2CC3AA8800F6F7DD /* MapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
 		2C132B7A2CC219C00087408A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -89,6 +101,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10E35B2E2CC3AA8800F6F7DD /* Map */ = {
+			isa = PBXGroup;
+			children = (
+				101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */,
+				10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */,
+				10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */,
+				10E35B2A2CC3AA8800F6F7DD /* Location.swift */,
+				10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */,
+				10E35B2C2CC3AA8800F6F7DD /* MapController.swift */,
+			);
+			path = Map;
+			sourceTree = "<group>";
+		};
 		81447E4D2CB31F12005BE180 = {
 			isa = PBXGroup;
 			children = (
@@ -108,11 +133,15 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+<<<<<<< HEAD
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
+=======
+				10E35B2E2CC3AA8800F6F7DD /* Map */,
+>>>>>>> origin/Map
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
 				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
@@ -273,10 +302,13 @@
 			files = (
 				B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */,
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
+				10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */,
 				81447EAC2CBC87E0005BE180 /* SearchUserView.swift in Sources */,
+				101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */,
 				81447E8A2CB46497005BE180 /* ChatLogView.swift in Sources */,
 				81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */,
 				81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */,
+				10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
 				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
@@ -287,8 +319,14 @@
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
 				B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
+<<<<<<< HEAD
 				B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */,
 				B01523482CC82ED90012FC49 /* EditView.swift in Sources */,
+=======
+				10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */,
+				10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */,
+				10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */,
+>>>>>>> origin/Map
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,
