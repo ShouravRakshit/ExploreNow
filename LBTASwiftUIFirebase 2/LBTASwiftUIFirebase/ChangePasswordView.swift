@@ -244,7 +244,7 @@ struct ChangePasswordView: View
                     .frame(width: 350) // Same width as TextField
                     .background(Color(red: 140/255, green: 82/255, blue: 255/255)) // Button color
                     .cornerRadius(15) // Rounded corners
-                    .padding (.top, 40)
+                    .padding(.top, (confirm_new_password.count > 0) ? 10 : 30)
                     
                 if entered_password.count > 0 && new_password.count > 0 && entered_password == new_password
                     {
