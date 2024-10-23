@@ -27,6 +27,8 @@
 		81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */; };
 		81447EA82CB4BCD0005BE180 /* HelloWorldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447EA72CB4BCD0005BE180 /* HelloWorldView.swift */; };
 		81447EAC2CBC87E0005BE180 /* SearchUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447EAB2CBC87E0005BE180 /* SearchUserView.swift */; };
+		B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523452CC814060012FC49 /* ProfileSettingsView.swift */; };
+		B01523482CC82ED90012FC49 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523472CC82ED50012FC49 /* EditView.swift */; };
 		B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */; };
 		B01DE7132CC199A000C158DD /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7122CC199A000C158DD /* MainMessagesView.swift */; };
 		B02392912CBDD511007CC920 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B02392902CBDD511007CC920 /* GoogleService-Info.plist */; };
@@ -56,6 +58,8 @@
 		81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
 		81447EA72CB4BCD0005BE180 /* HelloWorldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelloWorldView.swift; sourceTree = "<group>"; };
 		81447EAB2CBC87E0005BE180 /* SearchUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserView.swift; sourceTree = "<group>"; };
+		B01523452CC814060012FC49 /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
+		B01523472CC82ED50012FC49 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicView.swift; sourceTree = "<group>"; };
 		B01DE7122CC199A000C158DD /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
 		B02392902CBDD511007CC920 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -102,6 +106,8 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				B01523472CC82ED50012FC49 /* EditView.swift */,
+				B01523452CC814060012FC49 /* ProfileSettingsView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
@@ -275,8 +281,10 @@
 				B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */,
 				2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */,
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
+				B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
 				B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */,
+				B01523482CC82ED90012FC49 /* EditView.swift in Sources */,
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,

@@ -410,7 +410,8 @@ struct SignUpView: View
                         [
                         "username": username,
                         "email": email,
-                        "name": name
+                        "name": name,
+                        "bio": ""
                         ]
                         // Save user data under the user's UID
                         db.collection("users").document(uid).setData(userData)

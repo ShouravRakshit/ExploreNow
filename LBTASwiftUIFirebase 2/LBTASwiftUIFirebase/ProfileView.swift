@@ -15,6 +15,7 @@ struct ProfileView: View {
     @State private var postCount = 600
     @State private var friendsCount = 1100
     @State private var posts = Array(1...5) // Dummy posts array
+    @State private var showProfileSettings = false
     var profileImageUrl: String? // getting the profile image URL
     var name: String // getting the name
 
@@ -26,11 +27,12 @@ struct ProfileView: View {
                         // Profile Info Section
                         HStack {
                             Spacer()
-                            NavigationLink(destination: SettingsPage(description: $description)) {
-                                Image(systemName: "gearshape.fill")
-                                    .font(.system(size: 30, weight: .bold))
-                                    .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
-                            }
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 30, weight: .bold))
+                                .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
+                                .onTapGesture {
+                                    showProfileSettings = true
+                                }
                         }
                         .padding(.horizontal)
                         .padding(.top)
@@ -95,6 +97,10 @@ struct ProfileView: View {
                     }
                     .navigationBarHidden(true)
                     .background(Color.white) // Ensure the background is consistent
+                    .fullScreenCover(isPresented: $showProfileSettings) {
+                        ProfileSettingsView()
+                            .environmentObject(userManager)
+                      }
             }
         }
 }
