@@ -11,7 +11,7 @@ import SDWebImageSwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var userManager: UserManager
-    @State private var description = "Travel Blogger DM for collabs" // Editable from Settings
+    //@State private var description = "Travel Blogger DM for collabs" // Editable from Settings
     @State private var postCount = 600
     @State private var friendsCount = 1100
     @State private var posts = Array(1...5) // Dummy posts array
@@ -77,9 +77,17 @@ struct ProfileView: View {
                         VStack(alignment: .leading, spacing: 4) {
                             Text(name)
                                 .font(.system(size: 24, weight: .bold))
-                            Text(description)
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundColor(.black)
+                            
+                            if let bio = userManager.currentUser?.bio{
+                                Text(bio)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.black)
+                            }
+                            else{
+                                Text("")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(.black)
+                            }
                         }
                         .padding(.horizontal, 21)
                         .padding(.top, 8)
