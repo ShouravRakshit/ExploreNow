@@ -18,7 +18,9 @@ struct ProfileSettingsView: View
     @State var image: UIImage?
     
     @State private var selectedRow: String? // Track the selected row
+    
     @State private var showEditView = false
+    @State private var showChangePassword = false
     
     
     var body: some View
@@ -192,7 +194,7 @@ struct ProfileSettingsView: View
                 .foregroundColor(.blue)
                 .underline() // Underline the text
                 .onTapGesture{
-                    
+                    showChangePassword = true
                 }
             
             Spacer() // Pushes content to the top
@@ -213,6 +215,10 @@ struct ProfileSettingsView: View
                         .environmentObject(userManager)
                 }
             }
+            .fullScreenCover(isPresented: $showChangePassword) {
+                ChangePasswordView()
+                    .environmentObject(userManager)
+              }
             .onAppear
                 {
                 // Load initial image from user manager

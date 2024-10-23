@@ -34,6 +34,7 @@
 		B02392912CBDD511007CC920 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B02392902CBDD511007CC920 /* GoogleService-Info.plist */; };
 		B02A96A92CC0AB81008B6E8B /* Sansation-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */; };
 		B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */; };
+		B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */; };
 		B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983942CC70D6F00E1CBE3 /* NavBar.swift */; };
 		B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */; };
 		B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */; };
@@ -66,6 +67,7 @@
 		B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Sansation-Regular.ttf"; sourceTree = "<group>"; };
 		B02A96AA2CC0AC21008B6E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		B0F983942CC70D6F00E1CBE3 /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
 		B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
 		B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewTest.swift; sourceTree = "<group>"; };
@@ -107,12 +109,10 @@
 			isa = PBXGroup;
 			children = (
 				B01523472CC82ED50012FC49 /* EditView.swift */,
-				B01523452CC814060012FC49 /* ProfileSettingsView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
-				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
 				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
@@ -129,6 +129,9 @@
 				81447E5D2CB31F14005BE180 /* Assets.xcassets */,
 				81447E5F2CB31F14005BE180 /* Preview Content */,
 				B02392902CBDD511007CC920 /* GoogleService-Info.plist */,
+				B01523452CC814060012FC49 /* ProfileSettingsView.swift */,
+				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
+				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
 			);
 			path = LBTASwiftUIFirebase;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */,
 				81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
+				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
 				81447EA82CB4BCD0005BE180 /* HelloWorldView.swift in Sources */,
 				B0F9839D2CC71D5B00E1CBE3 /* UserManager.swift in Sources */,

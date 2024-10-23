@@ -30,4 +30,39 @@ class FirebaseManager: NSObject {
         super.init()
     }
     
+    func reauthenticateUser(currentPassword: String, completion: @escaping (Bool) -> Void) {
+        guard let user = auth.currentUser else {
+            completion(false)
+            return
+        }
+        
+        // Reauthenticate with email and password
+        let credential = EmailAuthProvider.credential(withEmail: user.email!, password: currentPassword)
+        
+        user.reauthenticate(with: credential) { result, error in
+            if let error = error {
+                print("Reauthentication failed: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    
+    func changePassword(newPassword: String, completion: @escaping (Bool) -> Void) {
+        guard let user = auth.currentUser else {
+            completion(false)
+            return
+        }
+        
+        user.updatePassword(to: newPassword) { error in
+            if let error = error {
+                print("Password update failed: \(error.localizedDescription)")
+                completion(false)
+                return
+            }
+            completion(true)
+        }
+    }
+    
 }

@@ -43,7 +43,13 @@ struct EditView: View {
             //    .font(.headline)
             //$fieldValue will update as user types
             TextField("Enter \(fieldName)", text: $fieldValue)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding(12) // Add padding inside the text field
+                .background(Color.white) // Background color
+                .cornerRadius(15) // Rounded corners
+                .overlay(
+                    RoundedRectangle(cornerRadius: 15) // Rounded border
+                        .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
+                )
                 .padding()
                 .autocapitalization(.none) // Prevent first letter from being capitalized
                 .onChange(of: fieldValue) {

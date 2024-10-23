@@ -78,6 +78,12 @@ struct ProfileView: View {
                             Text(name)
                                 .font(.system(size: 24, weight: .bold))
                             
+                            /*if let username = userManager.currentUser?.username{
+                                Text ("@\(username)")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(.black)
+                            }*/
+                            
                             if let bio = userManager.currentUser?.bio{
                                 Text(bio)
                                     .font(.system(size: 14, weight: .medium))
