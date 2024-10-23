@@ -1,5 +1,21 @@
 .DS_Store
 */xcuserdata/*
 *.xcuserstate
-*.xcuserdata
 *.xcshareddata
+
+# Xcode files
+*.xcuserdata
+*.xcsettings
+xcshareddata/xcschememanagement.plist
+xcshareddata/xcschemes/*.xcscheme
+
+# Swift Package Manager
+.swiftpm/
+Package.resolved
+
+# Xcode workspace settings
+*.xcworkspace
+contents.xcworkspacedata
+
+# Ignore IDE workspace checks
+IDEWorkspaceChecks.plist

@@ -133,15 +133,12 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
-<<<<<<< HEAD
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
-=======
 				10E35B2E2CC3AA8800F6F7DD /* Map */,
->>>>>>> origin/Map
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
 				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
@@ -319,14 +316,11 @@
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
 				B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
-<<<<<<< HEAD
 				B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */,
 				B01523482CC82ED90012FC49 /* EditView.swift in Sources */,
-=======
 				10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */,
 				10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */,
 				10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */,
->>>>>>> origin/Map
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,

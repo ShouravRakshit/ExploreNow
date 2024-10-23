@@ -184,21 +184,21 @@ struct MainMessagesView: View {
 //                    .cornerRadius(10)
 //            }
             
-            Button(action: {
-                // Present MapController when the button is tapped
-                let mapController = MapController()
-                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-                    let window = windowScene.windows.first
-                    window?.rootViewController?.present(mapController, animated: true, completion: nil)
-                }
-            }) {
-                Text("Go to Map")
-                    .font(.title2)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(10)
-            }
+//            Button(action: {
+//                // Present MapController when the button is tapped
+//                let mapController = MapController()
+//                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+//                    let window = windowScene.windows.first
+//                    window?.rootViewController?.present(mapController, animated: true, completion: nil)
+//                }
+//            }) {
+//                Text("Go to Map")
+//                    .font(.title2)
+//                    .foregroundColor(.white)
+//                    .padding()
+//                    .background(Color.blue)
+//                    .cornerRadius(10)
+//            }
 
 
 

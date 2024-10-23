@@ -27,20 +27,9 @@ struct ContentView: View {
                     .environmentObject(appState)
                     .environmentObject(userManager)
             }
-            // Include the MapViewControllerWrapper here for now
-            MapViewControllerWrapper()
-                .edgesIgnoringSafeArea(.all)
+           
         }
     }
 }
 
-struct MapViewControllerWrapper: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> MapController {
-        return MapController() // Initialize the view controller
-    }
-
-    func updateUIViewController(_ uiViewController: MapController, context: Context) {
-        // Update the view controller if needed
-    }
-}
 

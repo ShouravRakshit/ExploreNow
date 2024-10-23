@@ -5,6 +5,7 @@
 //  Created by Alisha Lalani on 2024-10-21.
 //
 import SwiftUI
+//import UIKit
 
 struct NavBar: View {
     
@@ -64,9 +65,8 @@ struct NavBar_Previews: PreviewProvider
 
 struct MapPinView: View {
     var body: some View {
-        Text("Map Pin Screen")
-            .font(.largeTitle)
-            .padding()
+        MapViewControllerWrapper()
+                  .edgesIgnoringSafeArea(.all)
     }
 }
 
@@ -78,5 +78,14 @@ struct AddView: View {
     }
 }
 
+struct MapViewControllerWrapper: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> MapController {
+        return MapController() // Initialize the view controller
+    }
+
+    func updateUIViewController(_ uiViewController: MapController, context: Context) {
+        // Update the view controller if needed
+    }
+}
 
 
