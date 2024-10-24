@@ -16,38 +16,6 @@ class MainMessagesViewModel: ObservableObject {
     @State private var showUserDetail = false
     
 
-//    init() {
-//        
-//        fetchCurrentUser()
-//    }
-
-    
-
-//    func fetchCurrentUser() {
-//        print ("Fetching current user")
-//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
-//            self.errorMessage = "Could not find Firebase UID"
-//            print ("Could not find Firebase UID")
-//            return
-//        }
-//        
-//        print ("UID: \(uid)")
-//
-//        FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
-//            if let error = error {
-//                self.errorMessage = "Failed to fetch current user: \(error.localizedDescription)"
-//                return
-//            }
-//
-//            guard let data = snapshot?.data() else {
-//                self.errorMessage = "No data found"
-//                return
-//            }
-//
-//            self.chatUser = ChatUser(data: data)
-//        }
-//    }
-
     func handleSignOut() {
         print ("Signing out user in handleSignOut")
         do {
@@ -173,34 +141,6 @@ struct MainMessagesView: View {
                     .foregroundColor(Color(.label))
             }
             
-            
-//            Spacer()
-//            NavigationLink(destination: MapControllerWrapper()) {
-//                Text("Go to Map")
-//                    .font(.title2)
-//                    .foregroundColor(.white)
-//                    .padding()
-//                    .background(Color.blue)
-//                    .cornerRadius(10)
-//            }
-            
-//            Button(action: {
-//                // Present MapController when the button is tapped
-//                let mapController = MapController()
-//                if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-//                    let window = windowScene.windows.first
-//                    window?.rootViewController?.present(mapController, animated: true, completion: nil)
-//                }
-//            }) {
-//                Text("Go to Map")
-//                    .font(.title2)
-//                    .foregroundColor(.white)
-//                    .padding()
-//                    .background(Color.blue)
-//                    .cornerRadius(10)
-//            }
-
-
 
         }
         .padding()
@@ -265,64 +205,6 @@ struct MainMessagesView: View {
         }
     }
 
-//    private var messagesView: some View {
-//        ScrollView {
-//            ForEach(0..<10, id: \.self) { num in
-//                VStack {
-//                    NavigationLink(destination: Text("Destination")) {
-//                        HStack(spacing: 16) {
-//                            Image(systemName: "person.fill")
-//                                .font(.system(size: 32))
-//                                .padding(8)
-//                                .overlay(RoundedRectangle(cornerRadius: 44).stroke(Color(.label), lineWidth: 1))
-//
-//                            VStack(alignment: .leading) {
-//                                Text("Username")
-//                                    .font(.system(size: 16, weight: .bold))
-//                                Text("Message sent to user")
-//                                    .font(.system(size: 14))
-//                                    .foregroundColor(Color(.lightGray))
-//                            }
-//                            Spacer()
-//                            Text("Today")
-//                                .font(.system(size: 14, weight: .semibold))
-//                        }
-//                    }
-//                    
-//                    Divider()
-//                        .padding(.vertical, 8)
-//                }
-//                .padding(.horizontal)
-//            }
-//            .padding(.bottom, 50)
-//        }
-//    }
-
-//    private var newMessageButton: some View {
-//        Button(action: {
-//            shouldShowNewMessageScreen.toggle()
-//        }) {
-//            HStack {
-//                Spacer()
-//                Text("+ New Message")
-//                    .font(.system(size: 16, weight: .bold))
-//                Spacer()
-//            }
-//            .foregroundColor(.white)
-//            .padding(.vertical)
-//            .background(Color.blue)
-//            .cornerRadius(32)
-//            .padding(.horizontal)
-//            .shadow(radius: 15)
-//        }
-//        .fullScreenCover(isPresented: $shouldShowNewMessageScreen) {
-//            SearchUserView(didSelectUser: { user in
-//                self.selectedChatUser = user // Set the selected user
-//                self.shouldNavigateToChatLogView = true // Navigate to ChatLogView
-//                self.shouldShowNewMessageScreen = false // Dismiss the SearchUserView
-//            }).environmentObject(appState)
-//        }
-//    }
 }
 
 struct MainMessagesView_Previews: PreviewProvider {
