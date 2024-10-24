@@ -18,6 +18,7 @@ protocol MapSearchControllerDelegate: AnyObject {
 
 class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate, MKLocalSearchCompleterDelegate {
     private let mapView: MKMapView
+    private weak var searchBar: UISearchBar?
     weak var delegate: MapSearchControllerDelegate?
     private var searchCompleter: MKLocalSearchCompleter
     private var searchResults: [MKLocalSearchCompletion] = []
@@ -36,8 +37,9 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         return table
     }()
     
-    init(mapView: MKMapView) {
+    init(mapView: MKMapView, searchBar: UISearchBar) {
         self.mapView = mapView
+        self.searchBar = searchBar
         self.searchCompleter = MKLocalSearchCompleter()
         super.init()
         
@@ -112,6 +114,8 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         tableView.deselectRow(at: indexPath, animated: true)
         let completion = searchResults[indexPath.row]
         
+        searchBar?.text = completion.title
+        
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         
@@ -141,5 +145,10 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
     
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Search completer error: \(error)")
+    }
+    
+    func hideSuggestions() {
+        suggestionsTableView.isHidden = true
+        searchBar?.resignFirstResponder()
     }
 }

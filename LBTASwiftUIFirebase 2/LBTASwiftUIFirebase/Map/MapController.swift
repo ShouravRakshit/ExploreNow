@@ -48,7 +48,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }
 
     private lazy var mapSearchController: MapSearchController = {
-        let controller = MapSearchController(mapView: mapView)
+        let controller = MapSearchController(mapView: mapView, searchBar: searchBar)
         controller.delegate = self
         return controller
     }()
@@ -94,6 +94,13 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         // Ensure search bar is always on top
         view.bringSubviewToFront(dimmingView)
         view.bringSubviewToFront(searchBar)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        locationManager.stopUpdatingLocation()
+        searchBar.resignFirstResponder()
+        mapSearchController.hideSuggestions()
     }
 
 
