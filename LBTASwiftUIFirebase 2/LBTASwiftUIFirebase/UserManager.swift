@@ -37,7 +37,7 @@ class UserManager: ObservableObject {
             // Initialize the User object
             DispatchQueue.main.async
                 {
-                self.currentUser = User(data: data, uid: uid)
+                self.currentUser = User(data: data)
                 if let currentUser = self.currentUser {
                        print("User Manager - Fetched User: \(currentUser.name)")
                    } else {
@@ -118,7 +118,7 @@ class UserManager: ObservableObject {
                 "email": user.email,
                 "bio": newBio,
                 "profileImageUrl": user.profileImageUrl ?? ""
-            ], uid: uid)
+            ])
         }
         // Assign the updated user back to currentUser
         self.currentUser = user
@@ -139,9 +139,9 @@ struct User
     let bio: String
     let profileImageUrl: String?
 
-    init(data: [String: Any], uid: String)
+    init(data: [String: Any])
         {
-        self.uid             = uid
+        self.uid             = data["username"] as? String ?? "No Username"
         self.name            = data["name"] as? String ?? "Unknown"
         self.username        = data["username"] as? String ?? "No Username"
         self.bio             = data ["bio"] as? String ?? ""

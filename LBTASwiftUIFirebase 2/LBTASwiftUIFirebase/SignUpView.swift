@@ -414,8 +414,9 @@ struct SignUpView: View
                         "name": name,
                         "bio": ""
                         ]
-                        // Save user data under the user's UID
-                        db.collection("users").document(uid).setData(userData)
+                        // Save user data under the user's username
+                        //key is username
+                        db.collection("users").document (username).setData (userData)
                         { error in
                         if let error = error
                             {

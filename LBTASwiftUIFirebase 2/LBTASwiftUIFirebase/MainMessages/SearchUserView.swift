@@ -72,6 +72,7 @@ struct SearchUserView: View {
             
             self.users = documents.compactMap { doc -> ChatUser? in
                 let data = doc.data()
+                let uid = doc.documentID
                 return ChatUser(data: data)
             }
             
