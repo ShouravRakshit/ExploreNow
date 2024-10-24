@@ -38,10 +38,6 @@ struct ForgotPasswordView: View {
                     .foregroundColor(.red)
                     .padding()
                 
-               // NavigationLink("Back to Login", destination: LoginView(didCompleteLoginProcess: {
-                    // Handle navigation back
-              //  }))
-              //      .padding()
             }
             .padding()
             .navigationTitle("Forgot Password")

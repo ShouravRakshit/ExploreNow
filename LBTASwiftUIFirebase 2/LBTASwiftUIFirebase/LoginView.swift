@@ -36,8 +36,7 @@ struct LoginView: View {
                         .frame(height: 1)
                     
                     Image("Explore")
-//                        .frame(width:50, height: 50)
-//                        .resizable()
+
                         .scaledToFit()
                         .frame(width: UIScreen.main.bounds.width * 0.60) // Adjusted to 60% of screen width
                     Spacer()
