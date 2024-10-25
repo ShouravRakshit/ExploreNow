@@ -247,7 +247,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             NSLayoutConstraint.activate([
                 infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
                 infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
-                infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 0.8) // Width for each info view
+                infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
             ])
 
             // Position the info views horizontally
@@ -287,7 +287,8 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
             infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
             infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor),
-            infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor)
+            infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor),
+            infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
         ])
         
         locationInfoScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 100)
