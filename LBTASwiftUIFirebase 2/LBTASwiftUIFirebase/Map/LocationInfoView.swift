@@ -5,14 +5,13 @@
 //  Created by Saadman Rahman on 2024-10-21.
 //
 
-
 import UIKit
 import MapKit
+import SwiftUI
 
 class LocationInfoView: UIView {
-    private let nameLabel = UILabel()
+//    private let nameLabel = UILabel()
     private let ratingLabel = UILabel()
-//    private let coordinatesLabel = UILabel()
     private let poiLabel = UILabel()
     
     override init(frame: CGRect) {
@@ -26,32 +25,50 @@ class LocationInfoView: UIView {
     }
     
     private func setupUI() {
-        backgroundColor = UIColor.white.withAlphaComponent(0.9)
-        layer.cornerRadius = 10
+        backgroundColor = .white
+        layer.cornerRadius = 12
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOpacity = 0.2
         layer.shadowOffset = CGSize(width: 0, height: 1)
         layer.shadowRadius = 4
         
-        let stackView = UIStackView(arrangedSubviews: [nameLabel, ratingLabel, poiLabel])
+        let stackView = UIStackView(arrangedSubviews: [poiLabel, ratingLabel])
         stackView.axis = .vertical
         stackView.spacing = 4
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        addSubview(stackView)
+        // Create a rectangle as the background of the card
+        let cardBackground = UIView()
+        cardBackground.backgroundColor = UIColor(hex: "#D9D9D9")
+        cardBackground.layer.cornerRadius = 12
         
+        addSubview(cardBackground)
+        cardBackground.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Add stack view to the card background
+        cardBackground.addSubview(stackView)
+
+        // Set up constraints
         NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 16),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16),
+            cardBackground.leadingAnchor.constraint(equalTo: leadingAnchor),
+            cardBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
+            cardBackground.topAnchor.constraint(equalTo: topAnchor),
+            cardBackground.bottomAnchor.constraint(equalTo: bottomAnchor),
+            
+            stackView.leadingAnchor.constraint(equalTo: cardBackground.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: cardBackground.trailingAnchor, constant: -16),
+            stackView.topAnchor.constraint(equalTo: cardBackground.topAnchor, constant: 16),
+            stackView.bottomAnchor.constraint(equalTo: cardBackground.bottomAnchor, constant: -16),
         ])
+        
+        // Add a border around the card
+        cardBackground.layer.borderColor = Color.customPurple.cgColor
+        cardBackground.layer.borderWidth = 1
     }
     
     func configure(with location: Location) {
-        nameLabel.text = location.name
+//        nameLabel.text = location.name
         ratingLabel.text = "Rating: \(location.rating)"
-//        coordinatesLabel.text = "Coordinates: \(location.coordinate.latitude), \(location.coordinate.longitude)"
         let coordinate = CLLocationCoordinate2D(latitude: location.coordinate.latitude, longitude: location.coordinate.longitude)
         getPointOfInterest(for: coordinate)
     }
