@@ -11,6 +11,7 @@ struct NavBar: View {
     
     //current user
     @State var user: User?
+    @EnvironmentObject var appState: AppState
     @EnvironmentObject var userManager: UserManager
 
     init()
@@ -44,6 +45,7 @@ struct NavBar: View {
             }
         if let user = userManager.currentUser {
             ProfileView (profileImageUrl: user.profileImageUrl, name: user.name)
+                .environmentObject(appState)
                 .tabItem {
                     Image(systemName: "person")
                 }

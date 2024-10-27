@@ -10,12 +10,14 @@ import SDWebImageSwiftUI
 
 
 struct ProfileView: View {
+    @EnvironmentObject var appState: AppState
     @EnvironmentObject var userManager: UserManager
     //@State private var description = "Travel Blogger DM for collabs" // Editable from Settings
     @State private var postCount = 600
     @State private var friendsCount = 1100
     @State private var posts = Array(1...5) // Dummy posts array
     @State private var showProfileSettings = false
+    @State private var shouldShowLogOutOptions = false
     var profileImageUrl: String? // getting the profile image URL
     var name: String // getting the name
 
@@ -31,7 +33,7 @@ struct ProfileView: View {
                                 .font(.system(size: 30, weight: .bold))
                                 .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
                                 .onTapGesture {
-                                    showProfileSettings = true
+                                    shouldShowLogOutOptions = true
                                 }
                         }
                         .padding(.horizontal)
@@ -115,8 +117,84 @@ struct ProfileView: View {
                         ProfileSettingsView()
                             .environmentObject(userManager)
                       }
+                    .actionSheet(isPresented: $shouldShowLogOutOptions) {
+                        ActionSheet(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [
+                            .default(Text("Profile Settings"), action: {
+                                showProfileSettings = true
+                            }),
+                            /*
+                            .default(Text("Change Password"), action: {
+                                shouldShowChangePasswordConfirmation.toggle()
+                            }),
+                             */
+                            .destructive(Text("Sign Out"), action: {
+                                handleSignOut()
+                            }),
+                            .destructive(Text("Delete Account"), action: {
+                                showDeleteAccountConfirmation()
+                            }),
+                            .cancel()
+                        ])
+                    }
+                    
             }
         }
+    
+    private func handleSignOut() {
+        do {
+            try FirebaseManager.shared.auth.signOut()
+            appState.isLoggedIn = false // Update authentication state
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError.localizedDescription)
+        }
+    }
+    
+    func deleteUserAccount(completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+            completion(.failure(NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "User not found."])))
+            return
+        }
+
+        FirebaseManager.shared.auth.currentUser?.delete { error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            FirebaseManager.shared.firestore.collection("users").document(uid).delete { error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                completion(.success(()))
+            }
+        }
+    }
+    
+    private func showDeleteAccountConfirmation() {
+        let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            deleteUserAccount { result in
+                switch result {
+                case .success:
+                    print("Account deleted successfully.")
+                    handleSignOut()
+                case .failure(let error):
+                    print("Failed to delete account:", error.localizedDescription)
+                }
+            }
+        }))
+
+        DispatchQueue.main.async {
+            if let topController = UIApplication.shared.windows.first?.rootViewController {
+                topController.present(alert, animated: true)
+            }
+        }
+    }
+    
+    
 }
 
 // PostCard Component

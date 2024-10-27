@@ -136,15 +136,18 @@ struct MainMessagesView: View {
     private var customNavBar: some View {
         HStack(spacing: 16) {
            
-            NavigationLink(destination: ProfileView(profileImageUrl: userManager.currentUser?.profileImageUrl, name: userManager.currentUser?.name ?? "")) {
-                WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 50, height: 50)
-                    .clipped()
-                    .cornerRadius(44)
-                    .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
-                    .shadow(radius: 5)
+            Group {
+                NavigationLink(destination: ProfileView(profileImageUrl: userManager.currentUser?.profileImageUrl, name: userManager.currentUser?.name ?? "")
+                    .environmentObject(appState)) {
+                    WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 50, height: 50)
+                        .clipped()
+                        .cornerRadius(44)
+                        .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
+                        .shadow(radius: 5)
+                }
             }
 
             VStack(alignment: .leading, spacing: 4) {

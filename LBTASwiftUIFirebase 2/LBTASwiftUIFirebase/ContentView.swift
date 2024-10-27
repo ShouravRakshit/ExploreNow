@@ -16,6 +16,7 @@ struct ContentView: View {
             if appState.isLoggedIn {
                 // The NavBar and potential MainMessagesView for logged-in users
                 NavBar()
+                    .environmentObject(appState)
                     .environmentObject(userManager)
                 // You can choose to uncomment or modify MainMessagesView later
                 // MainMessagesView()
