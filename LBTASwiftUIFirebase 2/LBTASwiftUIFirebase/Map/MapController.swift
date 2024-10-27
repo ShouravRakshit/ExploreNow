@@ -28,7 +28,9 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         ("Los Angeles", 4.0, CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437)), // Los Angeles
         ("New York", 3.5, CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),  // New York
         ("London", 1.5, CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278)),   // London
-        ("Paris", 4.5, CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522))    // Paris
+        ("Paris", 4.5, CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522)),    // Paris
+        ("Banff", 4.5, CLLocationCoordinate2D(latitude: 51.17800196486704, longitude: -115.57025630902808))    // Banff
+
     ]
     
     private var allAnnotations: [Location] = [] // Add this to store all annotations
