@@ -24,7 +24,7 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
     private var searchResults: [MKLocalSearchCompletion] = []
     
     private lazy var suggestionsTableView: UITableView = {
-        let table = UITableView()
+        let table = UITableView(frame: .zero, style: .plain)
         table.delegate = self
         table.dataSource = self
         table.register(UITableViewCell.self, forCellReuseIdentifier: "SuggestionCell")
@@ -36,7 +36,7 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         table.layer.borderColor = UIColor.systemGray5.cgColor
         return table
     }()
-    
+
     init(mapView: MKMapView, searchBar: UISearchBar) {
         self.mapView = mapView
         self.searchBar = searchBar
@@ -102,9 +102,14 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         let cell = tableView.dequeueReusableCell(withIdentifier: "SuggestionCell", for: indexPath)
         let result = searchResults[indexPath.row]
         
-        cell.textLabel?.text = result.title
-        cell.detailTextLabel?.text = result.subtitle
+        cell.textLabel?.text = result.title + ", " + result.subtitle
+//        cell.detailTextLabel?.text = result.subtitle
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
+//        cell.detailTextLabel?.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+//        cell.detailTextLabel?.textColor = .secondaryLabel
         cell.backgroundColor = .clear
+        print(result.title)
+        print(result.subtitle)
         
         return cell
     }
