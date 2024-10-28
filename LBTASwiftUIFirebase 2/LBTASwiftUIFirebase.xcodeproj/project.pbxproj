@@ -18,9 +18,12 @@
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
 		2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */; };
 		682B8D1F2CCEFF0E00E56AB0 /* LocationPostsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */; };
+<<<<<<< HEAD
 		68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A04D752CCA0CFD00BCA36E /* AddPostView.swift */; };
 		68D3B3942CCA321D00166069 /* LocationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B3932CCA321D00166069 /* LocationSearchView.swift */; };
 		68D3B3982CCA37A200166069 /* AddPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B3972CCA37A200166069 /* AddPhotos.swift */; };
+=======
+>>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
 		81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E5B2CB31F12005BE180 /* LoginView.swift */; };
 		81447E5E2CB31F14005BE180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E5D2CB31F14005BE180 /* Assets.xcassets */; };
@@ -63,9 +66,12 @@
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPostsPage.swift; sourceTree = "<group>"; };
+<<<<<<< HEAD
 		68A04D752CCA0CFD00BCA36E /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
 		68D3B3932CCA321D00166069 /* LocationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchView.swift; sourceTree = "<group>"; };
 		68D3B3972CCA37A200166069 /* AddPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotos.swift; sourceTree = "<group>"; };
+=======
+>>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
 		81447E5B2CB31F12005BE180 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };

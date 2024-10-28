@@ -28,15 +28,22 @@ class LocationInfoView: UIView {
         super.init(frame: frame)
         setupUI()
 <<<<<<< HEAD
+<<<<<<< HEAD
         setupGesture()
 =======
 >>>>>>> 14696e3 (Add Post interface)
+=======
+        setupGesture()
+>>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupUI()
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
         setupGesture()
     }
     
@@ -155,6 +162,7 @@ extension UIView {
             }
         }
         return nil
+<<<<<<< HEAD
 =======
         addSubview(stackView)
         
@@ -171,5 +179,7 @@ extension UIView {
         ratingLabel.text = "Rating: \(location.rating)"
         coordinatesLabel.text = "Coordinates: \(location.coordinate.latitude), \(location.coordinate.longitude)"
 >>>>>>> 14696e3 (Add Post interface)
+=======
+>>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
     }
 }
