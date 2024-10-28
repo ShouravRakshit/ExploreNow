@@ -28,9 +28,13 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         ("Los Angeles", 4.0, CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437)), // Los Angeles
         ("New York", 3.5, CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),  // New York
         ("London", 1.5, CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278)),   // London
+<<<<<<< HEAD
         ("Paris", 4.5, CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522)),    // Paris
         ("Banff", 4.5, CLLocationCoordinate2D(latitude: 51.17800196486704, longitude: -115.57025630902808))    // Banff
 
+=======
+        ("Paris", 4.5, CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522))    // Paris
+>>>>>>> 14696e3 (Add Post interface)
     ]
     
     private var allAnnotations: [Location] = [] // Add this to store all annotations
@@ -50,7 +54,11 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }
 
     private lazy var mapSearchController: MapSearchController = {
+<<<<<<< HEAD
         let controller = MapSearchController(mapView: mapView, searchBar: searchBar)
+=======
+        let controller = MapSearchController(mapView: mapView)
+>>>>>>> 14696e3 (Add Post interface)
         controller.delegate = self
         return controller
     }()
@@ -97,6 +105,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         view.bringSubviewToFront(dimmingView)
         view.bringSubviewToFront(searchBar)
     }
+<<<<<<< HEAD
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -104,6 +113,8 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         searchBar.resignFirstResponder()
         mapSearchController.hideSuggestions()
     }
+=======
+>>>>>>> 14696e3 (Add Post interface)
 
 
     private func setupUI() {
@@ -249,7 +260,11 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             NSLayoutConstraint.activate([
                 infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
                 infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
+<<<<<<< HEAD
                 infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
+=======
+                infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 0.8) // Width for each info view
+>>>>>>> 14696e3 (Add Post interface)
             ])
 
             // Position the info views horizontally
@@ -289,8 +304,12 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
             infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
             infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor),
+<<<<<<< HEAD
             infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor),
             infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
+=======
+            infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor)
+>>>>>>> 14696e3 (Add Post interface)
         ])
         
         locationInfoScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 100)
