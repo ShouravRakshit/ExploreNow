@@ -17,11 +17,13 @@ class LocationInfoView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
+        setupGesture()
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupUI()
+        setupGesture()
     }
     
     private func setupUI() {
@@ -66,6 +68,26 @@ class LocationInfoView: UIView {
         cardBackground.layer.borderWidth = 1
     }
     
+    private func setupGesture() {
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+            self.addGestureRecognizer(tapGesture)
+            self.isUserInteractionEnabled = true // Enable user interaction for this view
+        }
+        
+        @objc private func handleTap() {
+            print("Card tapped!") // Debug print
+            if poiLabel.text == "224 Banff Ave" {
+                let locationPostsPage = UIHostingController(rootView: LocationPostsPage())
+                    if let parentVC = self.parentViewController {
+                        parentVC.present(locationPostsPage, animated: true, completion: nil)
+                    } else {
+                        print("No parent view controller found!")
+                    }
+            } else {
+                print("Location is not Banff!") // Debug print
+            }
+        }
+    
     func configure(with location: Location) {
 //        nameLabel.text = location.name
         ratingLabel.text = "Rating: \(location.rating)"
@@ -93,5 +115,19 @@ class LocationInfoView: UIView {
                 self.poiLabel.text = "No POI found"
             }
         }
+    }
+}
+
+// Helper to find the parent view controller
+extension UIView {
+    var parentViewController: UIViewController? {
+        var responder: UIResponder? = self
+        while responder != nil {
+            responder = responder?.next
+            if let viewController = responder as? UIViewController {
+                return viewController
+            }
+        }
+        return nil
     }
 }
