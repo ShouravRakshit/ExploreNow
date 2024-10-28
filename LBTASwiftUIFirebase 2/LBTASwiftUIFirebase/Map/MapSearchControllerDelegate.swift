@@ -18,20 +18,13 @@ protocol MapSearchControllerDelegate: AnyObject {
 
 class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate, MKLocalSearchCompleterDelegate {
     private let mapView: MKMapView
-<<<<<<< HEAD
     private weak var searchBar: UISearchBar?
-=======
->>>>>>> 14696e3 (Add Post interface)
     weak var delegate: MapSearchControllerDelegate?
     private var searchCompleter: MKLocalSearchCompleter
     private var searchResults: [MKLocalSearchCompletion] = []
     
     private lazy var suggestionsTableView: UITableView = {
-<<<<<<< HEAD
         let table = UITableView(frame: .zero, style: .plain)
-=======
-        let table = UITableView()
->>>>>>> 14696e3 (Add Post interface)
         table.delegate = self
         table.dataSource = self
         table.register(UITableViewCell.self, forCellReuseIdentifier: "SuggestionCell")
@@ -43,16 +36,10 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         table.layer.borderColor = UIColor.systemGray5.cgColor
         return table
     }()
-<<<<<<< HEAD
 
     init(mapView: MKMapView, searchBar: UISearchBar) {
         self.mapView = mapView
         self.searchBar = searchBar
-=======
-    
-    init(mapView: MKMapView) {
-        self.mapView = mapView
->>>>>>> 14696e3 (Add Post interface)
         self.searchCompleter = MKLocalSearchCompleter()
         super.init()
         
@@ -115,7 +102,6 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         let cell = tableView.dequeueReusableCell(withIdentifier: "SuggestionCell", for: indexPath)
         let result = searchResults[indexPath.row]
         
-<<<<<<< HEAD
         cell.textLabel?.text = result.title + ", " + result.subtitle
 //        cell.detailTextLabel?.text = result.subtitle
         cell.textLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
@@ -124,11 +110,6 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         cell.backgroundColor = .clear
         print(result.title)
         print(result.subtitle)
-=======
-        cell.textLabel?.text = result.title
-        cell.detailTextLabel?.text = result.subtitle
-        cell.backgroundColor = .clear
->>>>>>> 14696e3 (Add Post interface)
         
         return cell
     }
@@ -138,11 +119,8 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         tableView.deselectRow(at: indexPath, animated: true)
         let completion = searchResults[indexPath.row]
         
-<<<<<<< HEAD
         searchBar?.text = completion.title
         
-=======
->>>>>>> 14696e3 (Add Post interface)
         let searchRequest = MKLocalSearch.Request(completion: completion)
         let search = MKLocalSearch(request: searchRequest)
         
@@ -173,12 +151,9 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
     func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
         print("Search completer error: \(error)")
     }
-<<<<<<< HEAD
     
     func hideSuggestions() {
         suggestionsTableView.isHidden = true
         searchBar?.resignFirstResponder()
     }
-=======
->>>>>>> 14696e3 (Add Post interface)
 }

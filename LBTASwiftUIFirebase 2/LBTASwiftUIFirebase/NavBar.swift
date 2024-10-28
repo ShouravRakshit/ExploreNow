@@ -33,11 +33,7 @@ struct NavBar: View {
                 Image(systemName: "mappin.and.ellipse")
             }
         
-<<<<<<< HEAD
-        AddView ()
-=======
         AddPostView ()
->>>>>>> 14696e3 (Add Post interface)
             .tabItem {
                 Image(systemName: "plus.circle.fill")
             }
@@ -74,16 +70,6 @@ struct MapPinView: View {
     }
 }
 
-<<<<<<< HEAD
-struct AddView: View {
-    var body: some View {
-        Text("Add New Item")
-            .font(.largeTitle)
-            .padding()
-    }
-}
-=======
->>>>>>> 14696e3 (Add Post interface)
 
 struct MapViewControllerWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MapController {

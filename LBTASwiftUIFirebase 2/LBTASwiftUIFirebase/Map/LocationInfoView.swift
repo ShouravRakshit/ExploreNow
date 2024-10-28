@@ -5,7 +5,6 @@
 //  Created by Saadman Rahman on 2024-10-21.
 //
 
-<<<<<<< HEAD
 import UIKit
 import MapKit
 import SwiftUI
@@ -14,64 +13,30 @@ class LocationInfoView: UIView {
 //    private let nameLabel = UILabel()
     private let ratingLabel = UILabel()
     private let poiLabel = UILabel()
-=======
-
-import UIKit
-
-class LocationInfoView: UIView {
-    private let nameLabel = UILabel()
-    private let ratingLabel = UILabel()
-    private let coordinatesLabel = UILabel()
->>>>>>> 14696e3 (Add Post interface)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
-<<<<<<< HEAD
-<<<<<<< HEAD
-        setupGesture()
-=======
->>>>>>> 14696e3 (Add Post interface)
-=======
-        setupGesture()
->>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         setupUI()
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
-        setupGesture()
     }
     
     private func setupUI() {
         backgroundColor = .white
         layer.cornerRadius = 12
-=======
-    }
-    
-    private func setupUI() {
-        backgroundColor = UIColor.white.withAlphaComponent(0.9)
-        layer.cornerRadius = 10
->>>>>>> 14696e3 (Add Post interface)
         layer.shadowColor = UIColor.black.cgColor
         layer.shadowOpacity = 0.2
         layer.shadowOffset = CGSize(width: 0, height: 1)
         layer.shadowRadius = 4
         
-<<<<<<< HEAD
         let stackView = UIStackView(arrangedSubviews: [poiLabel, ratingLabel])
-=======
-        let stackView = UIStackView(arrangedSubviews: [nameLabel, ratingLabel, coordinatesLabel])
->>>>>>> 14696e3 (Add Post interface)
         stackView.axis = .vertical
         stackView.spacing = 4
         stackView.translatesAutoresizingMaskIntoConstraints = false
         
-<<<<<<< HEAD
         // Create a rectangle as the background of the card
         let cardBackground = UIView()
         cardBackground.backgroundColor = UIColor(hex: "#D9D9D9")
@@ -101,26 +66,6 @@ class LocationInfoView: UIView {
         cardBackground.layer.borderWidth = 1
     }
     
-    private func setupGesture() {
-            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-            self.addGestureRecognizer(tapGesture)
-            self.isUserInteractionEnabled = true // Enable user interaction for this view
-        }
-        
-        @objc private func handleTap() {
-            print("Card tapped!") // Debug print
-            if poiLabel.text == "224 Banff Ave" {
-                let locationPostsPage = UIHostingController(rootView: LocationPostsPage())
-                    if let parentVC = self.parentViewController {
-                        parentVC.present(locationPostsPage, animated: true, completion: nil)
-                    } else {
-                        print("No parent view controller found!")
-                    }
-            } else {
-                print("Location is not Banff!") // Debug print
-            }
-        }
-    
     func configure(with location: Location) {
 //        nameLabel.text = location.name
         ratingLabel.text = "Rating: \(location.rating)"
@@ -148,38 +93,5 @@ class LocationInfoView: UIView {
                 self.poiLabel.text = "No POI found"
             }
         }
-    }
-}
-
-// Helper to find the parent view controller
-extension UIView {
-    var parentViewController: UIViewController? {
-        var responder: UIResponder? = self
-        while responder != nil {
-            responder = responder?.next
-            if let viewController = responder as? UIViewController {
-                return viewController
-            }
-        }
-        return nil
-<<<<<<< HEAD
-=======
-        addSubview(stackView)
-        
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: 16),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16),
-        ])
-    }
-    
-    func configure(with location: Location) {
-        nameLabel.text = location.name
-        ratingLabel.text = "Rating: \(location.rating)"
-        coordinatesLabel.text = "Coordinates: \(location.coordinate.latitude), \(location.coordinate.longitude)"
->>>>>>> 14696e3 (Add Post interface)
-=======
->>>>>>> 0fd37054c8e36d48c00bfd56aefd50a2bf81d1b4
     }
 }
