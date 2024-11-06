@@ -165,7 +165,6 @@ struct AddPostView: View {
         }
     }
 
-    // Rest of the code (addPost, clearForm, etc.) remains the same
     private func addPost() {
         // Input validation
         if descriptionText.isEmpty {
@@ -233,7 +232,6 @@ struct AddPostView: View {
             }
         }
         
-        // After all images are uploaded, create the post
         group.notify(queue: .main) {
             let db = FirebaseManager.shared.firestore
             let postData: [String: Any] = [
@@ -241,7 +239,7 @@ struct AddPostView: View {
                 "rating": rating,
                 "description": descriptionText,
                 "location": selectedLocation,
-                "location_coordinates": [latitude, longitude], // This will now be raw numbers
+                "location_coordinates": [latitude, longitude],
                 "images": imageURLs,
                 "timestamp": FieldValue.serverTimestamp()
             ]
@@ -253,11 +251,9 @@ struct AddPostView: View {
                     return
                 }
                 
-                // Success
                 self.addPostStatusMessage = "Post uploaded successfully!"
                 self.clearForm()
                 
-                // Dismiss the view after successful upload
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     self.dismiss()
                 }
