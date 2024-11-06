@@ -46,6 +46,7 @@
 		B02392912CBDD511007CC920 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B02392902CBDD511007CC920 /* GoogleService-Info.plist */; };
 		B02A96A92CC0AB81008B6E8B /* Sansation-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */; };
 		B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */; };
+		B09365862CDC231F00126005 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09365852CDC231900126005 /* NotificationView.swift */; };
 		B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */; };
 		B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983942CC70D6F00E1CBE3 /* NavBar.swift */; };
 		B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */; };
@@ -91,6 +92,7 @@
 		B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Sansation-Regular.ttf"; sourceTree = "<group>"; };
 		B02A96AA2CC0AC21008B6E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		B09365852CDC231900126005 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		B0F983942CC70D6F00E1CBE3 /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
 		B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				B09365852CDC231900126005 /* NotificationView.swift */,
 				10F6BB532CDB704D0033B9A5 /* Post.swift */,
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
@@ -324,6 +327,7 @@
 				101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */,
 				81447E8A2CB46497005BE180 /* ChatLogView.swift in Sources */,
 				81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */,
+				B09365862CDC231F00126005 /* NotificationView.swift in Sources */,
 				81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */,
 				10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
