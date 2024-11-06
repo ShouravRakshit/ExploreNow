@@ -263,6 +263,7 @@ struct ChatLogView: View {
     @ObservedObject var vm: ChatLogViewModel
     @State private var showEmojiPicker = false
     @State private var selectedEmoji: String = ""
+    @State private var isNavigating = false // Tracks the state of navigation
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
@@ -294,8 +295,39 @@ struct ChatLogView: View {
             }
             .padding()
         }
-        .navigationTitle(chatUser?.email ?? "")
+        //.navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
+        // Set the left bar button to make the email clickable
+        // Use toolbar modifier to center the email
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack {
+                    Spacer() // To center the content
+                    if let email = chatUser?.email {
+                        Button(action: {
+                            // Set the navigation state to true when the email is tapped
+                            self.isNavigating = true
+                        }) {
+                            Text(email) // Make the email clickable
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.purple)
+                        }
+                    }
+                    Spacer() // To center the content
+                }
+            }
+        }
+        // Use a NavigationLink triggered programmatically by `isNavigating`
+        .background(
+            NavigationLink(
+                destination: ProfileView(uid: chatUser?.uid ?? ""),
+                isActive: $isNavigating
+            ) {
+                EmptyView() // NavigationLink content is invisible; it only triggers navigation
+            }
+            .hidden() // Hide the NavigationLink content to avoid extra UI elements
+        )
+
     }
     
     private var messagesView: some View {

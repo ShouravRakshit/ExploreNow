@@ -10,6 +10,7 @@ import SDWebImageSwiftUI
 import MapKit
 
 class MainMessagesViewModel: ObservableObject {
+    @EnvironmentObject var userManager: UserManager
     @Published var errorMessage = ""
     @Published var chatUser: ChatUser?
     @Published var isUserCurrentlyLoggedOut = false
@@ -103,18 +104,24 @@ struct MainMessagesView: View {
 
     private var customNavBar: some View {
         HStack(spacing: 16) {
-           
-            NavigationLink(destination: ProfileView(profileImageUrl: userManager.currentUser?.profileImageUrl, name: userManager.currentUser?.name ?? "")) {
-                WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 50, height: 50)
-                    .clipped()
-                    .cornerRadius(44)
-                    .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
-                    .shadow(radius: 5)
-            }
 
+            if let currentUser = userManager.currentUser {
+                NavigationLink(destination: ProfileView(uid: currentUser.uid)) {
+                    WebImage(url: URL(string: currentUser.profileImageUrl ?? ""))
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 50, height: 50)
+                        .clipped()
+                        .cornerRadius(44)
+                        .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
+                        .shadow(radius: 5)
+                }
+            } else {
+                // Fallback UI in case the currentUser is nil
+                Text("Loading...") // or any other placeholder
+                    .font(.system(size: 16, weight: .medium))
+            }
+            
             VStack(alignment: .leading, spacing: 4) {
                 let name = userManager.currentUser?.name ?? ""
                 Text(name)

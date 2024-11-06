@@ -141,7 +141,7 @@ struct User
 
     init(data: [String: Any], uid: String)
         {
-        self.uid             = uid
+        self.uid             = uid //change to data["uid"]
         self.name            = data["name"] as? String ?? "Unknown"
         self.username        = data["username"] as? String ?? "No Username"
         self.bio             = data ["bio"] as? String ?? ""

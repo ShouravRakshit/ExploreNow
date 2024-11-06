@@ -6,32 +6,46 @@ import FirebaseFirestore
 
 struct ProfileView: View {
     @EnvironmentObject var userManager: UserManager
+    @State private var profileUser: User? // User object to represent the profile being viewed
     @State private var userPosts: [Post] = []
     @State private var isLoading = false
     @State private var showProfileSettings = false
     @State private var showAddPost = false
-    var profileImageUrl: String?
-    var name: String
+    @State private var viewingOtherProfile = true
+    
+    var uid: String // The UID (or username) of the user whose profile is being viewed
+ //   var profileImageUrl: String?
+ //   var name: String
 
+    
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
                 // Settings Button
-                HStack {
-                    Spacer()
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 30, weight: .bold))
-                        .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
-                        .onTapGesture {
-                            showProfileSettings = true
-                        }
+                if viewingOtherProfile{
+                    HStack{
+                        
+                    }
+                    .padding(.top)
                 }
-                .padding(.horizontal)
-                .padding(.top)
+                
+                else {
+                    HStack {
+                        Spacer()
+                        Image(systemName: "gearshape.fill")
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
+                            .onTapGesture {
+                                showProfileSettings = true
+                            }
+                    }
+                    .padding(.horizontal)
+                    .padding(.top)
+                }
                 
                 // Profile Info Section
                 HStack {
-                    WebImage(url: URL(string: profileImageUrl ?? ""))
+                    WebImage(url: URL(string: profileUser?.profileImageUrl ?? ""))
                         .resizable()
                         .scaledToFill()
                         .frame(width: 80, height: 80)
@@ -63,24 +77,53 @@ struct ProfileView: View {
                 
                 // Username and Description
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(name)
-                        .font(.system(size: 24, weight: .bold))
-                    
-                    if let bio = userManager.currentUser?.bio {
+                    //! forces unwrap and aborts if nil is returned
+                    if let profileUser = profileUser {
+                        Text(profileUser.name)
+                            .font(.system(size: 24, weight: .bold))
+                        Text(profileUser.bio)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.black)
+                    } else {
+                        // Fallback UI while the data is being loaded
+                        Text("Loading...")
+                            .font(.system(size: 24, weight: .bold))
+                    }
+                    /*
+                    if let bio = profileUser?.bio {
                         Text(bio)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.black)
-                    }
+                    }*/
                 }
                 .padding(.horizontal, 21)
                 .padding(.top, 8)
+                
+                //Friendship status - add friend, friends
+                if viewingOtherProfile{
+                    Button(action: {
+                        // Handle the friend request action
+                        //toggleFriendshipStatus()
+                    }) {
+                        Text("Add Friend")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white) // White text color
+                            .padding() // Add padding inside the button
+                            .frame(maxWidth: .infinity) // Make the button expand to full width
+                            .background(Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
+                            .cornerRadius(25) // Rounded corners
+                            .shadow(radius: 5) // Optional shadow for depth
+                    }
+                    .padding (.top, 10)
+                    .padding(10) // Padding outside the button
+                }
                 
                 // Posts Section
                 ScrollView {
                     if isLoading {
                         ProgressView()
                             .padding()
-                    } else if userPosts.isEmpty {
+                    } else if !viewingOtherProfile && userPosts.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 50))
@@ -135,7 +178,8 @@ struct ProfileView: View {
                 AddPostView()
             }
             .onAppear {
-                fetchUserPosts()
+                fetchUserData  ()
+                fetchUserPosts ()
             }
         }
     }
@@ -176,8 +220,8 @@ struct ProfileView: View {
                                     imageUrls: data["images"] as? [String] ?? [],
                                     timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
                                     uid: data["uid"] as? String ?? "",
-                                    username: name,
-                                    userProfileImageUrl: profileImageUrl ?? ""
+                                    username: profileUser?.name ?? "",
+                                    userProfileImageUrl: profileUser?.profileImageUrl ?? ""
                                 )
                                 
                                 // Update on main thread since we're modifying @State
@@ -260,6 +304,39 @@ struct ProfileView: View {
                 }
             }
     }
+    
+    // Fetch user data from Firestore
+    private func fetchUserData() {
+        print ("current user uid: \(uid)")
+        print ("profile user uid: \(self.userManager.currentUser?.uid)")
+        if uid == self.userManager.currentUser?.uid {
+            print ("Setting profile user to current user")
+            self.profileUser = self.userManager.currentUser
+            viewingOtherProfile = false
+            return
+        }
+        
+        isLoading = true
+        FirebaseManager.shared.firestore
+            .collection("users")
+            .document(uid) // Fetch the user by their UID
+            .addSnapshotListener { snapshot, error in
+                isLoading = false
+                if let error = error {
+                    print("Failed to fetch user data:", error.localizedDescription)
+                    return
+                }
+
+                guard let data = snapshot?.data() else {
+                    print("No data found")
+                    return
+                }
+                
+                // Initialize the User object with the data
+                self.profileUser = User(data: data, uid: uid)
+            }
+    }
+    
 }
 
 

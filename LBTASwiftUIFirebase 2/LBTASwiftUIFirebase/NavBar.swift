@@ -42,11 +42,14 @@ struct NavBar: View {
             .tabItem {
                 Image(systemName: "message")
             }
+            .environmentObject (userManager)
+        
         if let user = userManager.currentUser {
-            ProfileView (profileImageUrl: user.profileImageUrl, name: user.name)
+            ProfileView (uid: user.uid)
                 .tabItem {
                     Image(systemName: "person")
                 }
+            .environmentObject (userManager)
         }
     }
     .accentColor(.gray) // Change selected tab icon color
