@@ -13,6 +13,8 @@
 		10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2A2CC3AA8800F6F7DD /* Location.swift */; };
 		10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */; };
 		10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2C2CC3AA8800F6F7DD /* MapController.swift */; };
+		10F6BB522CDB39660033B9A5 /* LocationSearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F6BB512CDB39660033B9A5 /* LocationSearchBar.swift */; };
+		10F6BB542CDB704D0033B9A5 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F6BB532CDB704D0033B9A5 /* Post.swift */; };
 		2C132B7B2CC219C70087408A /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7A2CC219C00087408A /* AppState.swift */; };
 		2C132B7D2CC22A770087408A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C132B7C2CC22A700087408A /* ContentView.swift */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
@@ -58,6 +60,8 @@
 		10E35B2A2CC3AA8800F6F7DD /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationAnnotationView.swift; sourceTree = "<group>"; };
 		10E35B2C2CC3AA8800F6F7DD /* MapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
+		10F6BB512CDB39660033B9A5 /* LocationSearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchBar.swift; sourceTree = "<group>"; };
+		10F6BB532CDB704D0033B9A5 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		2C132B7A2CC219C00087408A /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -141,6 +145,7 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				10F6BB532CDB704D0033B9A5 /* Post.swift */,
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
@@ -197,6 +202,7 @@
 		81447E7A2CB34DFC005BE180 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				10F6BB512CDB39660033B9A5 /* LocationSearchBar.swift */,
 				81447E7B2CB34E26005BE180 /* FirebaseManager.swift */,
 			);
 			path = Utils;
@@ -314,6 +320,7 @@
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
 				10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */,
 				81447EAC2CBC87E0005BE180 /* SearchUserView.swift in Sources */,
+				10F6BB522CDB39660033B9A5 /* LocationSearchBar.swift in Sources */,
 				101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */,
 				81447E8A2CB46497005BE180 /* ChatLogView.swift in Sources */,
 				81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */,
@@ -323,6 +330,7 @@
 				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
 				81447EA82CB4BCD0005BE180 /* HelloWorldView.swift in Sources */,
+				10F6BB542CDB704D0033B9A5 /* Post.swift in Sources */,
 				B0F9839D2CC71D5B00E1CBE3 /* UserManager.swift in Sources */,
 				B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */,
 				2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */,
