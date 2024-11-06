@@ -8,6 +8,43 @@
 import MapKit
 import UIKit
 
+class LocationManager {
+    static let shared = LocationManager()
+    @Published var eventLocations: [(String, Double, CLLocationCoordinate2D)] = []
+    
+    func fetchLocationsFromFirebase(completion: @escaping ([(String, Double, CLLocationCoordinate2D)]) -> Void) {
+        FirebaseManager.shared.firestore.collection("locations").getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching locations: \(error.localizedDescription)")
+                completion([])
+                return
+            }
+            
+            var locations: [(String, Double, CLLocationCoordinate2D)] = []
+            
+            snapshot?.documents.forEach { document in
+                let data = document.data()
+                
+                if let address = data["address"] as? String,
+                   let averageRating = data["average_rating"] as? Double,
+                   let coordinates = data["location_coordinates"] as? [Double],
+                   coordinates.count == 2 {
+                    
+                    let coordinate = CLLocationCoordinate2D(
+                        latitude: coordinates[0],
+                        longitude: coordinates[1]
+                    )
+                    
+                    locations.append((address, averageRating, coordinate))
+                }
+            }
+            
+            self.eventLocations = locations
+            completion(locations)
+        }
+    }
+}
+
 class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
 
     private let mapView = MKMapView() // Initialize map view programmatically
@@ -15,26 +52,15 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     private let containerView = UIView()  // Container for SearchBar + MapView
 
     private let locationManager = CLLocationManager()
+    private let locationDataManager = LocationManager.shared
+    private var eventLocations: [(String, Double, CLLocationCoordinate2D)] = []
+    private var allAnnotations: [Location] = []
     private var userTrackingButton: MKUserTrackingButton!
     private var scaleView: MKScaleView!
     private let locationInfoScrollView = UIScrollView() // Add this
     private var locationInfoViews: [LocationInfoView] = [] // To hold instances
 
-    // Hardcoded event locations
-    private let eventLocations:[(String, Double, CLLocationCoordinate2D)] = [
-        ("San Francisco", 2.9, CLLocationCoordinate2D(latitude: 37.7749, longitude: -122.4194)), // San Francisco
-        ("San Francisco", 3.1, CLLocationCoordinate2D(latitude: 37.7755, longitude: -122.4200)), // San Francisco
-
-        ("Los Angeles", 4.0, CLLocationCoordinate2D(latitude: 34.0522, longitude: -118.2437)), // Los Angeles
-        ("New York", 3.5, CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060)),  // New York
-        ("London", 1.5, CLLocationCoordinate2D(latitude: 51.5074, longitude: -0.1278)),   // London
-        ("Paris", 4.5, CLLocationCoordinate2D(latitude: 48.8566, longitude: 2.3522)),    // Paris
-        ("Banff", 4.5, CLLocationCoordinate2D(latitude: 51.17800196486704, longitude: -115.57025630902808))    // Banff
-
-    ]
-    
-    private var allAnnotations: [Location] = [] // Add this to store all annotations
-    
+        
     private lazy var dimmingView: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.black.withAlphaComponent(0.3)
@@ -43,28 +69,12 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }()
 
 
-    private func loadLocationAnnotations() {
-        let locationAnnotations = eventLocations.map { Location(name: $0, rating: $1, coordinate: $2) }
-        allAnnotations = locationAnnotations
-        mapView.addAnnotations(locationAnnotations)
-    }
-
     private lazy var mapSearchController: MapSearchController = {
         let controller = MapSearchController(mapView: mapView, searchBar: searchBar)
         controller.delegate = self
         return controller
     }()
-    
-    func resetAnnotationViews() {
         
-        // Remove all annotations except user location
-        mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
-        
-        // Re-add all original annotations to restore clustering
-//        mapView.addAnnotations(allAnnotations)
-        loadLocationAnnotations()
-    }
-    
     @objc private func mapTapped() {
         locationInfoScrollView.isHidden = true // Hide the info scroll view when tapping on the map
     }
@@ -83,13 +93,13 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
 
-        loadLocationAnnotations()
+        // Load locations from Firebase
+        loadLocations()
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(mapTapped))
-        mapView.addGestureRecognizer(tapGesture) // Add tap gesture to the map view
-
+        mapView.addGestureRecognizer(tapGesture)
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
@@ -214,6 +224,39 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         mapView.register(LocationAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
     }
+    
+    private func loadLocations() {
+        locationDataManager.fetchLocationsFromFirebase { [weak self] locations in
+            guard let self = self else { return }
+            
+            // Update on main thread since we're updating UI
+            DispatchQueue.main.async {
+                self.eventLocations = locations
+                self.loadLocationAnnotations()
+            }
+        }
+    }
+    
+    private func loadLocationAnnotations() {
+        // Remove existing annotations except user location
+        let existingAnnotations = mapView.annotations.filter { !($0 is MKUserLocation) }
+        mapView.removeAnnotations(existingAnnotations)
+        
+        // Create and add new annotations
+        let locationAnnotations = eventLocations.map { Location(name: $0, rating: $1, coordinate: $2) }
+        allAnnotations = locationAnnotations
+        mapView.addAnnotations(locationAnnotations)
+    }
+
+    func resetAnnotationViews() {
+        // Remove all annotations except user location
+        mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
+        
+        // Re-add all annotations
+        loadLocationAnnotations()
+    }
+
+
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let cluster = view.annotation as? MKClusterAnnotation {
@@ -433,3 +476,4 @@ extension MapController: UISearchBarDelegate {
     }
 
 }
+

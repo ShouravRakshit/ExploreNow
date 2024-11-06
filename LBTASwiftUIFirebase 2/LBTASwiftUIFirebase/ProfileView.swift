@@ -175,12 +175,17 @@ struct ProfileView: View {
                                     locationAddress: address,
                                     imageUrls: data["images"] as? [String] ?? [],
                                     timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
-                                    uid: data["uid"] as? String ?? ""
+                                    uid: data["uid"] as? String ?? "",
+                                    username: name,
+                                    userProfileImageUrl: profileImageUrl ?? ""
                                 )
                                 
-                                if !userPosts.contains(where: { $0.id == post.id }) {
-                                    userPosts.append(post)
-                                    userPosts.sort { $0.timestamp > $1.timestamp }
+                                // Update on main thread since we're modifying @State
+                                DispatchQueue.main.async {
+                                    if !userPosts.contains(where: { $0.id == post.id }) {
+                                        userPosts.append(post)
+                                        userPosts.sort { $0.timestamp > $1.timestamp }
+                                    }
                                 }
                             }
                         }
@@ -188,7 +193,7 @@ struct ProfileView: View {
                 }
             }
     }
-    
+
     private func deletePost(_ post: Post) {
         // Remove from local array first for immediate UI update
         userPosts.removeAll { $0.id == post.id }
@@ -257,17 +262,6 @@ struct ProfileView: View {
     }
 }
 
-// Post Model
-struct Post: Identifiable {
-    let id: String
-    let description: String
-    let rating: Int
-    let locationRef: DocumentReference
-    let locationAddress: String // Add this to store the fetched location address
-    let imageUrls: [String]
-    let timestamp: Date
-    let uid: String
-}
 
 // Updated PostCard to show actual post data
 struct UserPostCard: View {
