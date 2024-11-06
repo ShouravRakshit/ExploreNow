@@ -191,10 +191,63 @@ struct AddPostView: View {
         isLoading = true
         addPostStatusMessage = "Uploading post..."
         
+        // First, check if location exists and handle location logic
+        handleLocation { locationRef in
+            // Now proceed with post upload
+            uploadPost(userID: userID, locationRef: locationRef)
+        }
+    }
+
+    private func handleLocation(completion: @escaping (DocumentReference) -> Void) {
+        let db = FirebaseManager.shared.firestore
+        
+        // Query for existing location
+        db.collection("locations")
+            .whereField("address", isEqualTo: selectedLocation)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    self.addPostStatusMessage = "Error checking location: \(error.localizedDescription)"
+                    self.isLoading = false
+                    return
+                }
+                
+                if let existingLocation = snapshot?.documents.first {
+                    // Location exists, use its reference
+                    completion(existingLocation.reference)
+                } else {
+                    // Location doesn't exist, create new one
+                    let locationData: [String: Any] = [
+                        "address": selectedLocation,
+                        "location_coordinates": [latitude, longitude],
+                        "average_rating": rating  // Initial rating
+                    ]
+                    
+                    // Add new location
+                    db.collection("locations").addDocument(data: locationData) { error in
+                        if let error = error {
+                            self.addPostStatusMessage = "Error creating location: \(error.localizedDescription)"
+                            self.isLoading = false
+                            return
+                        }
+                        
+                        // Get the reference of the newly created location
+                        db.collection("locations")
+                            .whereField("address", isEqualTo: self.selectedLocation)
+                            .getDocuments { snapshot, error in
+                                if let newLocationRef = snapshot?.documents.first?.reference {
+                                    completion(newLocationRef)
+                                }
+                            }
+                    }
+                }
+            }
+    }
+
+    private func uploadPost(userID: String, locationRef: DocumentReference) {
+        // Upload images first
         var imageURLs: [String] = []
         let group = DispatchGroup()
         
-        // Upload each image
         for (index, image) in images.enumerated() {
             group.enter()
             
@@ -205,7 +258,6 @@ struct AddPostView: View {
                 continue
             }
             
-            // Upload image
             imageRef.putData(imageData, metadata: nil) { metadata, err in
                 if let err = err {
                     self.addPostStatusMessage = "Failed to upload image: \(err.localizedDescription)"
@@ -214,7 +266,6 @@ struct AddPostView: View {
                     return
                 }
                 
-                // Get download URL
                 imageRef.downloadURL { url, err in
                     if let err = err {
                         self.addPostStatusMessage = "Failed to get download URL: \(err.localizedDescription)"
@@ -232,18 +283,20 @@ struct AddPostView: View {
             }
         }
         
+        // After all images are uploaded, create the post with location reference
         group.notify(queue: .main) {
             let db = FirebaseManager.shared.firestore
+            
+            // Create post with location reference
             let postData: [String: Any] = [
                 "uid": userID,
-                "rating": rating,
-                "description": descriptionText,
-                "location": selectedLocation,
-                "location_coordinates": [latitude, longitude],
+                "rating": self.rating,
+                "description": self.descriptionText,
+                "locationRef": locationRef,  // Store reference to location document
                 "images": imageURLs,
                 "timestamp": FieldValue.serverTimestamp()
             ]
-
+            
             db.collection("user_posts").addDocument(data: postData) { err in
                 if let err = err {
                     self.addPostStatusMessage = "Failed to create post: \(err.localizedDescription)"
@@ -251,9 +304,14 @@ struct AddPostView: View {
                     return
                 }
                 
+                // Update location's average rating
+                self.updateLocationAverageRating(locationRef: locationRef)
+                
+                // Success
                 self.addPostStatusMessage = "Post uploaded successfully!"
                 self.clearForm()
                 
+                // Dismiss the view after successful upload
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                     self.dismiss()
                 }
@@ -261,6 +319,43 @@ struct AddPostView: View {
             }
         }
     }
+
+    private func updateLocationAverageRating(locationRef: DocumentReference) {
+        let db = FirebaseManager.shared.firestore
+        
+        // Get all posts for this location to calculate new average
+        db.collection("user_posts")
+            .whereField("locationRef", isEqualTo: locationRef)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error getting posts for rating update: \(error.localizedDescription)")
+                    return
+                }
+                
+                // Calculate new average
+                var totalRating = 0
+                var count = 0
+                
+                snapshot?.documents.forEach { doc in
+                    if let rating = doc.data()["rating"] as? Int {
+                        totalRating += rating
+                        count += 1
+                    }
+                }
+                
+                let newAverageRating = count > 0 ? Double(totalRating) / Double(count) : Double(self.rating)
+                
+                // Update location with new average rating
+                locationRef.updateData([
+                    "average_rating": newAverageRating
+                ]) { error in
+                    if let error = error {
+                        print("Error updating location average rating: \(error.localizedDescription)")
+                    }
+                }
+            }
+    }
+
     private func clearForm() {
         descriptionText = ""
         selectedLocation = ""

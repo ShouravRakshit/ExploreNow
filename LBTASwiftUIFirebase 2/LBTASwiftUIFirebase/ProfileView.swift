@@ -114,7 +114,7 @@ struct ProfileView: View {
                         LazyVStack {
                             ForEach(userPosts) { post in
                                 UserPostCard(post: post, onDelete: { deletedPost in
-                                    userPosts.removeAll { $0.id == deletedPost.id }
+                                    deletePost(deletedPost)
                                 })
                                 .padding(.top, 10)
                             }
@@ -160,24 +160,99 @@ struct ProfileView: View {
                     if change.type == .added {
                         let data = change.document.data()
                         
-                        let post = Post(
-                            id: change.document.documentID,
-                            description: data["description"] as? String ?? "",
-                            rating: data["rating"] as? Int ?? 0,
-                            location: data["location"] as? String ?? "",
-                            imageUrls: data["images"] as? [String] ?? [],
-                            timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
-                            uid: data["uid"] as? String ?? ""
-                        )
+                        guard let locationRef = data["locationRef"] as? DocumentReference else { return }
                         
-                        if !userPosts.contains(where: { $0.id == post.id }) {
-                            userPosts.append(post)
+                        // Fetch location details
+                        locationRef.getDocument { locationSnapshot, locationError in
+                            if let locationData = locationSnapshot?.data(),
+                               let address = locationData["address"] as? String {
+                                
+                                let post = Post(
+                                    id: change.document.documentID,
+                                    description: data["description"] as? String ?? "",
+                                    rating: data["rating"] as? Int ?? 0,
+                                    locationRef: locationRef,
+                                    locationAddress: address,
+                                    imageUrls: data["images"] as? [String] ?? [],
+                                    timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
+                                    uid: data["uid"] as? String ?? ""
+                                )
+                                
+                                if !userPosts.contains(where: { $0.id == post.id }) {
+                                    userPosts.append(post)
+                                    userPosts.sort { $0.timestamp > $1.timestamp }
+                                }
+                            }
                         }
                     }
                 }
+            }
+    }
+    
+    private func deletePost(_ post: Post) {
+        // Remove from local array first for immediate UI update
+        userPosts.removeAll { $0.id == post.id }
+        
+        // Delete images from Storage
+        for imageUrl in post.imageUrls {
+            let imageRef = FirebaseManager.shared.storage.reference(forURL: imageUrl)
+            imageRef.delete { error in
+                if let error = error {
+                    print("Error deleting image: \(error.localizedDescription)")
+                }
+            }
+        }
+        
+        // Delete post document from Firestore
+        FirebaseManager.shared.firestore
+            .collection("user_posts")
+            .document(post.id)
+            .delete { error in
+                if let error = error {
+                    print("Error deleting post: \(error.localizedDescription)")
+                    return
+                }
                 
-                // Sort posts by timestamp
-                userPosts.sort { $0.timestamp > $1.timestamp }
+                // Update location's average rating
+                updateLocationRating(locationRef: post.locationRef)
+            }
+    }
+    
+    private func updateLocationRating(locationRef: DocumentReference) {
+        let db = FirebaseManager.shared.firestore
+        
+        // Get all remaining posts for this location
+        db.collection("user_posts")
+            .whereField("locationRef", isEqualTo: locationRef)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error getting posts for rating update: \(error.localizedDescription)")
+                    return
+                }
+                
+                // Calculate new average
+                var totalRating = 0
+                var count = 0
+                
+                snapshot?.documents.forEach { doc in
+                    if let rating = doc.data()["rating"] as? Int {
+                        totalRating += rating
+                        count += 1
+                    }
+                }
+                
+                if count > 0 {
+                    let newAverageRating = Double(totalRating) / Double(count)
+                    // Update location with new average rating
+                    locationRef.updateData([
+                        "average_rating": newAverageRating
+                    ])
+                } else {
+                    // Either delete the location or set rating to 0
+                    locationRef.updateData([
+                        "average_rating": 0
+                    ])
+                }
             }
     }
 }
@@ -187,7 +262,8 @@ struct Post: Identifiable {
     let id: String
     let description: String
     let rating: Int
-    let location: String
+    let locationRef: DocumentReference
+    let locationAddress: String // Add this to store the fetched location address
     let imageUrls: [String]
     let timestamp: Date
     let uid: String
@@ -196,12 +272,12 @@ struct Post: Identifiable {
 // Updated PostCard to show actual post data
 struct UserPostCard: View {
     let post: Post
-    let onDelete: (Post) -> Void  // Add this closure
+    let onDelete: (Post) -> Void
     @State private var showingAlert = false
     @State private var currentImageIndex = 0
     @State private var showingError = false
     @State private var errorMessage = ""
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack {
@@ -248,7 +324,7 @@ struct UserPostCard: View {
                     Text("\(post.rating)")
                     
                     Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
-                    Text(post.location)
+                    Text(post.locationAddress)
                         .lineLimit(1)
                 }
             }
@@ -266,7 +342,7 @@ struct UserPostCard: View {
                 title: Text("Delete Post"),
                 message: Text("Are you sure you want to delete this post? This action cannot be undone."),
                 primaryButton: .destructive(Text("Delete")) {
-                    deletePost()
+                    onDelete(post)
                 },
                 secondaryButton: .cancel()
             )
@@ -276,32 +352,5 @@ struct UserPostCard: View {
         } message: {
             Text(errorMessage)
         }
-    }
-
-    private func deletePost() {
-        for imageUrl in post.imageUrls {
-            let imageRef = FirebaseManager.shared.storage.reference(forURL: imageUrl)
-            imageRef.delete { error in
-                if let error = error {
-                    print("Error deleting image: \(error.localizedDescription)")
-                }
-            }
-        }
-        
-        // 2. Delete the post document from Firestore
-        FirebaseManager.shared.firestore
-            .collection("user_posts")
-            .document(post.id)
-            .delete { error in
-                if let error = error {
-                    errorMessage = "Error deleting post: \(error.localizedDescription)"
-                    showingError = true
-                } else {
-                    // Call onDelete closure after successful deletion
-                    DispatchQueue.main.async {
-                        onDelete(post)
-                    }
-                }
-            }
     }
 }
