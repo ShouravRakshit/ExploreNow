@@ -8,7 +8,7 @@ class LocationInfoView: UIView {
     private let ratingLabel = UILabel()
     private let poiLabel = UILabel()
     private var loadingIndicator: UIActivityIndicatorView?
-    private var currentLocation: Location? // Add this to store the location
+    private var currentLocation: Location?
 
     
     override init(frame: CGRect) {
@@ -108,7 +108,6 @@ class LocationInfoView: UIView {
                     let locationRef = locationDoc.reference
                     let locationPostsPage = UIHostingController(rootView:
                         LocationPostsPage(locationRef: locationRef)
-                        // Removed .environmentObject(UserManager.shared)
                     )
                     
                     if let parentVC = self.parentViewController {

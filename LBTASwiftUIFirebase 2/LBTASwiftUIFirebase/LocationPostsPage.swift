@@ -17,11 +17,8 @@ struct LocationPostsPage: View {
     @State private var locationPosts: [Post] = []
     @State private var locationDetails: LocationDetails?
     @State private var isLoading = true
-    
-    // Move LocationDetails outside of the view
 }
 
-// Move LocationDetails struct outside the view
 struct LocationDetails {
     let mainAddress: String
     let fullAddress: String
@@ -36,7 +33,7 @@ extension LocationPostsPage {
             } else {
                 // Header Image with location and rating
                 ZStack(alignment: .bottom) {
-                    Image("banff") // You might want to add location images later
+                    Image("banff") // we gotta add custom images later. either through the app or using apple maps api/google api
                         .resizable()
                         .scaledToFill()
                         .frame(height: 250)
@@ -190,8 +187,8 @@ extension LocationPostsPage {
                             imageUrls: data["images"] as? [String] ?? [],
                             timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
                             uid: data["uid"] as? String ?? "",
-                            username: "User", // You might want to fetch this from the user document
-                            userProfileImageUrl: "" // You might want to fetch this from the user document
+                            username: "User", // have to change these to actual user info
+                            userProfileImageUrl: ""
                         )
                         
                         if !locationPosts.contains(where: { $0.id == post.id }) {

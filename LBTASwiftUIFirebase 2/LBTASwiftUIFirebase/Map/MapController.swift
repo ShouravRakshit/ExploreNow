@@ -11,45 +11,47 @@ import UIKit
 class LocationManager {
     static let shared = LocationManager()
     @Published var eventLocations: [(String, Double, CLLocationCoordinate2D)] = []
-    
-    func fetchLocationsFromFirebase(completion: @escaping ([(String, Double, CLLocationCoordinate2D)]) -> Void) {
-        FirebaseManager.shared.firestore.collection("locations").getDocuments { snapshot, error in
-            if let error = error {
-                print("Error fetching locations: \(error.localizedDescription)")
-                completion([])
-                return
-            }
-            
-            var locations: [(String, Double, CLLocationCoordinate2D)] = []
-            
-            snapshot?.documents.forEach { document in
-                let data = document.data()
-                
-                if let address = data["address"] as? String,
-                   let averageRating = data["average_rating"] as? Double,
-                   let coordinates = data["location_coordinates"] as? [Double],
-                   coordinates.count == 2 {
-                    
-                    let coordinate = CLLocationCoordinate2D(
-                        latitude: coordinates[0],
-                        longitude: coordinates[1]
-                    )
-                    
-                    locations.append((address, averageRating, coordinate))
+        
+    func startListeningToLocations(completion: @escaping ([(String, Double, CLLocationCoordinate2D)]) -> Void) {
+        FirebaseManager.shared.firestore.collection("locations")
+            .addSnapshotListener { snapshot, error in
+                if let error = error {
+                    print("Error fetching locations: \(error.localizedDescription)")
+                    completion([])
+                    return
                 }
+                
+                var locations: [(String, Double, CLLocationCoordinate2D)] = []
+                
+                snapshot?.documents.forEach { document in
+                    let data = document.data()
+                    
+                    if let address = data["address"] as? String,
+                       let averageRating = data["average_rating"] as? Double,
+                       let coordinates = data["location_coordinates"] as? [Double],
+                       coordinates.count == 2 {
+                        
+                        let coordinate = CLLocationCoordinate2D(
+                            latitude: coordinates[0],
+                            longitude: coordinates[1]
+                        )
+                        
+                        locations.append((address, averageRating, coordinate))
+                    }
+                }
+                
+                self.eventLocations = locations
+                completion(locations)
             }
-            
-            self.eventLocations = locations
-            completion(locations)
-        }
     }
+
 }
 
 class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
 
-    private let mapView = MKMapView() // Initialize map view programmatically
+    private let mapView = MKMapView()
     private let searchBar = UISearchBar()
-    private let containerView = UIView()  // Container for SearchBar + MapView
+    private let containerView = UIView()
 
     private let locationManager = CLLocationManager()
     private let locationDataManager = LocationManager.shared
@@ -57,7 +59,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     private var allAnnotations: [Location] = []
     private var userTrackingButton: MKUserTrackingButton!
     private var scaleView: MKScaleView!
-    private let locationInfoScrollView = UIScrollView() // Add this
+    private let locationInfoScrollView = UIScrollView()
     private var locationInfoViews: [LocationInfoView] = [] // To hold instances
 
         
@@ -76,7 +78,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }()
         
     @objc private func mapTapped() {
-        locationInfoScrollView.isHidden = true // Hide the info scroll view when tapping on the map
+        locationInfoScrollView.isHidden = true 
     }
 
 
@@ -93,8 +95,8 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
 
-        // Load locations from Firebase
-        loadLocations()
+        // Start listening for location updates
+        startListeningToLocations()
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(mapTapped))
         mapView.addGestureRecognizer(tapGesture)
@@ -225,18 +227,17 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
     }
     
-    private func loadLocations() {
-        locationDataManager.fetchLocationsFromFirebase { [weak self] locations in
+    private func startListeningToLocations() {
+        LocationManager.shared.startListeningToLocations { [weak self] locations in
             guard let self = self else { return }
             
-            // Update on main thread since we're updating UI
             DispatchQueue.main.async {
                 self.eventLocations = locations
                 self.loadLocationAnnotations()
             }
         }
     }
-    
+
     private func loadLocationAnnotations() {
         // Remove existing annotations except user location
         let existingAnnotations = mapView.annotations.filter { !($0 is MKUserLocation) }
