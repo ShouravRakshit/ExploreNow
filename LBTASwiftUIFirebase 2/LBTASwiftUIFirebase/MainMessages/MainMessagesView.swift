@@ -85,9 +85,11 @@ struct MainMessagesView: View {
                 NavigationLink(destination: ChatLogView(chatUser: selectedChatUser).environmentObject(userManager), isActive: $shouldNavigateToChatLogView) {
                     EmptyView()
                 }
+                .navigationBarHidden(false) // Show the navigation bar in the destination view
+
             }
-            .navigationBarHidden(true)
             .background(Color(.systemGray6))
+            .toolbarBackground(Color.black, for: .navigationBar) // Set navigation bar background to black
 
         }
     }

@@ -12,7 +12,11 @@ struct ProfileView: View {
     @State private var showProfileSettings = false
     @State private var showAddPost = false
     @State private var viewingOtherProfile = true
-    @State private var isRequestSent = false
+    @State private var isRequestSentToOtherUser = false
+    @State private var didUserSendMeRequest = false
+    @State private var isFriends = false
+    @State private var friendshipLabelText = "Add Friend..."
+    @State private var friendsList: [String] = []
     
     var user_uid: String // The UID (or username) of the user whose profile is being viewed
  //   var profileImageUrl: String?
@@ -60,15 +64,15 @@ struct ProfileView: View {
                     VStack {
                         Text("\(userPosts.count)")
                             .font(.system(size: 20, weight: .bold))
-                        Text("Posts")
+                        Text("\(userPosts.count == 1 ? "Post" : "Posts")")
                             .font(.system(size: 16))
                     }.padding(.horizontal, 40)
                     
                     // Friends Counts
                     VStack {
-                        Text("\(1100)")
+                        Text("\(friendsList.count)")
                             .font(.system(size: 20, weight: .bold))
-                        Text("Friends")
+                        Text("\(friendsList.count == 1 ? "Friend" : "Friends")")
                             .font(.system(size: 16))
                     }.padding(.horizontal, 10)
                     
@@ -107,7 +111,8 @@ struct ProfileView: View {
                         if let receiver_id = profileUser?.uid{
                             userManager.sendFriendRequest(to: receiver_id) { success, error in
                                 if success {
-                                    self.isRequestSent = true
+                                    self.isRequestSentToOtherUser = true
+                                    self.friendshipLabelText = "Requested"
                                     print("Friend request and notification sent successfully.")
                                 } else {
                                     print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
@@ -115,12 +120,12 @@ struct ProfileView: View {
                             }
                         }
                     }) {
-                        Text(isRequestSent ? "Requested" : "Add Friend")
+                        Text(friendshipLabelText)
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white) // White text color
                             .padding() // Add padding inside the button
                             .frame(maxWidth: .infinity) // Make the button expand to full width
-                            .background(isRequestSent ? Color.gray : Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
+                            .background(isRequestSentToOtherUser ? Color.gray : Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
                             .cornerRadius(25) // Rounded corners
                             .shadow(radius: 5) // Optional shadow for depth
                     }
@@ -163,7 +168,7 @@ struct ProfileView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 50)
-                    } else {
+                    } else if isFriends {
                         LazyVStack {
                             ForEach(userPosts) { post in
                                 UserPostCard(post: post, onDelete: { deletedPost in
@@ -191,13 +196,22 @@ struct ProfileView: View {
                 checkIfRequestedUser ()
                 fetchUserData  ()
                 fetchUserPosts (uid: user_uid)
+                fetchUserFriends(userId: user_uid) { friends, error in
+                    if let error = error {
+                        print("Failed to fetch friends: \(error.localizedDescription)")
+                    } else if let friends = friends {
+                        print("User's friends: \(friends.count)")
+                    } else {
+                        print("No friends found for the user.")
+                    }
+                }
             }
         }
     }
     
     private func checkIfRequestedUser (){
         //updates "add friend" label to "requested" if a request was sent by setting isRequestSent
-        isRequestSent = false
+        isRequestSentToOtherUser = true
     }
     
     private func fetchUserPosts(uid: String) {
@@ -323,7 +337,7 @@ struct ProfileView: View {
     // Fetch user data from Firestore
     private func fetchUserData()
         {
-        //if profile for current user
+        //if viewing your own profile
         print ("current user uid: \(userManager.currentUser?.uid)")
         print ("profile user uid: \(user_uid)")
         if user_uid == self.userManager.currentUser?.uid
@@ -354,7 +368,129 @@ struct ProfileView: View {
                 // Initialize the User object with the data
                 self.profileUser = User(data: data, uid: user_uid)
             }
+        //check friendship status from user1 - current user to user 2 - other user
+        checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
     }
+    
+    
+    func checkFriendshipStatus(user1Id: String, user2Id: String) {
+        print ("Calling checkFriendshipStatus")
+        friendshipLabelText = "Loading..."
+        isFriends = false
+        isRequestSentToOtherUser = false
+        didUserSendMeRequest = false
+        
+        let db = Firestore.firestore()
+ 
+        // 1. Check if they are friends by looking at the user's "friends" field
+        let friendsRef = db.collection("friends")
+        
+        // Query for user1's friends list
+        let user1FriendsQuery = friendsRef.document(user1Id).getDocument { (document, error) in
+            if let error = error {
+                print("Error checking user1's friends list: \(error)")
+            } else if let document = document, document.exists {
+                // Check if user2Id is in user1's friends list
+                if let friendsList = document.data()?["friends"] as? [String], friendsList.contains(user2Id) {
+                    isFriends = true
+                }
+                else{
+                    print ("Not friends")
+                }
+            }
+            
+            // 2. Now check if a friend request has been sent with "pending" status
+            let friendRequestsRef = db.collection("friendRequests")
+            
+            // Query for a pending request from user1 to user2
+            let requestQuery1 = friendRequestsRef.whereField("senderId", isEqualTo: user1Id)
+                                                .whereField("receiverId", isEqualTo: user2Id)
+                                                .whereField("status", isEqualTo: "pending")
+            
+            // Query for a pending request from user2 to user1
+            let requestQuery2 = friendRequestsRef.whereField("senderId", isEqualTo: user2Id)
+                                                .whereField("receiverId", isEqualTo: user1Id)
+                                                .whereField("status", isEqualTo: "pending")
+            
+            // Execute both requests queries
+            requestQuery1.getDocuments { (snapshot1, error) in
+                if let error = error {
+                    print("Error checking first request query: \(error)")
+                } else if !snapshot1!.isEmpty {
+                    // If we find any document with status "pending", a request has been sent
+                    isRequestSentToOtherUser = true
+                    friendshipLabelText = "Requested"
+                    print ("Status: friends")
+                }
+                else{
+                    print ("Did not send friend request to other user")
+                }
+                
+                // Execute the second query (for the reverse direction)
+                requestQuery2.getDocuments { (snapshot2, error) in
+                    if let error = error {
+                        print("Error checking second request query: \(error)")
+                    } else if !snapshot2!.isEmpty {
+                        // If we find any document with status "pending", a request has been sent
+                        didUserSendMeRequest = true
+                        friendshipLabelText = "Add Friend"
+                        print ("Status: other user sent me request")
+                    }
+                    else{
+                        print ("Other user did not send me a request")
+                    }
+                    
+                    // Return the results once both checks are done
+                    //completion(isRequestSentToOtherUser, isFriends)
+                }
+            }
+            if !isRequestSentToOtherUser && !isFriends{
+                friendshipLabelText = "Add Friend"
+                print ("Setting friendship label to Add friend")
+            }
+            else if isFriends{
+                friendshipLabelText = "Friends"
+                print ("Status: friends")
+            }
+            else if isRequestSentToOtherUser{
+                friendshipLabelText = "Requested"
+                print ("Status: requested")
+            }
+        }
+
+    }
+    
+    func fetchUserFriends(userId: String, completion: @escaping ([String]?, Error?) -> Void) {
+        let db = Firestore.firestore()
+        
+        // Reference to the user's document in the 'friends' collection
+        let friendsRef = db.collection("friends").document(userId)
+        
+        // Fetch the document for the user
+        friendsRef.getDocument { (document, error) in
+            if let error = error {
+                // Handle any errors that occurred during the fetch
+                print("Error fetching friends for user \(userId): \(error.localizedDescription)")
+                completion(nil, error)
+            } else if let document = document, document.exists {
+                // Document exists, extract the 'friends' field (assuming it's an array of friend IDs)
+                if let friendsList = document.data()?["friends"] as? [String] {
+                    self.friendsList = friendsList
+                    // Return the list of friend IDs
+                    completion(friendsList, nil)
+                } else {
+                    // No friends list or the 'friends' field is missing
+                    print("No friends list found for user \(userId).")
+                    completion([], nil) // Returning an empty list if no friends are found
+                }
+            } else {
+                // The document doesn't exist (no friends found for the user)
+                print("No document found for user \(userId).")
+                completion([], nil) // Returning an empty list if no document exists
+            }
+        }
+    }
+    
     
 }
 

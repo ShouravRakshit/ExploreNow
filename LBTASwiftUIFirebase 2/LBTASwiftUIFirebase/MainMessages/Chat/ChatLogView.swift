@@ -299,6 +299,8 @@ struct ChatLogView: View {
         }
         //.navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden(false) // Ensure back button is shown
+        .navigationBarTitle("Chat Log", displayMode: .inline) // Optional, customize the title
         // Set the left bar button to make the email clickable
         // Use toolbar modifier to center the email
         .toolbar {
@@ -327,7 +329,7 @@ struct ChatLogView: View {
             ) {
                 EmptyView() // NavigationLink content is invisible; it only triggers navigation
             }
-            .hidden() // Hide the NavigationLink content to avoid extra UI elements
+            //.hidden() // Hide the NavigationLink content to avoid extra UI elements
         )
 
     }
