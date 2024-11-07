@@ -47,6 +47,7 @@
 		B02A96A92CC0AB81008B6E8B /* Sansation-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */; };
 		B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */; };
 		B09365862CDC231F00126005 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09365852CDC231900126005 /* NotificationView.swift */; };
+		B09365882CDC952400126005 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09365872CDC951E00126005 /* NotificationManager.swift */; };
 		B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */; };
 		B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983942CC70D6F00E1CBE3 /* NavBar.swift */; };
 		B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */; };
@@ -93,6 +94,7 @@
 		B02A96AA2CC0AC21008B6E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		B09365852CDC231900126005 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		B09365872CDC951E00126005 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		B0F983942CC70D6F00E1CBE3 /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
 		B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				B09365872CDC951E00126005 /* NotificationManager.swift */,
 				B09365852CDC231900126005 /* NotificationView.swift */,
 				10F6BB532CDB704D0033B9A5 /* Post.swift */,
 				B01523472CC82ED50012FC49 /* EditView.swift */,
@@ -352,6 +355,7 @@
 				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,
 				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
+				B09365882CDC952400126005 /* NotificationManager.swift in Sources */,
 				68D3B3942CCA321D00166069 /* LocationSearchView.swift in Sources */,
 				81447E6F2CB3306C005BE180 /* ImagePicker.swift in Sources */,
 				B01DE7132CC199A000C158DD /* MainMessagesView.swift in Sources */,

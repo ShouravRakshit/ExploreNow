@@ -190,7 +190,7 @@ struct ProfileView: View {
             .onAppear {
                 checkIfRequestedUser ()
                 fetchUserData  ()
-                fetchUserPosts ()
+                fetchUserPosts (uid: user_uid)
             }
         }
     }
@@ -200,8 +200,7 @@ struct ProfileView: View {
         isRequestSent = false
     }
     
-    private func fetchUserPosts() {
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+    private func fetchUserPosts(uid: String) {
         isLoading = true
         
         FirebaseManager.shared.firestore
