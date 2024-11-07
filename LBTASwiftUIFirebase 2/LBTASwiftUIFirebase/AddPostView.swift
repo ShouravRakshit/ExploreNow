@@ -17,7 +17,8 @@ struct AddPostView: View {
     @State private var longitude: Double = 0.0
     @State private var isLoading = false
     @Environment(\.dismiss) var dismiss
-    
+    @StateObject private var searchCompleter = LocationSearchCompleter()
+
     let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
@@ -363,5 +364,6 @@ struct AddPostView: View {
         rating = 0
         latitude = 0
         longitude = 0
+        addPostStatusMessage = ""
     }
 }
