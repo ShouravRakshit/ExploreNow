@@ -193,6 +193,7 @@ struct ProfileView: View {
                 AddPostView()
             }
             .onAppear {
+                print ("Profile view appeared")
                 checkIfRequestedUser ()
                 fetchUserData  ()
                 fetchUserPosts (uid: user_uid)
@@ -204,6 +205,15 @@ struct ProfileView: View {
                     } else {
                         print("No friends found for the user.")
                     }
+                }
+            }
+            
+            .onChange(of: showProfileSettings) { newValue in
+                if !newValue {
+                    // When the full screen cover is dismissed (isProfileViewPresented becomes false)
+                    print("Full screen cover dismissed, resetting user values")
+                    // Perform necessary actions after dismissal
+                    fetchUserData()
                 }
             }
         }
