@@ -37,6 +37,7 @@ struct LocationSearchBar: View {
                 if !searchText.isEmpty {
                     Button(action: {
                         searchText = ""
+                        selectedLocation = ""
                         showResults = false
                     }) {
                         Image(systemName: "xmark.circle.fill")
@@ -84,6 +85,12 @@ struct LocationSearchBar: View {
             }
         }
         .padding(.horizontal)
+        .onChange(of: selectedLocation) { _, newValue in
+            if newValue.isEmpty {
+                searchText = ""
+                showResults = false
+            }
+        }
     }
 }
 
