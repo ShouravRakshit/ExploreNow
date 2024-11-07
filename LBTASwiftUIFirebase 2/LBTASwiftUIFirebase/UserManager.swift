@@ -211,7 +211,8 @@ class UserManager: ObservableObject {
                 "receiverId": receiverId,
                 "message": "\(name) (@\(username)) accepted your friend request.",
                 "timestamp": Timestamp(),
-                "isRead": false // Initially unread
+                "isRead": false, // Initially unread
+                "status": "accepted"
             ]
             
             // Add notification to the notifications collection

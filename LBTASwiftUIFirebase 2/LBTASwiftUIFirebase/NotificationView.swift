@@ -111,7 +111,8 @@ struct NotificationView: View {
                                         viewModel.notificationUsers[index].notification.message = "You and \(user.name) are now friends."
                                     }
                                     acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
-                                    sendNotificationToAcceptedUser(receiverId: receiverId, senderId: senderId) { success, error in
+                                    //__ accepted your friend request
+                                    sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
                                         if success {
                                             print("Notification sent successfully")
                                         } else {
@@ -119,6 +120,7 @@ struct NotificationView: View {
                                         }
                                     }
                                     //can be combined with updateNotificationStatus for efficiency
+                                    //You and __ are now friends
                                     updateNotificationAccepted (user)
                                 }) {
                                     Text(user.notification.status == "pending" ? "Confirm" : "Friends")

@@ -168,7 +168,8 @@ struct ProfileView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 50)
-                    } else if isFriends {
+                        //you should only see posts if its your profile or if you're their friend
+                    } else if isFriends || !viewingOtherProfile {
                         LazyVStack {
                             ForEach(userPosts) { post in
                                 UserPostCard(post: post, onDelete: { deletedPost in
@@ -214,6 +215,16 @@ struct ProfileView: View {
                     print("Full screen cover dismissed, resetting user values")
                     // Perform necessary actions after dismissal
                     fetchUserData()
+                    fetchUserPosts (uid: user_uid)
+                    fetchUserFriends(userId: user_uid) { friends, error in
+                        if let error = error {
+                            print("Failed to fetch friends: \(error.localizedDescription)")
+                        } else if let friends = friends {
+                            print("User's friends: \(friends.count)")
+                        } else {
+                            print("No friends found for the user.")
+                        }
+                    }
                 }
             }
         }
@@ -355,6 +366,7 @@ struct ProfileView: View {
             print ("Setting profile user to current user")
             self.profileUser = self.userManager.currentUser
             viewingOtherProfile = false
+            
             return
             }
 
