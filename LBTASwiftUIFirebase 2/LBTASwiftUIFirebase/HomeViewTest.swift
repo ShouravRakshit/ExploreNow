@@ -59,7 +59,7 @@ struct HomeViewTest: View {
         }
         .edgesIgnoringSafeArea(.top) // To avoid clipping at the top edge of the screen
         .fullScreenCover(isPresented: $navigateToNotifications) {
-            NotificationView()
+            NotificationView(userManager: userManager)
                 .environmentObject(userManager)
         }
         .onAppear {

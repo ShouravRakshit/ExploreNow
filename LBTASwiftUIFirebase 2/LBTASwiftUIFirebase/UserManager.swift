@@ -24,7 +24,6 @@ class UserManager: ObservableObject {
     }
     @Published var hasUnreadNotifications: Bool = false // Flag for unread notifications
     private let db = Firestore.firestore()
-    private var notificationListener: ListenerRegistration?
     
 
     init() {
@@ -158,9 +157,12 @@ class UserManager: ObservableObject {
             "status": "pending",  // Initially set to "pending"
             "timestamp": Timestamp()  // Current timestamp
         ]
+        
+        // Use senderId_receiverId as the document ID to ensure unique identification of the request
+        let friendRequestDocId = "\(senderId)_\(receiverId)"
 
         // Add the friend request to the friendRequests collection
-        db.collection("friendRequests").addDocument(data: friendRequestData) { error in
+        db.collection("friendRequests").document(friendRequestDocId).setData(friendRequestData){ error in
             if let error = error {
                 completion(false, error)
             } else {
@@ -176,14 +178,38 @@ class UserManager: ObservableObject {
         }
     }
     
+    //sends friend request to user
     func sendNotification(to receiverId: String, senderId: String, completion: @escaping (Bool, Error?) -> Void) {
         if let name = currentUser?.name, let username = currentUser?.username{
             let notificationData: [String: Any] = [
                 "type": "friendRequest",
                 "senderId": senderId,
-                "senderProfileImg": currentUser?.profileImageUrl ?? "",
                 "receiverId": receiverId,
-                "message": "\(name) (@\(username)) sent you a new friend request.",
+                "message": "\(name) (@\(username)) sent you a friend request.",
+                "timestamp": Timestamp(),
+                "isRead": false, // Initially unread,
+                "status": "pending"
+            ]
+            
+            // Add notification to the notifications collection
+            db.collection("notifications").addDocument(data: notificationData) { error in
+                if let error = error {
+                    completion(false, error)
+                } else {
+                    completion(true, nil)
+                }
+            }
+        }
+    }
+    
+    //sends notification to user that their request was accepted
+    func sendRequestAcceptedNotification(to receiverId: String, senderId: String, completion: @escaping (Bool, Error?) -> Void) {
+        if let name = currentUser?.name, let username = currentUser?.username{
+            let notificationData: [String: Any] = [
+                "type": "friendRequest",
+                "senderId": senderId,
+                "receiverId": receiverId,
+                "message": "\(name) (@\(username)) accepted your friend request.",
                 "timestamp": Timestamp(),
                 "isRead": false // Initially unread
             ]
@@ -217,15 +243,17 @@ class UserManager: ObservableObject {
                         print("No notifications found.")
                         return  // Exit early if no notifications are found
                     }
-                    
+
                     // Parse the notifications into an array
                     var notifications: [Notification] = []
                     snapshot?.documents.forEach { document in
                         let data = document.data()
+
                         if let receiverId = data["receiverId"] as? String,
                            let senderId = data["senderId"] as? String,
                            let message = data["message"] as? String,
                            let timestamp = data["timestamp"] as? Timestamp,
+                           let status = data["status"] as? String,
                            let isRead = data["isRead"] as? Bool {
                             
                             print ("notification message: \(message)")
@@ -234,7 +262,8 @@ class UserManager: ObservableObject {
                                                             senderId: senderId,
                                                             message: message,
                                                             timestamp: timestamp,
-                                                            isRead: isRead)
+                                                            isRead: isRead,
+                                                            status: status)
                             notifications.append(notification)
                         }
                     }
@@ -323,8 +352,9 @@ struct User
 struct Notification {
     let receiverId: String
     let senderId: String
-    let message: String
+    var message: String
     let timestamp: Timestamp
+    var status: String
     var isRead: Bool
     
     // Initializer that takes a Firestore document
@@ -335,15 +365,17 @@ struct Notification {
         self.message = data["message"] as? String ?? "No message"
         self.timestamp = data["timestamp"] as? Timestamp ?? Timestamp(date: Date()) // Default to current time if not found
         self.isRead = data["isRead"] as? Bool ?? false // Default to unread
+        self.status = data ["status"] as? String ?? ""
     }
     
     // Initializer to create a Notification from Firestore data
-    init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool) {
+    init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool, status: String) {
         self.receiverId = receiverId
         self.senderId = senderId
         self.message = message
         self.timestamp = timestamp
         self.isRead = isRead
+        self.status = status
     }
     
     // You can add a computed property to display the time nicely
@@ -373,4 +405,5 @@ struct Notification {
         }
         return "Just now"
     }
+
 }
