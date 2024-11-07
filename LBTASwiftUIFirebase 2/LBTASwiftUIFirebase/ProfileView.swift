@@ -125,7 +125,7 @@ struct ProfileView: View {
                             .foregroundColor(.white) // White text color
                             .padding() // Add padding inside the button
                             .frame(maxWidth: .infinity) // Make the button expand to full width
-                            .background(isRequestSentToOtherUser ? Color.gray : Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
+                            .background((isRequestSentToOtherUser || isFriends) ? Color.gray : Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
                             .cornerRadius(25) // Rounded corners
                             .shadow(radius: 5) // Optional shadow for depth
                     }
