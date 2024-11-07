@@ -38,6 +38,7 @@ class ChatLogViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var chatMessages = [ChatMessage]()
     @Published var blockedUsers: [String] = []
+    @EnvironmentObject var userManager: UserManager
     
     let chatUser: ChatUser?
     
@@ -260,6 +261,7 @@ class ChatLogViewModel: ObservableObject {
 struct ChatLogView: View {
     let chatUser: ChatUser?
     
+    @EnvironmentObject var userManager: UserManager
     @ObservedObject var vm: ChatLogViewModel
     @State private var showEmojiPicker = false
     @State private var selectedEmoji: String = ""
@@ -320,7 +322,7 @@ struct ChatLogView: View {
         // Use a NavigationLink triggered programmatically by `isNavigating`
         .background(
             NavigationLink(
-                destination: ProfileView(uid: chatUser?.uid ?? ""),
+                destination: ProfileView(user_uid: chatUser?.uid ?? ""),
                 isActive: $isNavigating
             ) {
                 EmptyView() // NavigationLink content is invisible; it only triggers navigation

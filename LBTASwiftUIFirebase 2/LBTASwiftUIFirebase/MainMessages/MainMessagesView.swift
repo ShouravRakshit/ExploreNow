@@ -82,7 +82,7 @@ struct MainMessagesView: View {
                                 }
                 .padding(.top, 1)
                 Spacer()
-                NavigationLink(destination: ChatLogView(chatUser: selectedChatUser), isActive: $shouldNavigateToChatLogView) {
+                NavigationLink(destination: ChatLogView(chatUser: selectedChatUser).environmentObject(userManager), isActive: $shouldNavigateToChatLogView) {
                     EmptyView()
                 }
             }
@@ -106,7 +106,7 @@ struct MainMessagesView: View {
         HStack(spacing: 16) {
 
             if let currentUser = userManager.currentUser {
-                NavigationLink(destination: ProfileView(uid: currentUser.uid)) {
+                NavigationLink(destination: ProfileView(user_uid: currentUser.uid)) {
                     WebImage(url: URL(string: currentUser.profileImageUrl ?? ""))
                         .resizable()
                         .scaledToFill()

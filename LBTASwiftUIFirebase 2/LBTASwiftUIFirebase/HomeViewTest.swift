@@ -41,8 +41,8 @@ struct HomeViewTest: View {
                                 .frame(width: 30, height: 30)
                                 .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Bell color
 
-                            // The red dot for new notifications
-                            if hasNotifications {
+                            // Show the red dot if there are notifications
+                            if userManager.hasUnreadNotifications{
                                 Circle()
                                     .fill(Color.red)
                                     .frame(width: 10, height: 10)
@@ -62,7 +62,26 @@ struct HomeViewTest: View {
             NotificationView()
                 .environmentObject(userManager)
         }
+        .onAppear {
+            print ("ON APPEAR")
+            // Make sure the current user is available before checking notifications
+            if userManager.currentUser != nil {
+                checkIfNotifications()
+            }
+            else{
+                print ("current user is nil")
+            }
+        }
+
     }
+    
+    private func checkIfNotifications() {
+        print ("Calling check if notifications")
+        // Check if the currentUser exists and if notifications is nil or empty
+        hasNotifications = !(userManager.currentUser?.notifications.isEmpty ?? true)
+        print ("has notifications: \(hasNotifications)")
+    }
+
     
 }
 

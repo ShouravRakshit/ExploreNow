@@ -45,7 +45,7 @@ struct NavBar: View {
             .environmentObject (userManager)
         
         if let user = userManager.currentUser {
-            ProfileView (uid: user.uid)
+            ProfileView (user_uid: user.uid)
                 .tabItem {
                     Image(systemName: "person")
                 }

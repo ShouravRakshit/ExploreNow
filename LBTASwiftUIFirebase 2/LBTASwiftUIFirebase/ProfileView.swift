@@ -12,8 +12,9 @@ struct ProfileView: View {
     @State private var showProfileSettings = false
     @State private var showAddPost = false
     @State private var viewingOtherProfile = true
+    @State private var isRequestSent = false
     
-    var uid: String // The UID (or username) of the user whose profile is being viewed
+    var user_uid: String // The UID (or username) of the user whose profile is being viewed
  //   var profileImageUrl: String?
  //   var name: String
 
@@ -102,15 +103,24 @@ struct ProfileView: View {
                 //Friendship status - add friend, friends
                 if viewingOtherProfile{
                     Button(action: {
-                        // Handle the friend request action
-                        //toggleFriendshipStatus()
+                        // Call the function to send the friend request
+                        if let receiver_id = profileUser?.uid{
+                            userManager.sendFriendRequest(to: receiver_id) { success, error in
+                                if success {
+                                    self.isRequestSent = true
+                                    print("Friend request and notification sent successfully.")
+                                } else {
+                                    print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
+                                }
+                            }
+                        }
                     }) {
-                        Text("Add Friend")
+                        Text(isRequestSent ? "Requested" : "Add Friend")
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(.white) // White text color
                             .padding() // Add padding inside the button
                             .frame(maxWidth: .infinity) // Make the button expand to full width
-                            .background(Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
+                            .background(isRequestSent ? Color.gray : Color(red: 140/255, green: 82/255, blue: 255/255))// Red for "Unfriend", blue for "Add Friend"
                             .cornerRadius(25) // Rounded corners
                             .shadow(radius: 5) // Optional shadow for depth
                     }
@@ -178,10 +188,16 @@ struct ProfileView: View {
                 AddPostView()
             }
             .onAppear {
+                checkIfRequestedUser ()
                 fetchUserData  ()
                 fetchUserPosts ()
             }
         }
+    }
+    
+    private func checkIfRequestedUser (){
+        //updates "add friend" label to "requested" if a request was sent by setting isRequestSent
+        isRequestSent = false
     }
     
     private func fetchUserPosts() {
@@ -306,20 +322,24 @@ struct ProfileView: View {
     }
     
     // Fetch user data from Firestore
-    private func fetchUserData() {
-        print ("current user uid: \(uid)")
-        print ("profile user uid: \(self.userManager.currentUser?.uid)")
-        if uid == self.userManager.currentUser?.uid {
+    private func fetchUserData()
+        {
+        //if profile for current user
+        print ("current user uid: \(userManager.currentUser?.uid)")
+        print ("profile user uid: \(user_uid)")
+        if user_uid == self.userManager.currentUser?.uid
+            {
             print ("Setting profile user to current user")
             self.profileUser = self.userManager.currentUser
             viewingOtherProfile = false
             return
-        }
-        
+            }
+
+        //else go fetch information for the selected user
         isLoading = true
         FirebaseManager.shared.firestore
             .collection("users")
-            .document(uid) // Fetch the user by their UID
+            .document(user_uid) // Fetch the user by their UID
             .addSnapshotListener { snapshot, error in
                 isLoading = false
                 if let error = error {
@@ -333,7 +353,7 @@ struct ProfileView: View {
                 }
                 
                 // Initialize the User object with the data
-                self.profileUser = User(data: data, uid: uid)
+                self.profileUser = User(data: data, uid: user_uid)
             }
     }
     
