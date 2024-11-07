@@ -179,6 +179,11 @@ struct ProfileView: View {
                             }
                         }
                         .padding(.horizontal, 2)
+                        
+                    }
+                    if viewingOtherProfile && isFriends && userPosts.count == 0 {
+                        Text ("No posts yet")
+                            .padding(.top, 50)
                     }
                 }
                 
