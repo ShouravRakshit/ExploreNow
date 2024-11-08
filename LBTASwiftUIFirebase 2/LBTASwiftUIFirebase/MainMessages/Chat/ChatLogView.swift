@@ -270,6 +270,19 @@ struct ChatLogView: View {
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
         self.vm = .init(chatUser: chatUser)
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.buttonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
+        appearance.backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
+
+        appearance.setBackIndicatorImage(UIImage(systemName: "chevron.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal),
+                                       transitionMaskImage: UIImage(systemName: "chevron.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))
+        
+        UINavigationBar.appearance().tintColor = .systemBlue // This sets the back button color
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().compactAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
 
     var body: some View {
@@ -299,10 +312,13 @@ struct ChatLogView: View {
         }
         //.navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false) // Ensure back button is shown
+        .navigationBarBackButtonHidden(false)
         .navigationBarTitle("Chat Log", displayMode: .inline) // Optional, customize the title
         // Set the left bar button to make the email clickable
         // Use toolbar modifier to center the email
+//        .onDisappear {
+//            print("Debug: Back button pressed - Leaving chat with \(chatUser?.email ?? "unknown user")")
+//        }
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack {
@@ -314,7 +330,7 @@ struct ChatLogView: View {
                         }) {
                             Text(email) // Make the email clickable
                                 .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(.purple)
+                                .foregroundColor(.customPurple)
                         }
                     }
                     Spacer() // To center the content
@@ -329,7 +345,7 @@ struct ChatLogView: View {
             ) {
                 EmptyView() // NavigationLink content is invisible; it only triggers navigation
             }
-            //.hidden() // Hide the NavigationLink content to avoid extra UI elements
+//            .hidden() // Hide the NavigationLink content to avoid extra UI elements
         )
 
     }
