@@ -26,28 +26,14 @@ struct ProfileView: View {
     var body: some View {
         NavigationView {
             VStack(alignment: .leading) {
-                // Settings Button
-                if viewingOtherProfile{
-                    HStack{
-                        
-                    }
-                    .padding(.top)
-                }
                 
-                else {
-                    HStack {
-                        Spacer()
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 30, weight: .bold))
-                            .foregroundColor(Color(red: 0.45, green: 0.3, blue: 0.7))
-                            .onTapGesture {
-                                showProfileSettings = true
-                            }
+                ScrollView {
+                    
+                    VStack {
+                        Text ("")
                     }
-                    .padding(.horizontal)
-                    .padding(.top)
-                }
-                
+                    .padding(.top, 20)  // Optional: Add horizontal padding to give some space on the sides
+                    
                 // Profile Info Section
                 HStack {
                     WebImage(url: URL(string: profileUser?.profileImageUrl ?? ""))
@@ -101,6 +87,7 @@ struct ProfileView: View {
                             .foregroundColor(.black)
                     }*/
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 21)
                 .padding(.top, 8)
                 
@@ -134,7 +121,7 @@ struct ProfileView: View {
                 }
                 
                 // Posts Section
-                ScrollView {
+               
                     if isLoading {
                         ProgressView()
                             .padding()
@@ -176,6 +163,7 @@ struct ProfileView: View {
                                     deletePost(deletedPost)
                                 })
                                 .padding(.top, 10)
+                                .padding(.horizontal, 5)  // Add horizontal padding to each post
                             }
                         }
                         .padding(.horizontal, 2)
@@ -186,10 +174,46 @@ struct ProfileView: View {
                             .padding(.top, 50)
                     }
                 }
-                
                 Spacer()
             }
-            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(false)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                // Toolbar with the username and gear icon
+                ToolbarItem(placement: .principal) {
+                    if !viewingOtherProfile {
+                    HStack {
+                        //Spacer() // To center the content
+                        /*
+                        if let username = profileUser?.username {
+                            Button(action: {
+                                // Set the navigation state to true when the email is tapped
+                                
+                            }) {
+                                Text(username) // Make the email clickable
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.customPurple)
+                            }
+                        }*/
+                        //Spacer() // To center the content
+                        // Gear icon to the right (if viewing the user's own profile)
+                                Spacer()
+                                Button(action: {
+                                    print("Gear icon tapped")
+                                    // Handle gear icon action here
+                                }) {
+                                    Image(systemName: "gearshape.fill")
+                                        .font(.system(size: 20))
+                                        .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
+                                }
+                        }
+                        
+                    }
+                }
+
+            }
+            .navigationBarTitleDisplayMode(.inline) // This makes the username appear inline, like a title
+            
             .background(Color.white)
             .fullScreenCover(isPresented: $showProfileSettings) {
                 ProfileSettingsView()
@@ -394,6 +418,7 @@ struct ProfileView: View {
                 
                 // Initialize the User object with the data
                 self.profileUser = User(data: data, uid: user_uid)
+                //print ("profile user username: \(profileUser?.username)")
             }
         //check friendship status from user1 - current user to user 2 - other user
         checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)

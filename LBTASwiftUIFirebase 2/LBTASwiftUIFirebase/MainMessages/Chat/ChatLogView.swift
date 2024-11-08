@@ -313,7 +313,7 @@ struct ChatLogView: View {
         //.navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-        .navigationBarTitle("Chat Log", displayMode: .inline) // Optional, customize the title
+        .navigationBarTitle("", displayMode: .inline) // Optional, customize the title
         // Set the left bar button to make the email clickable
         // Use toolbar modifier to center the email
 //        .onDisappear {
@@ -322,18 +322,19 @@ struct ChatLogView: View {
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack {
-                    Spacer() // To center the content
-                    if let email = chatUser?.email {
+                    //Spacer() // To center the content
+                    if let username = chatUser?.username {
                         Button(action: {
                             // Set the navigation state to true when the email is tapped
                             self.isNavigating = true
                         }) {
-                            Text(email) // Make the email clickable
+                            Text(username) // Make the email clickable
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(.customPurple)
+                                .frame(maxWidth: .infinity, alignment: .center) // Ensure the username takes all available width and is centered
                         }
                     }
-                    Spacer() // To center the content
+                    //Spacer() // To center the content
                 }
             }
         }
