@@ -80,13 +80,14 @@ struct HomeViewTest: View {
                 .environmentObject(userManager)
         }
         .onAppear {
-            print("ON APPEAR")
+            //print("ON APPEAR")
             // Make sure the current user is available before checking notifications
             if userManager.currentUser != nil {
                 checkIfNotifications()
             }
             fetchAllPosts()
         }
+        
     }
     
     private func fetchAllPosts() {
@@ -248,8 +249,11 @@ struct PostCard: View {
                         .clipShape(Circle())
                 }
                 
-                Text(post.username)
-                    .font(.headline)
+                NavigationLink(destination: ProfileView(user_uid: post.uid)) {
+                    Text(post.username)
+                        .font(.headline)
+                        .foregroundColor(.customPurple)  // Optional: To make the username look clickable
+                }
                 
                 Spacer()
                 

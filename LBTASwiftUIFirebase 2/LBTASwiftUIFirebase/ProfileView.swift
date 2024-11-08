@@ -17,6 +17,8 @@ struct ProfileView: View {
     @State private var isFriends = false
     @State private var friendshipLabelText = "Add Friend..."
     @State private var friendsList: [String] = []
+    @State private var shouldShowLogOutOptions = false
+    @EnvironmentObject var appState: AppState
     
     var user_uid: String // The UID (or username) of the user whose profile is being viewed
  //   var profileImageUrl: String?
@@ -199,8 +201,8 @@ struct ProfileView: View {
                         // Gear icon to the right (if viewing the user's own profile)
                                 Spacer()
                                 Button(action: {
-                                    print("Gear icon tapped")
-                                    // Handle gear icon action here
+                                    shouldShowLogOutOptions = true
+                                    
                                 }) {
                                     Image(systemName: "gearshape.fill")
                                         .font(.system(size: 20))
@@ -255,6 +257,18 @@ struct ProfileView: View {
                         }
                     }
                 }
+            }
+            
+            .actionSheet(isPresented: $shouldShowLogOutOptions) {
+                ActionSheet(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [
+                    .default(Text("Edit Profile"), action: {
+                        showProfileSettings = true
+                    }),
+                    .destructive(Text("Sign Out"), action: {
+                        handleSignOut()
+                    }),
+                    .cancel()
+                ])
             }
         }
     }
@@ -542,6 +556,16 @@ struct ProfileView: View {
             }
         }
     }
+    
+    private func handleSignOut() {
+        do {
+            try FirebaseManager.shared.auth.signOut()
+            appState.isLoggedIn = false // Update authentication state
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError.localizedDescription)
+        }
+    }
+
     
     
 }
