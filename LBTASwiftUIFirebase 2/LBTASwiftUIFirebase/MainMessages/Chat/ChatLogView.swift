@@ -323,12 +323,12 @@ struct ChatLogView: View {
             ToolbarItem(placement: .principal) {
                 HStack {
                     //Spacer() // To center the content
-                    if let username = chatUser?.username {
+                    if let name = chatUser?.name {
                         Button(action: {
                             // Set the navigation state to true when the email is tapped
                             self.isNavigating = true
                         }) {
-                            Text(username) // Make the email clickable
+                            Text(name) // Make the email clickable
                                 .font(.system(size: 20, weight: .bold))
                                 .foregroundColor(.customPurple)
                                 .frame(maxWidth: .infinity, alignment: .center) // Ensure the username takes all available width and is centered
