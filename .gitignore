@@ -13,7 +13,6 @@ xcshareddata/xcschemes/*.xcscheme
 .swiftpm/
 Package.resolved
 # Ignore the specific project.pbxproj file
-LBTASwiftUIFirebase\ 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 # Xcode workspace settings
 *.xcworkspace
 contents.xcworkspacedata
