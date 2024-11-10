@@ -20,6 +20,7 @@ struct RecentMessage: Identifiable {
     let timestamp: Timestamp
     let email: String
     let profileImageUrl: String
+    var name: String?
 
     init(documentId: String, data: [String: Any]) {
         self.documentId = documentId
@@ -164,11 +165,12 @@ struct MainMessagesView: View {
                     VStack {
                         Button {
                             let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+                            
                             let data = [
                                 "uid": uid,
                                 "email": recentMessage.email,
                                 "profileImageUrl": recentMessage.profileImageUrl,
-                                "name": recentMessage.email // Assuming you have a name field; adjust as needed
+                                "name": recentMessage.name // Assuming you have a name field; adjust as needed
                             ]
                             let chatUser = ChatUser(data: data)
                             self.selectedChatUser = chatUser
@@ -184,7 +186,7 @@ struct MainMessagesView: View {
                                     .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color(.label), lineWidth: 1))
 
                                 VStack(alignment: .leading, spacing: 8) {
-                                    Text(recentMessage.email)
+                                    Text(recentMessage.name ?? "")
                                         .font(.system(size: 16, weight: .bold))
                                         .foregroundColor(Color(.label))
                                     Text(recentMessage.text)
@@ -203,6 +205,9 @@ struct MainMessagesView: View {
                         Divider()
                     }
                     .padding(.vertical, 8)
+                    .onAppear(){
+                        updateRecentMessagesWithNames ()
+                    }
                 }
             }
         }
@@ -336,6 +341,46 @@ struct MainMessagesView: View {
             }
         }
     }
+    
+    func updateRecentMessagesWithNames() {
+        // Iterate over each message in recentMessages
+        for (index, recentMessage) in vm.recentMessages.enumerated() {
+            // Determine which user (fromId or toId) to fetch the name for
+            let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+            
+            // Fetch the user's name using the uid
+            fetchUserName(uid: uid) { userName in
+                // Update the recentMessage's name field once the name is fetched
+                DispatchQueue.main.async {
+                    // Update the message at the correct index with the fetched name
+                    vm.recentMessages[index].name = userName
+                }
+            }
+        }
+    }
+    
+    func fetchUserName(uid: String, completion: @escaping (String) -> Void) {
+        print("Fetching user for UID: \(uid)")  // Debugging line
+        let userRef = FirebaseManager.shared.firestore.collection("users").document(uid)
+        
+        userRef.getDocument { (document, error) in
+            if let document = document, document.exists {
+                let data = document.data()
+                if let name = data?["name"] as? String {
+                    print("Fetched name: \(name)")  // Debugging line
+                    completion(name)
+                } else {
+                    print("Name field not found")  // Debugging line
+                    completion("Unknown")
+                }
+            } else {
+                print("Error fetching user: \(error?.localizedDescription ?? "No error description")")  // Debugging line
+                completion("Unknown")
+            }
+        }
+    }
+    
+    
 }
 
 struct MainMessagesView_Previews: PreviewProvider {
