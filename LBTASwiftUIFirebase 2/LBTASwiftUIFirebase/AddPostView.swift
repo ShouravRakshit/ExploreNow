@@ -4,6 +4,7 @@ import Firebase
 import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
+import SDWebImageSwiftUI
 
 struct AddPostView: View {
     @State private var descriptionText: String = ""
@@ -18,6 +19,7 @@ struct AddPostView: View {
     @State private var isLoading = false
     @Environment(\.dismiss) var dismiss
     @StateObject private var searchCompleter = LocationSearchCompleter()
+    @EnvironmentObject var userManager: UserManager //Current user
 
     let columns = [
         GridItem(.flexible()),
@@ -30,12 +32,12 @@ struct AddPostView: View {
                 VStack(spacing: 16) {
                     // Profile section
                     HStack(alignment: .center) {
-                        Image("user_profile")
+                        WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
                             .resizable()
                             .frame(width: 60, height: 60)
                             .clipShape(Circle())
 
-                        Text("User 1")
+                        Text(userManager.currentUser?.username ?? "User 1")
                             .font(.custom("Sansation", size: 18))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
@@ -50,6 +52,7 @@ struct AddPostView: View {
                     TextField("Description of the recently visited place...", text: $descriptionText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.horizontal)
+                        .lineLimit(nil) // Allow for multiple lines
                     
                     Divider()
                     
@@ -145,12 +148,14 @@ struct AddPostView: View {
                     .padding(.bottom, 20)
                 }
             }
+            .padding (.top, 10)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("New Post")
                         .font(.headline)
                 }
+                /*
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         dismiss()
@@ -158,7 +163,7 @@ struct AddPostView: View {
                         Image(systemName: "xmark")
                             .foregroundColor(.primary)
                     }
-                }
+                }*/
             }
         }
         .sheet(isPresented: $isImagePickerPresented) {

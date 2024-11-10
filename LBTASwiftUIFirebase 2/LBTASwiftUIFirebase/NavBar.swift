@@ -46,6 +46,7 @@ struct NavBar: View {
                 .tabItem {
                     Image(systemName: "plus.circle.fill")
                 }
+                .environmentObject(userManager)
             
             MainMessagesView()
                 .tabItem {
