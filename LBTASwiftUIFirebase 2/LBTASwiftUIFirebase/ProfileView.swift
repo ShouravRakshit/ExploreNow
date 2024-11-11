@@ -579,80 +579,82 @@ struct UserPostCard: View {
     @State private var currentImageIndex = 0
     @State private var showingError = false
     @State private var errorMessage = ""
-
+    
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            HStack {
-                Spacer()
-                Button(action: {
-                    showingAlert = true
-                }) {
-                    Image(systemName: "trash")
-                        .foregroundColor(.red)
-                }
-            }
-            .padding([.top, .trailing])
-            
-            if !post.imageUrls.isEmpty {
-                TabView(selection: $currentImageIndex) {
-                    ForEach(post.imageUrls.indices, id: \.self) { index in
-                        WebImage(url: URL(string: post.imageUrls[index]))
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 172)
-                            .clipped()
-                            .tag(index)
+        NavigationLink(destination: PostView(post: post)) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showingAlert = true
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
                     }
                 }
-                .tabViewStyle(PageTabViewStyle())
-                .frame(height: 172)
-                .padding(.horizontal, 10)
-                .padding(.top, 6)
-            }
-            
-            Text(post.description)
-                .font(.system(size: 14))
-                .padding(.horizontal)
-                .padding(.top, 8)
-            
-            HStack {
-                Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
-                Text("600")
+                .padding([.top, .trailing])
                 
-                Spacer()
-                
-                HStack(spacing: 10) {
-                    Image(systemName: "star.fill").foregroundColor(Color.customPurple)
-                    Text("\(post.rating)")
-                    
-                    Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
-                    Text(post.locationAddress)
-                        .lineLimit(1)
+                if !post.imageUrls.isEmpty {
+                    TabView(selection: $currentImageIndex) {
+                        ForEach(post.imageUrls.indices, id: \.self) { index in
+                            WebImage(url: URL(string: post.imageUrls[index]))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 172)
+                                .clipped()
+                                .tag(index)
+                        }
+                    }
+                    .tabViewStyle(PageTabViewStyle())
+                    .frame(height: 172)
+                    .padding(.horizontal, 10)
+                    .padding(.top, 6)
                 }
+                
+                Text(post.description)
+                    .font(.system(size: 14))
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
+                HStack {
+                    Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
+                    Text("600")
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 10) {
+                        Image(systemName: "star.fill").foregroundColor(Color.customPurple)
+                        Text("\(post.rating)")
+                        
+                        Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
+                        Text(post.locationAddress)
+                            .lineLimit(1)
+                    }
+                }
+                .font(.system(size: 14))
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
-            .font(.system(size: 14))
-            .foregroundColor(.gray)
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-        }
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(radius: 5)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
-        .alert(isPresented: $showingAlert) {
-            Alert(
-                title: Text("Delete Post"),
-                message: Text("Are you sure you want to delete this post? This action cannot be undone."),
-                primaryButton: .destructive(Text("Delete")) {
-                    onDelete(post)
-                },
-                secondaryButton: .cancel()
-            )
-        }
-        .alert("Error", isPresented: $showingError) {
-            Button("OK", role: .cancel) { }
-        } message: {
-            Text(errorMessage)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 5)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
+            .alert(isPresented: $showingAlert) {
+                Alert(
+                    title: Text("Delete Post"),
+                    message: Text("Are you sure you want to delete this post? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        onDelete(post)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+            .alert("Error", isPresented: $showingError) {
+                Button("OK", role: .cancel) { }
+            } message: {
+                Text(errorMessage)
+            }
         }
     }
 }
