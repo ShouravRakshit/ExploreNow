@@ -27,77 +27,80 @@ struct LocationDetails {
 
 extension LocationPostsPage {
     var body: some View {
-        VStack(spacing: 0) {
-            if isLoading {
-                ProgressView()
-            } else {
-                // Header Image with location and rating
-                ZStack(alignment: .bottom) {
-                    Image("banff") // we gotta add custom images later. either through the app or using apple maps api/google api
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 250)
-                        .clipped()
-                    
-                    // Location info overlay
-                    VStack(spacing: 8) {
-                        // Main address (POI)
-                        Text(locationDetails?.mainAddress ?? "Location")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                            .multilineTextAlignment(.center)
+        NavigationView {
+            VStack(spacing: 0) {
+                if isLoading {
+                    ProgressView()
+                } else {
+                    // Header Image with location and rating
+                    ZStack(alignment: .bottom) {
+                        Image("banff") // we gotta add custom images later. either through the app or using apple maps api/google api
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 250)
+                            .clipped()
                         
-                        // Full address
-                        if let fullAddress = locationDetails?.fullAddress {
-                            Text(fullAddress)
-                                .font(.subheadline)
-                                .foregroundColor(.white.opacity(0.9))
+                        // Location info overlay
+                        VStack(spacing: 8) {
+                            // Main address (POI)
+                            Text(locationDetails?.mainAddress ?? "Location")
+                                .font(.title)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
                                 .multilineTextAlignment(.center)
-                                .padding(.horizontal)
+                            
+                            // Full address
+                            if let fullAddress = locationDetails?.fullAddress {
+                                Text(fullAddress)
+                                    .font(.subheadline)
+                                    .foregroundColor(.white.opacity(0.9))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal)
+                            }
+                            
+                            // Rating
+                            HStack(spacing: 4) {
+                                Text(String(format: "%.1f", locationDetails?.averageRating ?? 0))
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                Image(systemName: "star.fill")
+                                    .foregroundColor(.yellow)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.white)
+                            .clipShape(Capsule())
+                            .shadow(radius: 3)
                         }
-                        
-                        // Rating
-                        HStack(spacing: 4) {
-                            Text(String(format: "%.1f", locationDetails?.averageRating ?? 0))
-                                .font(.headline)
-                                .foregroundColor(.black)
-                            Image(systemName: "star.fill")
-                                .foregroundColor(.yellow)
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.white)
-                        .clipShape(Capsule())
-                        .shadow(radius: 3)
+                        .padding(.bottom, 50)
+                        .shadow(radius: 5)
                     }
-                    .padding(.bottom, 50)
-                    .shadow(radius: 5)
-                }
-
-                ScrollView {
-                    VStack(spacing: 16) {
-                        if locationPosts.isEmpty {
-                            Text("No posts yet for this location")
-                                .foregroundColor(.gray)
-                                .padding()
-                        } else {
-                            ForEach(locationPosts) { post in
-                                LocationPostView(post: post)
+                    
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            if locationPosts.isEmpty {
+                                Text("No posts yet for this location")
+                                    .foregroundColor(.gray)
+                                    .padding()
+                            } else {
+                                ForEach(locationPosts) { post in
+                                    LocationPostView(post: post)
+                                }
                             }
                         }
+                        .padding(.top)
                     }
-                    .padding(.top)
                 }
+                
+                Spacer()
             }
-            
-            Spacer()
+            .edgesIgnoringSafeArea(.top)
+            .onAppear {
+                fetchLocationDetails()
+                fetchLocationPosts()
+            }
         }
-        .edgesIgnoringSafeArea(.top)
-        .onAppear {
-            fetchLocationDetails()
-            fetchLocationPosts()
-        }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
     
     private func fetchLocationDetails() {
@@ -205,91 +208,93 @@ struct LocationPostView: View {
     @State private var currentImageIndex = 0
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            // Top section with user image and username
-            HStack(alignment: .center) {
-                if let imageUrl = URL(string: post.userProfileImageUrl) {
-                    WebImage(url: imageUrl)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 60, height: 60)
-                        .clipShape(Circle())
-                } else {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .foregroundColor(.gray)
-                        .frame(width: 60, height: 60)
-                        .clipShape(Circle())
+        NavigationLink(destination: PostView(post: post)) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Top section with user image and username
+                HStack(alignment: .center) {
+                    if let imageUrl = URL(string: post.userProfileImageUrl) {
+                        WebImage(url: imageUrl)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 60, height: 60)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .foregroundColor(.gray)
+                            .frame(width: 60, height: 60)
+                            .clipShape(Circle())
+                    }
+                    
+                    Text(post.username)
+                        .font(.custom("Sansation", size: 14))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 5)
+                        .background(Color(red: 140/255, green: 82/255, blue: 255/255))
+                        .cornerRadius(15)
+                    
+                    Spacer()
                 }
+                .padding([.top, .horizontal])
                 
-                Text(post.username)
-                    .font(.custom("Sansation", size: 14))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 5)
-                    .background(Color(red: 140/255, green: 82/255, blue: 255/255))
-                    .cornerRadius(15)
-                
-                Spacer()
-            }
-            .padding([.top, .horizontal])
-            
-            // Post images carousel
-            if !post.imageUrls.isEmpty {
-                TabView(selection: $currentImageIndex) {
-                    ForEach(post.imageUrls.indices, id: \.self) { index in
-                        if let imageUrl = URL(string: post.imageUrls[index]) {
-                            WebImage(url: imageUrl)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 150)
-                                .clipped()
-                                .tag(index)
-                        } else {
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(height: 150)
-                                .overlay(
-                                    Image(systemName: "photo")
-                                        .foregroundColor(.gray)
-                                )
-                                .tag(index)
+                // Post images carousel
+                if !post.imageUrls.isEmpty {
+                    TabView(selection: $currentImageIndex) {
+                        ForEach(post.imageUrls.indices, id: \.self) { index in
+                            if let imageUrl = URL(string: post.imageUrls[index]) {
+                                WebImage(url: imageUrl)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 150)
+                                    .clipped()
+                                    .tag(index)
+                            } else {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(height: 150)
+                                    .overlay(
+                                        Image(systemName: "photo")
+                                            .foregroundColor(.gray)
+                                    )
+                                    .tag(index)
+                            }
                         }
                     }
-                }
-                .tabViewStyle(PageTabViewStyle())
-                .frame(height: 150)
-                .padding(.horizontal)
-                .padding(.top, 6)
-            }
-            
-            // Description if any
-            if !post.description.isEmpty {
-                Text(post.description)
-                    .font(.system(size: 14))
+                    .tabViewStyle(PageTabViewStyle())
+                    .frame(height: 150)
                     .padding(.horizontal)
-                    .padding(.top, 8)
-            }
-            
-            // Bottom section with rating and timestamp
-            HStack {
-                Image(systemName: "star.fill").foregroundColor(Color.customPurple)
-                Text("\(post.rating)")
+                    .padding(.top, 6)
+                }
                 
-                Spacer()
+                // Description if any
+                if !post.description.isEmpty {
+                    Text(post.description)
+                        .font(.system(size: 14))
+                        .padding(.horizontal)
+                        .padding(.top, 8)
+                }
                 
-                Text(formatDate(post.timestamp))
-                    .font(.caption)
-                    .foregroundColor(.gray)
+                // Bottom section with rating and timestamp
+                HStack {
+                    Image(systemName: "star.fill").foregroundColor(Color.customPurple)
+                    Text("\(post.rating)")
+                    
+                    Spacer()
+                    
+                    Text(formatDate(post.timestamp))
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                }
+                .font(.system(size: 14))
+                .padding(.horizontal)
+                .padding(.vertical, 8)
             }
-            .font(.system(size: 14))
-            .padding(.horizontal)
-            .padding(.vertical, 8)
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 5)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
         }
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(radius: 5)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
     }
     
     // Helper function to format the date

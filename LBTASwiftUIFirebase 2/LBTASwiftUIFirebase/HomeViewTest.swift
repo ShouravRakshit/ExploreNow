@@ -232,118 +232,120 @@ struct PostCard: View {
     @State private var currentImageIndex = 0
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // User info header
-            HStack {
-                if let imageUrl = URL(string: post.userProfileImageUrl) {
-                    WebImage(url: imageUrl)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                } else {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
+        NavigationLink(destination: PostView(post: post)) {
+            VStack(alignment: .leading, spacing: 8) {
+                // User info header
+                HStack {
+                    if let imageUrl = URL(string: post.userProfileImageUrl) {
+                        WebImage(url: imageUrl)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .foregroundColor(.gray)
+                            .clipShape(Circle())
+                    }
+                    
+                    NavigationLink(destination: ProfileView(user_uid: post.uid)) {
+                        Text(post.username)
+                            .font(.headline)
+                            .foregroundColor(.customPurple)  // Optional: To make the username look clickable
+                    }
+                    
+                    Spacer()
+                    
+                    Text(formatDate(post.timestamp))
+                        .font(.caption)
                         .foregroundColor(.gray)
-                        .clipShape(Circle())
                 }
                 
-                NavigationLink(destination: ProfileView(user_uid: post.uid)) {
-                    Text(post.username)
-                        .font(.headline)
-                        .foregroundColor(.customPurple)  // Optional: To make the username look clickable
-                }
-                
-                Spacer()
-                
-                Text(formatDate(post.timestamp))
-                    .font(.caption)
-                    .foregroundColor(.gray)
-            }
-            
-            // Post images
-            if !post.imageUrls.isEmpty {
-                TabView(selection: $currentImageIndex) {
-                    ForEach(post.imageUrls.indices, id: \.self) { index in
-                        if let imageUrl = URL(string: post.imageUrls[index]) {
-                            WebImage(url: imageUrl)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 300)
-                                .clipped()
-                                .tag(index)
-                        } else {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 300)
-                                .foregroundColor(.gray)
-                                .tag(index)
+                // Post images
+                if !post.imageUrls.isEmpty {
+                    TabView(selection: $currentImageIndex) {
+                        ForEach(post.imageUrls.indices, id: \.self) { index in
+                            if let imageUrl = URL(string: post.imageUrls[index]) {
+                                WebImage(url: imageUrl)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 300)
+                                    .clipped()
+                                    .tag(index)
+                            } else {
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(height: 300)
+                                    .foregroundColor(.gray)
+                                    .tag(index)
+                            }
                         }
                     }
+                    .tabViewStyle(PageTabViewStyle())
+                    .frame(height: 300)
+                    .cornerRadius(12)
                 }
-                .tabViewStyle(PageTabViewStyle())
-                .frame(height: 300)
-                .cornerRadius(12)
-            }
-            
-            // Post description
-            if !post.description.isEmpty {
-                Text(post.description)
-                    .font(.body)
-            }
-            
-            // Interaction buttons (Likes and Comments)
-            HStack {
-                Button(action: {
-                    // Like action
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "heart.fill")
-                            .foregroundColor(.customPurple)
-                        Text("1.2k")
-                            .foregroundColor(.gray)
+                
+                // Post description
+                if !post.description.isEmpty {
+                    Text(post.description)
+                        .font(.body)
+                }
+                
+                // Interaction buttons (Likes and Comments)
+                HStack {
+                    Button(action: {
+                        // Like action
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "heart.fill")
+                                .foregroundColor(.customPurple)
+                            Text("1.2k")
+                                .foregroundColor(.gray)
+                        }
                     }
-                }
-                
-                Spacer()
-                    .frame(width: 20)
-                
-                Button(action: {
-                    // Comment action
-                }) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "bubble.right.fill")
-                            .foregroundColor(.customPurple)
-                        Text("600")
-                            .foregroundColor(.gray)
-                    }
-                }
-                
-                Spacer()
-                
-                // Location and rating
-                HStack(spacing: 4) {
-                    Image(systemName: "mappin.circle.fill")
-                        .foregroundColor(.customPurple)
-                    Text(post.locationAddress)
-                        .font(.subheadline)
-                        .lineLimit(1)
                     
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.customPurple)
-                    Text("\(post.rating)")
-                        .font(.subheadline)
+                    Spacer()
+                        .frame(width: 20)
+                    
+                    Button(action: {
+                        // Comment action
+                    }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "bubble.right.fill")
+                                .foregroundColor(.customPurple)
+                            Text("600")
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    
+                    Spacer()
+                    
+                    // Location and rating
+                    HStack(spacing: 4) {
+                        Image(systemName: "mappin.circle.fill")
+                            .foregroundColor(.customPurple)
+                        Text(post.locationAddress)
+                            .font(.subheadline)
+                            .lineLimit(1)
+                        
+                        Image(systemName: "star.fill")
+                            .foregroundColor(.customPurple)
+                        Text("\(post.rating)")
+                            .font(.subheadline)
+                    }
+                    .foregroundColor(.gray)
                 }
-                .foregroundColor(.gray)
+                .font(.subheadline)
             }
-            .font(.subheadline)
+            .padding()
+            .background(Color.white)
+            .cornerRadius(15)
+            .shadow(radius: 5)
         }
-        .padding()
-        .background(Color.white)
-        .cornerRadius(15)
-        .shadow(radius: 5)
     }
     
     private func formatDate(_ date: Date) -> String {
