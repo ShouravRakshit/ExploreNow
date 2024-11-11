@@ -74,13 +74,24 @@ struct NotificationView: View {
                                         .stroke(Color.black, lineWidth: 4) // Black border
                                         .frame(width: 51, height: 51) // Slightly larger than the image
                                     
-                                    // User image
-                                    WebImage(url: URL(string: user.profileImageUrl.isEmpty == false ? user.profileImageUrl : "")) // Use empty string if no URL is available
-                                        .resizable()
-                                        .resizable()
-                                        .scaledToFill()
-                                        .clipShape(Circle()) // Clip to circle shape
-                                        .frame(width: 50, height: 50) // Set size
+                                    if !user.profileImageUrl.isEmpty
+                                        {
+                                        WebImage(url: URL(string: user.profileImageUrl))
+                                            .resizable()
+                                            .scaledToFill()
+                                            .clipShape(Circle()) // Clip to circle shape
+                                            .frame(width: 50, height: 50) // Set size
+                                        }
+                                    else
+                                        {
+                                        Image(systemName: "person.fill")
+                                            .font(.system(size: 50))
+                                            .padding()
+                                            .foregroundColor(Color(.label))
+                                            .frame(width: 50, height: 50) // Set size for placeholder
+                                            .background(Color.gray.opacity(0.2)) // Optional background
+                                            .clipShape(Circle()) // Clip to circle shape
+                                        }
                                 }
 
 
