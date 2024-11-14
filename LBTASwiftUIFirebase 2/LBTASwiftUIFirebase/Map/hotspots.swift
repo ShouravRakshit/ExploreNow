@@ -114,7 +114,7 @@ struct hotspots: View {
                 VStack{
                     LazyVGrid(columns: gridItems, spacing: 0) {
                         ForEach(suggestions, id: \.0) { image in
-                            NavigationLink(destination: LocationPage(locationName: image.0)) {
+                            NavigationLink(destination: Text("Detail for \(image.1)")) {
                                 ZStack(alignment: .bottomLeading) {
                                     // Displaying image
                                     Image(image.0)
