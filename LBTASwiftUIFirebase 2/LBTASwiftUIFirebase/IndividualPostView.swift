@@ -4,6 +4,9 @@ import Firebase
 import FirebaseFirestore
 import SDWebImageSwiftUI
 
+
+
+
 struct PostView: View {
     @EnvironmentObject var userManager: UserManager
     @State private var comments: [Comment] = []
@@ -14,6 +17,9 @@ struct PostView: View {
     @State private var likesCount: Int = 0  // Track the like count
     @State private var liked: Bool = false  // Track if the current user has liked the post
     @State private var post: Post
+    @State private var showEmojiPicker = false  // Toggle to show/hide the emoji picker
+       
+   
 
         // Custom initializer to accept values passed from `PostCard`
         init(post: Post, likesCount: Int, liked: Bool) {
@@ -25,8 +31,9 @@ struct PostView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Profile section
+           
             HStack {
+                
                 if let imageUrl = URL(string: post.userProfileImageUrl) {
                     WebImage(url: imageUrl)
                         .resizable()
@@ -48,6 +55,7 @@ struct PostView: View {
                 }
             }
             .padding()
+           
             
             // Post images
             if !post.imageUrls.isEmpty {
@@ -184,6 +192,27 @@ struct PostView: View {
                                     }
                                     
                                     Spacer()
+                                    
+                                    // Like button for each comment
+                                           HStack(spacing: 4) {
+                                               Image(systemName: comment.likedByCurrentUser ? "heart.fill" : "heart")
+                                                   .foregroundColor(comment.likedByCurrentUser ? .red : .gray)
+                                                   .onTapGesture {
+                                                       toggleLikeForComment(comment)  // Toggle like for comment
+                                                   }
+                                               
+                                               Text("\(comment.likeCount)")
+                                                   .foregroundColor(.gray)
+                                           }
+                                           
+                                    
+                                    // Delete button
+                                    if comment.userID == FirebaseManager.shared.auth.currentUser?.uid {
+                                        Button(action: { deleteComment(comment) }) {
+                                            Image(systemName: "trash")
+                                                .foregroundColor(.red)
+                                        }
+                                    }
                                 }
                                 .padding(.horizontal)
                                 .padding(.vertical, 10)
@@ -223,38 +252,107 @@ struct PostView: View {
                         .padding(10)
                         .background(Color.gray.opacity(0.1))
                         .cornerRadius(20)
+                   
+                    
+                            .padding(.leading, 5)
+                    
+                 
+                  
+                                      
                     
                     Button(action: addComment) {
                         Text("Post")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.blue)
+                        // Emoji Picker Sheet
+                        // Emoji Picker Overlay
+                        
                     }
                     .padding(.leading, 5)
                 }
                 .padding(.horizontal)
+                
+                
             }
+            
             .padding(.bottom, 20)
             .onAppear {
                 fetchCurrentUserProfile() // Fetch profile image on view load
                 fetchLikes() // Fetch likes on view load
             }
+            
         }
         .padding(.bottom, 20)
+        
         .onAppear {
             fetchComments() // Fetch comments when the view appears
         }
     }
     
+    private func toggleLikeForComment(_ comment: Comment) {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        let db = FirebaseManager.shared.firestore
+        let commentRef = db.collection("comments").document(comment.id)
+        
+        // Update the like status in Firestore
+        db.runTransaction { (transaction, errorPointer) -> Any? in
+            let documentSnapshot: DocumentSnapshot
+            do {
+                try documentSnapshot = transaction.getDocument(commentRef)
+            } catch let error {
+                print("Failed to fetch comment: \(error)")
+                return nil
+            }
+            
+            guard let currentLikeCount = documentSnapshot.data()?["likeCount"] as? Int else {
+                print("Comment data is missing like count")
+                return nil
+            }
+            
+            // Check if the current user has already liked the comment
+            var newLikeCount = currentLikeCount
+            var newLikedByUser = comment.likedByCurrentUser
+            
+            if comment.likedByCurrentUser {
+                newLikeCount -= 1  // Dislike action
+                newLikedByUser = false
+            } else {
+                newLikeCount += 1  // Like action
+                newLikedByUser = true
+            }
+            
+            transaction.updateData([
+                "likeCount": newLikeCount,
+                "likedByCurrentUser": newLikedByUser // Update likedByCurrentUser field in Firestore
+            ], forDocument: commentRef)
+            
+            return nil
+        } completion: { _, error in
+            if let error = error {
+                print("Transaction failed: \(error)")
+            } else {
+                // Update the local state to reflect changes immediately
+                if let index = self.comments.firstIndex(where: { $0.id == comment.id }) {
+                    self.comments[index].likeCount = comment.likedByCurrentUser ? comment.likeCount - 1 : comment.likeCount + 1
+                    self.comments[index].likedByCurrentUser = !comment.likedByCurrentUser // Toggle like status locally
+                }
+            }
+        }
+    }
+
     private func addComment() {
         guard !commentText.isEmpty else { return } // Avoid posting empty comments
-        let userID = FirebaseManager.shared.auth.currentUser?.uid
+        guard let userID = FirebaseManager.shared.auth.currentUser?.uid else { return }
         let postId = post.id
         
         let commentData: [String: Any] = [
             "pid": postId,
             "uid": userID,
             "comment": commentText,
-            "timestamp": FieldValue.serverTimestamp()
+            "timestamp": FieldValue.serverTimestamp(),
+            "likeCount": 0,
+            "likedByCurrentUser": false // Add this field so that you can track if the comment is liked by the current user
         ]
         
         let db = FirebaseManager.shared.firestore
@@ -263,10 +361,26 @@ struct PostView: View {
                 print("Error adding comment: \(error)")
             } else {
                 print("Comment successfully added!")
+                
+                // Immediately add the comment to the local array with the actual document ID
+                let newComment = Comment(id: db.collection("comments").document().documentID, // Use the actual Firestore document ID
+                                         postID: postId,
+                                         userID: userID,
+                                         text: commentText,
+                                         timestamp: Date(),
+                                         likeCount: 0,
+                                         likedByCurrentUser: false)
+                
+                self.comments.insert(newComment, at: 0) // Insert at the beginning for descending order
+                
                 commentText = "" // Clear the input field after posting
+                
+                // Optionally, fetch comments again (though adding it to local state as above might be sufficient)
+                self.fetchComments()
             }
         }
         
+        // Send notification
         userManager.sendCommentNotification(commenterId: userManager.currentUser?.uid ?? "", post: post, commentMessage: commentText) { success, error in
             if success {
                 print("Comment notification sent successfully!")
@@ -279,7 +393,7 @@ struct PostView: View {
             }
         }
     }
-    
+
     private func fetchComments() {
         let db = FirebaseManager.shared.firestore
         db.collection("comments")
@@ -293,10 +407,11 @@ struct PostView: View {
                     self.comments = snapshot?.documents.compactMap { document in
                         Comment(document: document)
                     } ?? []
+                   
                 }
             }
     }
-    
+
     // Function to fetch user data
     private func fetchUserData(for userID: String, completion: @escaping (String, String?) -> Void) {
         if let cachedData = userData[userID] {
@@ -319,6 +434,21 @@ struct PostView: View {
             }
         }
     }
+    
+    private func deleteComment(_ comment: Comment) {
+          let db = FirebaseManager.shared.firestore
+          db.collection("comments").document(comment.id).delete { error in
+              if let error = error {
+                  print("Error deleting comment: \(error)")
+              } else {
+                  // Remove comment from local array
+                  if let index = comments.firstIndex(where: { $0.id == comment.id }) {
+                      comments.remove(at: index)
+                  }
+                  print("Comment successfully deleted!")
+              }
+          }
+      }
     
     // Fetch current user profile data
     private func fetchCurrentUserProfile() {

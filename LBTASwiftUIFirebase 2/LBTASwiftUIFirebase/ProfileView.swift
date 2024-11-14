@@ -19,6 +19,7 @@ struct ProfileView: View {
     @State private var friendsList: [String] = []
     @State private var shouldShowLogOutOptions = false
     @EnvironmentObject var appState: AppState
+   
     
     var user_uid: String // The UID (or username) of the user whose profile is being viewed
  //   var profileImageUrl: String?
@@ -590,7 +591,26 @@ struct UserPostCard: View {
     @State private var currentImageIndex = 0
     @State private var showingError = false
     @State private var errorMessage = ""
+    @State private var comments: [Comment] = []
+    @State private var commentText: String = ""
+    @State private var posts: [Post] = []
     
+    private func fetchComments() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("comments")
+            .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching comments: \(error)")
+                } else {
+                    // Decode Firestore documents into Comment objects
+                    self.comments = snapshot?.documents.compactMap { document in
+                        Comment(document: document)
+                    } ?? []
+                }
+            }
+    }
     var body: some View {
         NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
             VStack(alignment: .leading, spacing: 0) {
@@ -629,7 +649,7 @@ struct UserPostCard: View {
                 
                 HStack {
                     Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
-                    Text("600")
+                    Text("\(comments.count)")
                     
                     Spacer()
                     
@@ -665,6 +685,8 @@ struct UserPostCard: View {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text(errorMessage)
+            } .onAppear {
+                fetchComments() // Fetch comments when the view appears
             }
         }
     }

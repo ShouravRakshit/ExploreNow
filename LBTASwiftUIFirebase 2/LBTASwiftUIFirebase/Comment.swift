@@ -14,6 +14,8 @@ struct Comment: Identifiable, Decodable {
     let userID: String
     let text: String
     let timestamp: Date
+    var likeCount: Int             // comment liked
+    var likedByCurrentUser: Bool   // comment liked by current user
 }
 
 extension Comment {
@@ -31,6 +33,11 @@ extension Comment {
         self.userID = userID
         self.text = text
         self.timestamp = timestamp.dateValue() // Convert Timestamp to Date
+        
+        // Safely extract likeCount and likedByCurrentUser from Firestore data
+        self.likeCount = data["likeCount"] as? Int ?? 0  // Default to 0 if not found
+        self.likedByCurrentUser = data["likedByCurrentUser"] as? Bool ?? false // Default to false if not found
     }
 }
+
 
