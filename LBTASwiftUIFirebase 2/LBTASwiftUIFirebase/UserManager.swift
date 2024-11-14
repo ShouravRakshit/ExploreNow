@@ -258,7 +258,7 @@ class UserManager: ObservableObject {
                            let status = data["status"] as? String,
                            let isRead = data["isRead"] as? Bool {
                             
-                            print ("notification message: \(message)")
+                           print("Notification message: \(message) with timestamp: \(timestamp.dateValue())") // Print the timestamp to confirm order
                             
                             let notification = Notification(receiverId: receiverId,
                                                             senderId: senderId,
@@ -270,13 +270,6 @@ class UserManager: ObservableObject {
                             notifications.append(notification)
                         }
                     }
-                    
-                   /* // Check if the notifications array is empty
-                    if notifications.isEmpty {
-                        print("No notifications found.")  // This message will be printed if there are no notifications
-                    } else {
-                        print("Found \(notifications.count) notifications.")  // This message will print how many notifications were found
-                    }*/
                     
                     // Set the fetched notifications for the current user
                     self.setNotificationsForCurrentUser(newNotifications: notifications)

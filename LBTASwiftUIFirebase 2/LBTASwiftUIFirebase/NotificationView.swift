@@ -220,14 +220,15 @@ struct NotificationView: View {
     // Helper function to update the notification as read in Firestore
     private func updateNotificationAccepted(_ notificationUser: NotificationUser) {
         guard let currentUser = userManager.currentUser else { return }
-        
+
         let db = FirebaseManager.shared.firestore
         let notificationsRef = db.collection("notifications")
         
-        // Find the notification by its timestamp and receiverId
+        // Find the notification by its timestamp and receiverId and order by timestamp descending
         notificationsRef
-            .whereField("timestamp", isEqualTo: notificationUser.notification.timestamp)
             .whereField("receiverId", isEqualTo: currentUser.uid)
+            .order(by: "timestamp", descending: true)  // Order by timestamp in descending order
+            .whereField("timestamp", isEqualTo: notificationUser.notification.timestamp)
             .getDocuments { snapshot, error in
                 if let error = error {
                     print("Failed to update notification status: \(error.localizedDescription)")
@@ -250,6 +251,7 @@ struct NotificationView: View {
                 }
             }
     }
+
     
     // Helper function to update the notification as read in Firestore
     private func updateNotificationStatus(_ notification: Notification) {
@@ -440,11 +442,12 @@ class NotificationViewModel: ObservableObject {
                 switch result {
                 case .success(let notificationUsers):
                     self.notificationUsers = notificationUsers
+                    self.notificationUsers.sort { $0.notification.timestamp.dateValue() > $1.notification.timestamp.dateValue() }
                     print("Fetched \(notificationUsers.count) notification users")
                     
                     // Loop through each notification user and print their full_message
                     for user in notificationUsers {
-                        print("User Full Message: \(user.full_message ?? "No message")")
+                        print("User Full Message: \(user.full_message ?? "No message") timestamp: \(user.notification.timestamp)")
                     }
                 case .failure(let error):
                     print("Failed to fetch notification users: \(error.localizedDescription)")
