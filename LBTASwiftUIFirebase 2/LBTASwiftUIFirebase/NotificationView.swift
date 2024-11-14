@@ -15,8 +15,8 @@ struct NotificationView: View {
         _viewModel = StateObject(wrappedValue: NotificationViewModel(userManager: userManager))
     }
     
-    //var notifications_all: [Notification] = []  // Array to hold notification objects
-    var notificationUsers: [NotificationUser] = []
+    var notificationUsers_all  : [NotificationUser] = []
+    
     @State private var isLoading = true
     
     let db = Firestore.firestore()
@@ -46,17 +46,20 @@ struct NotificationView: View {
             }
             //------------------------------------------------
             Spacer()
-            if isLoading {
+            if isLoading
+                {
                 Text("Loading...")
                     .font(.system(size: 24, weight: .bold))
-            }
+                }
             
-            else{
-                if viewModel.notificationUsers.isEmpty{
+            else
+                {
+                if viewModel.notificationUsers.isEmpty
+                    {
                     Text("No notifications available.")
                         .foregroundColor(.gray)
                         .padding()
-                }
+                    }
                 else
                 {
                     List(viewModel.notificationUsers, id: \.notification.timestamp) { user in
@@ -145,7 +148,8 @@ struct NotificationView: View {
                                     .buttonStyle(PlainButtonStyle())  // Avoid default button styles
                                 }
                             }
-                            HStack {
+                            HStack
+                                {
                                 /*
                                 Text("From: \(user.notification.senderId)")  // Show sender's ID
                                     .font(.footnote)
@@ -157,7 +161,7 @@ struct NotificationView: View {
                                 Text(user.notification.timeAgo)  // Show timestamp
                                     .font(.footnote)
                                     .foregroundColor(.gray)
-                            }
+                                }
                             
                             Divider() // Divider for each notification
                         }
@@ -169,17 +173,20 @@ struct NotificationView: View {
             Spacer() // Pushes content to the top
   
         }
-        .onAppear{
+        .onAppear
+            {
             //viewModel.resetNotificationUsers()
             //populate notifications
             isLoading = true
             userManager.fetchNotifications()
             viewModel.populateNotificationUsers()  // Fetch users when view appears
             isLoading = false
+
             markNotificationsAsRead()
             userManager.fetchNotifications()// Re-fetch notifications to ensure the read status is reflected
-        }
-        .fullScreenCover(isPresented: $showingProfile) {
+            }
+        .fullScreenCover(isPresented: $showingProfile)
+            {
             /*
            if let selectedUser = selectedUser {
                ProfileView(user_uid: selectedUser.uid)  // Show the profile view with the selected user
@@ -188,7 +195,6 @@ struct NotificationView: View {
        }
         
     }
-
 
     
     // Function to mark all notifications as read
@@ -422,7 +428,9 @@ struct NotificationView: View {
 
 // ViewModel to manage notification users
 class NotificationViewModel: ObservableObject {
-    @Published var notificationUsers: [NotificationUser] = []
+    @Published var notificationUsers      : [NotificationUser] = []
+    @Published var unreadNotificationUsers: [NotificationUser] = []
+    @Published var restNotificationUsers  : [NotificationUser] = []
     private var userManager: UserManager  // Store userManager
     
     // Custom initializer to inject userManager
@@ -443,6 +451,10 @@ class NotificationViewModel: ObservableObject {
                 case .success(let notificationUsers):
                     self.notificationUsers = notificationUsers
                     self.notificationUsers.sort { $0.notification.timestamp.dateValue() > $1.notification.timestamp.dateValue() }
+                    // Split the notificationUsers array into unread and rest notifications
+                    self.unreadNotificationUsers = notificationUsers.filter { !$0.notification.isRead }
+                    self.restNotificationUsers = notificationUsers.filter { $0.notification.isRead }
+                    
                     print("Fetched \(notificationUsers.count) notification users")
                     
                     // Loop through each notification user and print their full_message

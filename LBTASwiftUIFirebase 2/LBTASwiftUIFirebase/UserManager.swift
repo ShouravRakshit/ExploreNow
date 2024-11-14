@@ -469,24 +469,37 @@ struct Notification {
         let calendar = Calendar.current
         let components = calendar.dateComponents([.second, .minute, .hour, .day, .month, .year], from: date, to: now)
 
+        // Handle years
         if let year = components.year, year > 0 {
-            return "\(year) year(s) ago"
+            return year == 1 ? "1 year ago" : "\(year) years ago"
         }
+
+        // Handle months
         if let month = components.month, month > 0 {
-            return "\(month) month(s) ago"
+            return month == 1 ? "1 month ago" : "\(month) months ago"
         }
+
+        // Handle days
         if let day = components.day, day > 0 {
-            return "\(day) day(s) ago"
+            return day == 1 ? "1 day ago" : "\(day) days ago"
         }
+
+        // Handle hours
         if let hour = components.hour, hour > 0 {
-            return "\(hour) hour(s) ago"
+            return hour == 1 ? "1 hour ago" : "\(hour) hours ago"
         }
+
+        // Handle minutes
         if let minute = components.minute, minute > 0 {
-            return "\(minute) minute(s) ago"
+            return minute == 1 ? "1 minute ago" : "\(minute) minutes ago"
         }
+
+        // Handle seconds
         if let second = components.second, second > 0 {
-            return "\(second) second(s) ago"
+            return second == 1 ? "1 second ago" : "\(second) seconds ago"
         }
+
+        // If no significant time difference
         return "Just now"
     }
 

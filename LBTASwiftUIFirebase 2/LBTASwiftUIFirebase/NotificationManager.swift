@@ -82,13 +82,14 @@ class NotificationManager {
                     
                     // Create a NotificationUser object and return it
                     var user = NotificationUser(uid: uid, name: name, username: username, profileImageUrl: profileImageUrl, notification: notification)
+                    let name_string = "\(name) (@\(username))"
                     // Check if the notification.message contains "$NAME" and replace it with user.name
                     if notification.message.contains("$NAME") {
                         // Replace "$NAME" with the user's name
-                        user.full_message = notification.message.replacingOccurrences(of: "$NAME", with: name)
+                        user.full_message = notification.message.replacingOccurrences(of: "$NAME", with: name_string)
                     } else {
                         // If no "$NAME" in the message, just use the message as is
-                        user.full_message = "\(name) (@\(username)) \(notification.message)"
+                        user.full_message = "\(name_string) \(notification.message)"
                     }
 
                     
