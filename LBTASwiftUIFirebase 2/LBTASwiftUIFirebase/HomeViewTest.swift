@@ -215,6 +215,7 @@ struct HomeViewTest: View {
     }
 
     private func checkIfNotifications() {
+        userManager.fetchNotifications()
         hasNotifications = !(userManager.currentUser?.notifications.isEmpty ?? true)
     }
     
