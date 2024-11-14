@@ -738,6 +738,8 @@ struct ProfileView: View {
     @State private var friendshipLabelText = "Add Friend..."
     @State private var friendsList: [String] = []
     @State private var shouldShowLogOutOptions = false
+//    @EnvironmentObject var appState: AppState
+   
     
     var user_uid: String // The UID of the user whose profile is being viewed
     
