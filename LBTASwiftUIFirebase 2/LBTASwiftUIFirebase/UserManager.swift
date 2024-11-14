@@ -30,38 +30,42 @@ class UserManager: ObservableObject {
         fetchCurrentUser()
     }
 
-    func fetchCurrentUser()
-        {
+    func fetchCurrentUser() {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
             print("Could not find Firebase UID")
             return
         }
 
-        FirebaseManager.shared.firestore.collection("users").document(uid).getDocument { snapshot, error in
-            if let error = error {
-                print("Failed to fetch current user: \(error.localizedDescription)")
-                return
-            }
+        FirebaseManager.shared.firestore.collection("users").document(uid)
+            .addSnapshotListener { [weak self] snapshot, error in
+                if let error = error {
+                    print("Failed to fetch current user: \(error.localizedDescription)")
+                    return
+                }
 
-            guard let data = snapshot?.data() else {
-                print("No data found")
-                return
-            }
+                guard let data = snapshot?.data() else {
+                    print("No data found")
+                    return
+                }
 
-            // Initialize the User object
-            DispatchQueue.main.async
-                {
-                self.currentUser = User(data: data, uid: uid)
-                if let currentUser = self.currentUser {
-                       print("User Manager - Fetched User: \(currentUser.name)")
-                        self.fetchNotifications()
-                   } else {
-                       print("User Manager - Failed to initialize current user.")
-                   }
+                DispatchQueue.main.async {
+                    self?.currentUser = User(data: data, uid: uid)
+                    if let currentUser = self?.currentUser {
+                        print("User Manager - Fetched User: \(currentUser.name)")
+                        self?.fetchNotifications()
+                    } else {
+                        print("User Manager - Failed to initialize current user.")
+                    }
                 }
             }
-        }
+    }
     
+    func checkFriendshipStatus() {
+        // Implement logic to check friendship status
+        print("checkFriendshipStatus called")
+    }
+
+
     private func updateUserInFirestore(_ user: User) {
         print ("in updateUserInFirestore")
         let userData: [String: Any] = [

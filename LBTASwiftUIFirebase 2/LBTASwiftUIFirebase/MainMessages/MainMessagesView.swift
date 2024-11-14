@@ -19,7 +19,7 @@ struct RecentMessage: Identifiable {
     let toId: String
     let timestamp: Timestamp
     let email: String
-    let profileImageUrl: String
+    var profileImageUrl: String
     var name: String?
 
     init(documentId: String, data: [String: Any]) {
@@ -61,8 +61,45 @@ class MainMessagesViewModel: ObservableObject {
                     let data = document.data()
                     return RecentMessage(documentId: document.documentID, data: data)
                 }) ?? []
+                self.updateRecentMessagesWithUserData()
+
             }
     }
+    
+    func updateRecentMessagesWithUserData() {
+            for (index, recentMessage) in recentMessages.enumerated() {
+                let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+
+                fetchUserData(uid: uid) { [weak self] user in
+                    guard let self = self else { return }
+                    DispatchQueue.main.async {
+                        self.recentMessages[index].name = user.name
+                        self.recentMessages[index].profileImageUrl = user.profileImageUrl
+                    }
+                }
+            }
+        }
+    
+    func fetchUserData(uid: String, completion: @escaping (ChatUser) -> Void) {
+            let userRef = FirebaseManager.shared.firestore.collection("users").document(uid)
+
+            userRef.getDocument { (document, error) in
+                if let error = error {
+                    print("Error fetching user data: \(error)")
+                    completion(ChatUser(data: [:]))
+                    return
+                }
+
+                if let document = document, document.exists {
+                    let data = document.data() ?? [:]
+                    let user = ChatUser(data: data)
+                    completion(user)
+                } else {
+                    print("User document does not exist")
+                    completion(ChatUser(data: [:]))
+                }
+            }
+        }
 
     func handleSignOut() {
         print("Signing out user in handleSignOut")
@@ -170,7 +207,7 @@ struct MainMessagesView: View {
                                 "uid": uid,
                                 "email": recentMessage.email,
                                 "profileImageUrl": recentMessage.profileImageUrl,
-                                "name": recentMessage.name // Assuming you have a name field; adjust as needed
+                                "name": recentMessage.name
                             ]
                             let chatUser = ChatUser(data: data)
                             self.selectedChatUser = chatUser
@@ -341,6 +378,8 @@ struct MainMessagesView: View {
             }
         }
     }
+    
+    
     
     func updateRecentMessagesWithNames() {
         // Iterate over each message in recentMessages
