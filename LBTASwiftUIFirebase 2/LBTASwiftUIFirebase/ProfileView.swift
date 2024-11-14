@@ -163,6 +163,11 @@ struct ProfileView: View {
                                 }
                                 .padding(.top, 10)
                             }
+                            else {
+                                Text("No Posts Yet.")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                            }
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 50)
@@ -180,10 +185,7 @@ struct ProfileView: View {
                         .padding(.horizontal, 2)
                         
                     }
-                    if viewingOtherProfile && isFriends && userPosts.count == 0 {
-                        Text ("No posts yet")
-                            .padding(.top, 50)
-                    }
+
                 }
                 Spacer()
             }
