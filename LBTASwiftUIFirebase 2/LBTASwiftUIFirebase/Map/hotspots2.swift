@@ -8,6 +8,8 @@ import MapKit
 struct hotspots: View {
     @State private var place: String = ""
     @State private var offset: CGFloat = 0
+    @State private var searchResults: [Post] = []
+    @State private var showSearchResults = false
 
     
     let destinations = [
@@ -76,6 +78,51 @@ struct hotspots: View {
                  }
              }
      }
+    
+    
+    
+    private func performSearch() {
+           searchPosts { posts in
+               searchResults = posts
+               showSearchResults = true
+           }
+       }
+
+    private func searchPosts() {
+        let db = FirebaseManager.shared.firestore
+        let keywords = place.split(separator: " ").map { String($0).lowercased() }
+        
+        db.collection("posts")
+            .whereField("description", arrayContainsAny: keywords)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error searching posts: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let snapshot = snapshot else { return }
+                var searchResults: [Post] = []
+                
+                for document in snapshot.documents {
+                    let data = document.data()
+                    guard let description = data["description"] as? String,
+                          let rating = data["rating"] as? Int,
+                          let timestamp = (data["timestamp"] as? Timestamp)?.dateValue() else { continue }
+                    
+                    let post = Post(id: document.documentID, description: description, rating: rating, timestamp: timestamp)
+                    searchResults.append(post)
+                }
+                
+                navigateToSearchResultsPage(posts: searchResults)
+            }
+    }
+
+    private func navigateToSearchResultsPage(posts: [Post]) {
+        NavigationLink(destination: ExplorePageSearchResults(posts: posts)) {
+            Text("Search Results")
+        }
+    }
+
 
     
     var body: some View {
@@ -94,7 +141,7 @@ struct hotspots: View {
                             .foregroundColor(Color(hex: "8C52FF"))
                             .padding(.leading, 15)
                         
-                        TextField("Places, hotels, restaurants, friends", text: $place)
+                        TextField("Places, hotels, restaurants, friends", text: $place, onCommit: performSearch)
                             .font(.custom("Sansation", size: 20))
                             .padding(.trailing, 17)
                             .frame(height: 50)
@@ -204,6 +251,11 @@ struct hotspots: View {
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .topLeading)
+            .onChange(of: place) { newValue in
+                if newValue.isEmpty {
+                    isSearching = false
+                }
+            }
         }
         
     }
