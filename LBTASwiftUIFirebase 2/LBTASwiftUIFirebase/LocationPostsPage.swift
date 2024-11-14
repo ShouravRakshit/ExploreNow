@@ -208,7 +208,7 @@ struct LocationPostView: View {
     @State private var currentImageIndex = 0
     
     var body: some View {
-        NavigationLink(destination: PostView(post: post)) {
+        NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
             VStack(alignment: .leading, spacing: 0) {
                 // Top section with user image and username
                 HStack(alignment: .center) {

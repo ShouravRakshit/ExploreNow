@@ -1,10 +1,3 @@
-//
-//  Post.swift
-//  LBTASwiftUIFirebase
-//
-//  Created by Saadman Rahman on 2024-11-06.
-//
-
 import Firebase
 import FirebaseFirestore
 
@@ -19,4 +12,9 @@ struct Post: Identifiable {
     let uid: String
     let username: String
     let userProfileImageUrl: String
+    var commentCount: Int = 0  // Default value, can be updated later
+    var likesCount: Int = 0  // Default value
+    var likedByUserIds: [String] = []  // Default to an empty array
+    var liked: Bool = false // initialized to false
 }
+

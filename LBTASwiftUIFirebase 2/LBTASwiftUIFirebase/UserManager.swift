@@ -185,7 +185,7 @@ class UserManager: ObservableObject {
                 "type": "friendRequest",
                 "senderId": senderId,
                 "receiverId": receiverId,
-                "message": "\(name) (@\(username)) sent you a friend request.",
+                "message": "sent you a friend request.",
                 "timestamp": Timestamp(),
                 "isRead": false, // Initially unread,
                 "status": "pending"
@@ -209,7 +209,7 @@ class UserManager: ObservableObject {
                 "type": "friendRequest",
                 "senderId": senderId,
                 "receiverId": receiverId,
-                "message": "\(name) (@\(username)) accepted your friend request.",
+                "message": "accepted your friend request.",
                 "timestamp": Timestamp(),
                 "isRead": false, // Initially unread
                 "status": "accepted"
@@ -252,6 +252,7 @@ class UserManager: ObservableObject {
 
                         if let receiverId = data["receiverId"] as? String,
                            let senderId = data["senderId"] as? String,
+                           let type = data["type"] as? String,
                            let message = data["message"] as? String,
                            let timestamp = data["timestamp"] as? Timestamp,
                            let status = data["status"] as? String,
@@ -264,7 +265,8 @@ class UserManager: ObservableObject {
                                                             message: message,
                                                             timestamp: timestamp,
                                                             isRead: isRead,
-                                                            status: status)
+                                                            status: status,
+                                                            type: type)
                             notifications.append(notification)
                         }
                     }
@@ -288,8 +290,93 @@ class UserManager: ObservableObject {
     
     // Manually update the notifications for the current user
     func setNotificationsForCurrentUser(newNotifications: [Notification]) {
-        print ("Setting notifications")
         currentUser?.notifications = newNotifications
+        print ("Setting notifications size: \(currentUser?.notifications.count)")
+    }
+    
+    func sendLikeNotification(likerId: String, post: Post, completion: @escaping (Bool, Error?) -> Void) {
+        // Check if the post belongs to the current user and if the liker is not the post's author
+        if post.uid != likerId {
+            // Create a message for the notification
+            let message = "liked your post!"
+            
+            // Create a timestamp for the notification
+            let timestamp = Timestamp(date: Date())
+            
+            // Create a Notification object
+            let notification = Notification(
+                receiverId: post.uid,
+                senderId: likerId,
+                message: message,
+                timestamp: timestamp,
+                isRead: false,
+                status: "Like",
+                type: "Like"
+            )
+            
+            
+            saveNotificationToFirestore(notification) { success, error in
+                if success {
+                    completion(true, nil)
+                } else {
+                    completion(false, error)
+                }
+            }
+        }
+    }
+    
+    func sendCommentNotification(commenterId: String, post: Post, commentMessage: String, completion: @escaping (Bool, Error?) -> Void) {
+        // Check if the post belongs to the current user and if the commenter is not the post's author
+        if post.uid != commenterId {
+            // Create a message for the notification
+            let message = "commented on your post: \(commentMessage)"
+            
+            // Create a timestamp for the notification
+            let timestamp = Timestamp(date: Date())
+            
+            // Create a Notification object for the comment
+            let notification = Notification(
+                receiverId: post.uid,
+                senderId: commenterId,
+                message: message,
+                timestamp: timestamp,
+                isRead: false,
+                status: "Comment",
+                type: "Comment"
+            )
+            
+            // Save the notification to Firestore
+            saveNotificationToFirestore(notification) { success, error in
+                if success {
+                    completion(true, nil)
+                } else {
+                    completion(false, error)
+                }
+            }
+        }
+    }
+    
+    private func saveNotificationToFirestore(_ notification: Notification, completion: @escaping (Bool, Error?) -> Void) {
+        let db = Firestore.firestore()
+        let notificationRef = db.collection("notifications").document()
+        
+        let notificationData: [String: Any] = [
+            "receiverId": notification.receiverId,
+            "senderId": notification.senderId,
+            "message": notification.message,
+            "timestamp": notification.timestamp,
+            "status": notification.status,
+            "isRead": notification.isRead,
+            "type"  : notification.type
+        ]
+        
+        notificationRef.setData(notificationData) { error in
+            if let error = error {
+                completion(false, error)
+            } else {
+                completion(true, nil)
+            }
+        }
     }
     
     
@@ -357,6 +444,7 @@ struct Notification {
     let timestamp: Timestamp
     var status: String
     var isRead: Bool
+    let type: String
     
     // Initializer that takes a Firestore document
     init(from document: QueryDocumentSnapshot) {
@@ -367,16 +455,18 @@ struct Notification {
         self.timestamp = data["timestamp"] as? Timestamp ?? Timestamp(date: Date()) // Default to current time if not found
         self.isRead = data["isRead"] as? Bool ?? false // Default to unread
         self.status = data ["status"] as? String ?? ""
+        self.type = data ["type"] as? String ?? ""
     }
     
     // Initializer to create a Notification from Firestore data
-    init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool, status: String) {
+    init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool, status: String, type: String) {
         self.receiverId = receiverId
         self.senderId = senderId
         self.message = message
         self.timestamp = timestamp
         self.isRead = isRead
         self.status = status
+        self.type   = type
     }
     
     // You can add a computed property to display the time nicely

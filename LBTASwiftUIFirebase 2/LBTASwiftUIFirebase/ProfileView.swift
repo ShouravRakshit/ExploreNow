@@ -74,6 +74,8 @@ struct ProfileView: View {
                     if let profileUser = profileUser {
                         Text(profileUser.name)
                             .font(.system(size: 24, weight: .bold))
+                        Text("@\(profileUser.username)")
+                            .font(.system(size: 16, weight: .bold))
                         Text(profileUser.bio)
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(.black)
@@ -581,7 +583,7 @@ struct UserPostCard: View {
     @State private var errorMessage = ""
     
     var body: some View {
-        NavigationLink(destination: PostView(post: post)) {
+        NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Spacer()

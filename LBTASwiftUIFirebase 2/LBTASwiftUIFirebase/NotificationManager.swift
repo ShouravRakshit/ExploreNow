@@ -8,6 +8,7 @@ struct NotificationUser {
     let username: String
     let profileImageUrl: String
     var notification: Notification
+    var full_message: String? // Optional property
 }
 
 // Singleton Manager to manage notification users
@@ -32,8 +33,9 @@ class NotificationManager {
         
         // Loop over each senderId (UID) and fetch the user data
         for notification in notifications {
-            group.enter() // Enter the group for each async operation
             
+            group.enter() // Enter the group for each async operation
+
             // Fetch user details from Firestore
             fetchUserFromFirestore(uid: notification.senderId, notification: notification) { [weak self] result in
                 guard let self = self else { return }  // Avoid using self if it's deallocated
@@ -42,6 +44,7 @@ class NotificationManager {
                 case .success(let user):
                     // Add the user to the notification users list
                     self.notificationUsers.append(user)
+                    print("Fetched User: \(user.name), \(user.username), Full message: \(user.full_message ?? "No message")")
                 case .failure(let error):
                     print("Error fetching user: \(error.localizedDescription)")
                 }
@@ -78,7 +81,17 @@ class NotificationManager {
                     }
                     
                     // Create a NotificationUser object and return it
-                    let user = NotificationUser(uid: uid, name: name, username: username, profileImageUrl: profileImageUrl, notification: notification)
+                    var user = NotificationUser(uid: uid, name: name, username: username, profileImageUrl: profileImageUrl, notification: notification)
+                    // Check if the notification.message contains "$NAME" and replace it with user.name
+                    if notification.message.contains("$NAME") {
+                        // Replace "$NAME" with the user's name
+                        user.full_message = notification.message.replacingOccurrences(of: "$NAME", with: name)
+                    } else {
+                        // If no "$NAME" in the message, just use the message as is
+                        user.full_message = "\(name) @(\(username)) \(notification.message)"
+                    }
+
+                    
                     completion(.success(user))
                 } else {
                     completion(.failure(NSError(domain: "Document data error", code: 0, userInfo: nil)))

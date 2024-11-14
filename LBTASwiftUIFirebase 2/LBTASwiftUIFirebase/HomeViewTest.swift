@@ -64,6 +64,7 @@ struct HomeViewTest: View {
                             LazyVStack(spacing: 16) {
                                 ForEach(posts) { post in
                                     PostCard(post: post)
+                                        .environmentObject(userManager)
                                         .padding(.horizontal)
                                 }
                             }
@@ -229,10 +230,16 @@ struct HomeViewTest: View {
 
 struct PostCard: View {
     let post: Post
+    @EnvironmentObject var userManager: UserManager
     @State private var currentImageIndex = 0
-    
+    @State private var comments: [Comment] = []
+    @State private var commentCount: Int = 0
+    @State private var likesCount: Int = 0  // Track the like count
+    @State private var likedByUserIds: [String] = []  // Track the list of users who liked the post
+    @State private var liked: Bool = false  // Track if the current user has liked the post
+
     var body: some View {
-        NavigationLink(destination: PostView(post: post)) {
+        NavigationLink(destination: PostView(post: post, likesCount: likesCount, liked:liked)) {
             VStack(alignment: .leading, spacing: 8) {
                 // User info header
                 HStack {
@@ -295,17 +302,32 @@ struct PostCard: View {
                         .font(.body)
                 }
                 
-                // Interaction buttons (Likes and Comments)
                 HStack {
                     Button(action: {
-                        // Like action
+                        toggleLike()
+                        userManager.sendLikeNotification(likerId: userManager.currentUser?.uid ?? "", post: post) { success, error in
+                            if success {
+                                print("Like notification sent successfully!")
+                            } else {
+                                if let error = error {
+                                    print("Failed to send like notification: \(error.localizedDescription)")
+                                } else {
+                                    print("Failed to send like notification for an unknown reason.")
+                                }
+                            }
+                        }
                     }) {
                         HStack(spacing: 4) {
-                            Image(systemName: "heart.fill")
-                                .foregroundColor(.customPurple)
-                            Text("1.2k")
-                                .foregroundColor(.gray)
+                            // Heart icon that changes based on whether the post is liked
+                            Image(systemName: liked ? "heart.fill" : "heart")  // Filled heart if liked, empty if not
+                                .foregroundColor(liked ? .red : .gray)  // Red if liked, gray if not
+                                .padding(5)
+                            
+                            // Display like count
+                            Text("\(likesCount)")
+                                .foregroundColor(.gray)  // Like count in gray
                         }
+
                     }
                     
                     Spacer()
@@ -317,7 +339,7 @@ struct PostCard: View {
                         HStack(spacing: 4) {
                             Image(systemName: "bubble.right.fill")
                                 .foregroundColor(.customPurple)
-                            Text("600")
+                            Text("\(comments.count)")  // Use the updated comments count
                                 .foregroundColor(.gray)
                         }
                     }
@@ -345,9 +367,100 @@ struct PostCard: View {
             .background(Color.white)
             .cornerRadius(15)
             .shadow(radius: 5)
+            .onAppear {
+                // Fetch likes count when post card appears
+                fetchLikes()
+                // Fetch comments when the post card appears
+                fetchComments()
+            }
+        }
+    }
+
+    private func fetchLikes() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("likes")
+            .whereField("postId", isEqualTo: post.id) // Filter likes by post ID
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching likes: \(error)")
+                } else {
+                    // Count how many users liked the post
+                    self.likesCount = snapshot?.documents.count ?? 0
+                    
+                    // Track users who liked this post
+                    self.likedByUserIds = snapshot?.documents.compactMap { document in
+                        return document.data()["userId"] as? String
+                    } ?? []
+                    
+                    // Check if the current user liked the post
+                    if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid {
+                        self.liked = self.likedByUserIds.contains(currentUserId)
+                    }
+                }
+            }
+    }
+
+    private func toggleLike() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        let db = FirebaseManager.shared.firestore
+        
+        // If the post is already liked by the current user, remove the like
+        if liked {
+            db.collection("likes")
+                .whereField("postId", isEqualTo: post.id)
+                .whereField("userId", isEqualTo: currentUserId)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Error removing like: \(error)")
+                    } else if let document = snapshot?.documents.first {
+                        document.reference.delete { err in
+                            if let err = err {
+                                print("Error removing like: \(err)")
+                            } else {
+                                self.likesCount -= 1
+                                self.liked = false
+                            }
+                        }
+                    }
+                }
+        } else {
+            // Otherwise, add a like
+            db.collection("likes").addDocument(data: [
+                "postId": post.id,
+                "userId": currentUserId,
+                "timestamp": Timestamp()
+            ]) { error in
+                if let error = error {
+                    print("Error adding like: \(error)")
+                } else {
+                    self.likesCount += 1
+                    self.liked = true
+                }
+            }
         }
     }
     
+    private func fetchComments() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("comments")
+            .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching comments: \(error)")
+                } else {
+                    // Decode Firestore documents into Comment objects
+                    self.comments = snapshot?.documents.compactMap { document in
+                        Comment(document: document)
+                    } ?? []
+                    
+                    // Update comment count
+                    self.commentCount = self.comments.count
+                }
+            }
+    }
+
     private func formatDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated

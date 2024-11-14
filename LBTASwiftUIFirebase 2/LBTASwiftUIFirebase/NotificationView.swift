@@ -1,10 +1,3 @@
-//
-//  NotificationView.swift
-//  LBTASwiftUIFirebase
-//
-//  Created by Alisha Lalani on 2024-11-06.
-//
-
 import SwiftUI
 import SDWebImageSwiftUI
 import FirebaseFirestore
@@ -14,6 +7,8 @@ struct NotificationView: View {
     @EnvironmentObject var userManager: UserManager
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel: NotificationViewModel
+    @State private var showingProfile = false // State to manage the full screen cover
+    @State private var selectedUser: NotificationUser? // Store selected user to pass to ProfileView
     
     // Custom initializer to pass userManager to the view model
     init(userManager: UserManager) {
@@ -22,7 +17,7 @@ struct NotificationView: View {
     
     //var notifications_all: [Notification] = []  // Array to hold notification objects
     var notificationUsers: [NotificationUser] = []
-    @State private var isLoading = false
+    @State private var isLoading = true
     
     let db = Firestore.firestore()
     
@@ -64,7 +59,7 @@ struct NotificationView: View {
                 }
                 else
                 {
-                    List(viewModel.notificationUsers, id: \.uid) { user in
+                    List(viewModel.notificationUsers, id: \.notification.timestamp) { user in
                         VStack(alignment: .leading) {
                             HStack{
                                 ZStack
@@ -95,53 +90,60 @@ struct NotificationView: View {
                                 }
 
 
-                                Text(user.notification.message)  // Show notification message
+                                Text(user.full_message ?? "")  // Show notification message
                                     .font(.body)
                                     .padding(.bottom, 5)
                                     .lineLimit(nil)  // Allow unlimited lines
                                     .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                // Confirm button
-                                Button(action: {
-                                    // Handle Confirm button action here
-                                    print ("Accepting friend request")
-                                    let senderId   = user.notification.senderId
-                                    let receiverId = user.notification.receiverId
-                                    let requestId = senderId + "_" + receiverId
-                                    print ("requestID: \(requestId)")
-                                    print ("senderID: \(senderId)")
-                                    print ("receiverID: \(receiverId)")
-                                    // Update status in the model first
-                                    //needs to update notification And send notification to accepted user
-                                    if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
-                                        viewModel.notificationUsers[index].notification.status = "accepted"
-                                        viewModel.notificationUsers[index].notification.message = "You and \(user.name) are now friends."
+                                    .onTapGesture {
+                                        // When the user taps on the notification message, show the full screen cover
+                                        self.selectedUser = user
+                                        self.showingProfile.toggle()
                                     }
-                                    acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
-                                    //__ accepted your friend request
-                                    sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
-                                        if success {
-                                            print("Notification sent successfully")
-                                        } else {
-                                            print("Error sending notification: \(String(describing: error))")
+                                
+                                if user.notification.type == "friendRequest"
+                                {
+                                    // Confirm button
+                                    Button(action: {
+                                        // Handle Confirm button action here
+                                        print ("Accepting friend request")
+                                        let senderId   = user.notification.senderId
+                                        let receiverId = user.notification.receiverId
+                                        let requestId = senderId + "_" + receiverId
+                                        print ("requestID: \(requestId)")
+                                        print ("senderID: \(senderId)")
+                                        print ("receiverID: \(receiverId)")
+                                        // Update status in the model first
+                                        //needs to update notification And send notification to accepted user
+                                        if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
+                                            viewModel.notificationUsers[index].notification.status = "accepted"
+                                            viewModel.notificationUsers[index].notification.message = "You and $NAME are now friends."
                                         }
+                                        acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
+                                        //__ accepted your friend request
+                                        sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                            if success {
+                                                print("Notification sent successfully")
+                                            } else {
+                                                print("Error sending notification: \(String(describing: error))")
+                                            }
+                                        }
+                                        //can be combined with updateNotificationStatus for efficiency
+                                        //You and __ are now friends
+                                        updateNotificationAccepted (user)
+                                    }) {
+                                        Text(user.notification.status == "pending" ? "Confirm" : "Friends")
+                                            .font(.body)
+                                            .padding(.horizontal, 12)
+                                            .padding(.vertical, 6)
+                                            .background(user.notification.status == "pending" ? Color(red: 140/255, green: 82/255, blue: 255/255) : Color.gray)
+                                            .foregroundColor(.white)
+                                            .cornerRadius(8)
                                     }
-                                    //can be combined with updateNotificationStatus for efficiency
-                                    //You and __ are now friends
-                                    updateNotificationAccepted (user)
-                                }) {
-                                    Text(user.notification.status == "pending" ? "Confirm" : "Friends")
-                                        .font(.body)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(user.notification.status == "pending" ? Color(red: 140/255, green: 82/255, blue: 255/255) : Color.gray)
-                                        .foregroundColor(.white)
-                                        .cornerRadius(8)
+                                    .contentShape(Rectangle())  // Ensure the button area is tappable
+                                    .buttonStyle(PlainButtonStyle())  // Avoid default button styles
                                 }
-                                .contentShape(Rectangle())  // Ensure the button area is tappable
-                                .buttonStyle(PlainButtonStyle())  // Avoid default button styles
-                                
                             }
                             HStack {
                                 /*
@@ -170,13 +172,21 @@ struct NotificationView: View {
         .onAppear{
             //viewModel.resetNotificationUsers()
             //populate notifications
-            userManager.fetchNotifications()
             isLoading = true
+            userManager.fetchNotifications()
             viewModel.populateNotificationUsers()  // Fetch users when view appears
             isLoading = false
             markNotificationsAsRead()
             userManager.fetchNotifications()// Re-fetch notifications to ensure the read status is reflected
         }
+        .fullScreenCover(isPresented: $showingProfile) {
+            /*
+           if let selectedUser = selectedUser {
+               ProfileView(user_uid: selectedUser.uid)  // Show the profile view with the selected user
+                   .environmentObject(userManager)
+           }*/
+       }
+        
     }
 
 
@@ -228,7 +238,7 @@ struct NotificationView: View {
                 if let document = snapshot?.documents.first {
                     document.reference.updateData([
                         "status": "accepted",
-                        "message": "You and \(notificationUser.name) are now friends",
+                        "message": "You and $NAME are now friends.",
                         "timestamp": Timestamp()
                     ]) { error in
                         if let error = error {
@@ -272,6 +282,34 @@ struct NotificationView: View {
                 }
             }
     }
+    
+
+    
+    private func saveNotificationToFirestore(_ notification: Notification, completion: @escaping (Bool, Error?) -> Void) {
+        let db = Firestore.firestore()
+        let notificationRef = db.collection("notifications").document()
+        
+        let notificationData: [String: Any] = [
+            "receiverId": notification.receiverId,
+            "senderId": notification.senderId,
+            "message": notification.message,
+            "timestamp": notification.timestamp,
+            "status": notification.status,
+            "isRead": notification.isRead,
+            "type"  : notification.type
+        ]
+        
+        notificationRef.setData(notificationData) { error in
+            if let error = error {
+                completion(false, error)
+            } else {
+                completion(true, nil)
+            }
+        }
+    }
+    
+
+
     
     private func acceptFriendRequest(requestId: String, receiverId: String, senderId: String) {
         // Step 1: Update the request status to "accepted"
@@ -402,7 +440,12 @@ class NotificationViewModel: ObservableObject {
                 switch result {
                 case .success(let notificationUsers):
                     self.notificationUsers = notificationUsers
-                    //print("Fetched \(notificationUsers.count) notification users")
+                    print("Fetched \(notificationUsers.count) notification users")
+                    
+                    // Loop through each notification user and print their full_message
+                    for user in notificationUsers {
+                        print("User Full Message: \(user.full_message ?? "No message")")
+                    }
                 case .failure(let error):
                     print("Failed to fetch notification users: \(error.localizedDescription)")
                 }
