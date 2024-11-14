@@ -88,7 +88,7 @@ class NotificationManager {
                         user.full_message = notification.message.replacingOccurrences(of: "$NAME", with: name)
                     } else {
                         // If no "$NAME" in the message, just use the message as is
-                        user.full_message = "\(name) @(\(username)) \(notification.message)"
+                        user.full_message = "\(name) (@\(username)) \(notification.message)"
                     }
 
                     

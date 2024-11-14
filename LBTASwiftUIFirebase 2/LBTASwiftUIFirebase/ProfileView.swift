@@ -129,33 +129,40 @@ struct ProfileView: View {
                     if isLoading {
                         ProgressView()
                             .padding()
-                    } else if !viewingOtherProfile && userPosts.isEmpty {
+                    }
+
+                    //if viewing your own profile or a friends profile with no posts
+                    else if (!viewingOtherProfile || isFriends) && userPosts.isEmpty {
                         VStack(spacing: 20) {
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 50))
                                 .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
                                 .padding(.top, 40)
                             
-                            Text("Share Your First Adventure!")
-                                .font(.headline)
-                                .foregroundColor(.gray)
-                            
-                            Button(action: {
-                                showAddPost = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "plus.circle.fill")
-                                        .font(.system(size: 20))
-                                    Text("Add Your First Post")
+                            if (!viewingOtherProfile)
+                            {
+                                Text("Share Your First Adventure!")
+                                    .font(.headline)
+                                    .foregroundColor(.gray)
+                                
+                                
+                                Button(action: {
+                                    showAddPost = true
+                                }) {
+                                    HStack {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.system(size: 20))
+                                        Text("Add Your First Post")
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 12)
+                                    .background(Color(red: 140/255, green: 82/255, blue: 255/255))
+                                    .cornerRadius(25)
+                                    .shadow(color: Color(red: 140/255, green: 82/255, blue: 255/255).opacity(0.3), radius: 10, x: 0, y: 5)
                                 }
-                                .foregroundColor(.white)
-                                .padding(.horizontal, 20)
-                                .padding(.vertical, 12)
-                                .background(Color(red: 140/255, green: 82/255, blue: 255/255))
-                                .cornerRadius(25)
-                                .shadow(color: Color(red: 140/255, green: 82/255, blue: 255/255).opacity(0.3), radius: 10, x: 0, y: 5)
+                                .padding(.top, 10)
                             }
-                            .padding(.top, 10)
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 50)

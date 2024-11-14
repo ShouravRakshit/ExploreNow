@@ -154,7 +154,7 @@ struct NotificationView: View {
                                 
                                 Spacer()
                                 
-                                Text(user.notification.timestamp.dateValue(), style: .time)  // Show timestamp
+                                Text(user.notification.timeAgo)  // Show timestamp
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                             }
