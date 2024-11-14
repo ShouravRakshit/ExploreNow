@@ -336,7 +336,9 @@ struct MainMessagesView: View {
             ])
         }
         .alert(isPresented: $shouldShowChangePasswordConfirmation) {
+            
             Alert(
+                
                 title: Text("Change Password"),
                 message: Text("A password reset link will be sent to your email."),
                 primaryButton: .default(Text("OK"), action: {
@@ -354,8 +356,16 @@ struct MainMessagesView: View {
                 secondaryButton: .cancel()
             )
         }
+        // Need to fix the sorting of the messages that appears in the chatview.
+//        .onAppear(){
+//            sortMessages()
+//        }
     }
-
+    
+//    func sortMessages(){
+//        vm.recentMessages.sort { $0.timestamp.dateValue() > $1.timestamp.dateValue() }
+//    }
+    
     private func showDeleteAccountConfirmation() {
         let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
 
