@@ -1,11 +1,15 @@
 import Foundation
 import SwiftUI
+import Firebase
+import MapKit
 
 
 
 struct hotspots: View {
     @State private var place: String = ""
     @State private var offset: CGFloat = 0
+    @State private var searchResults: [Post] = []
+    @State private var showSearchResults = false
 
     
     let destinations = [
@@ -19,6 +23,107 @@ struct hotspots: View {
     let gridItems = [GridItem(.flexible()), GridItem(.flexible())]
     
     @State private var isNavigatingToDetailPage: Bool = false
+    
+    // Helper function to get coordinates based on the image name
+    func locationCoordinatesForImage(_ locationName: String) -> [Double] {
+        // Define coordinates for each location (latitude, longitude)
+        let coordinates: [String: [Double]] = [
+            "Jasper": [52.8734, -118.0810],
+            "Banff": [51.1784, -115.5708],
+            "Seoul": [37.5665, 126.9780],
+            "Paris": [48.8566, 2.3522],
+            "Drumheller": [51.4658, -112.7101],
+            "Canmore": [51.0890, -115.3550],
+            "Toronto": [43.65107, -79.347015]
+        ]
+        
+        return coordinates[locationName] ?? [0.0, 0.0] // Default to [0.0, 0.0] if not found
+    }
+
+    // Function to handle the tap for suggested locations
+    @objc private func handleTap(locationName: String, coordinates: [Double]) {
+        guard coordinates.count == 2 else {
+               print("Invalid coordinates")
+               return
+           }
+           
+           let latitude = coordinates[0]
+           let longitude = coordinates[1]
+         
+         let db = FirebaseManager.shared.firestore
+         db.collection("locations")
+             .whereField("location_coordinates", isEqualTo: [latitude, longitude])
+             .getDocuments { [weak self] snapshot, error in
+                 guard let self = self else { return }
+                 self.hideLoading()
+                 
+                 if let error = error {
+                     print("Error fetching location: \(error.localizedDescription)")
+                     return
+                 }
+                 
+                 if let locationDoc = snapshot?.documents.first {
+                     let locationRef = locationDoc.reference
+                     let locationPostsPage = UIHostingController(rootView:
+                         LocationPostsPage(locationRef: locationRef)
+                     )
+                     
+                     if let parentVC = self.parentViewController {
+                         parentVC.present(locationPostsPage, animated: true, completion: nil)
+                     } else {
+                         print("No parent view controller found!")
+                     }
+                 } else {
+                     print("Location not found in database!")
+                 }
+             }
+     }
+    
+    
+    
+    private func performSearch() {
+           searchPosts { posts in
+               searchResults = posts
+               showSearchResults = true
+           }
+       }
+
+    private func searchPosts() {
+        let db = FirebaseManager.shared.firestore
+        let keywords = place.split(separator: " ").map { String($0).lowercased() }
+        
+        db.collection("posts")
+            .whereField("description", arrayContainsAny: keywords)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error searching posts: \(error.localizedDescription)")
+                    return
+                }
+                
+                guard let snapshot = snapshot else { return }
+                var searchResults: [Post] = []
+                
+                for document in snapshot.documents {
+                    let data = document.data()
+                    guard let description = data["description"] as? String,
+                          let rating = data["rating"] as? Int,
+                          let timestamp = (data["timestamp"] as? Timestamp)?.dateValue() else { continue }
+                    
+                    let post = Post(id: document.documentID, description: description, rating: rating, timestamp: timestamp)
+                    searchResults.append(post)
+                }
+                
+                navigateToSearchResultsPage(posts: searchResults)
+            }
+    }
+
+    private func navigateToSearchResultsPage(posts: [Post]) {
+        NavigationLink(destination: ExplorePageSearchResults(posts: posts)) {
+            Text("Search Results")
+        }
+    }
+
+
     
     var body: some View {
         ScrollView{
@@ -36,7 +141,7 @@ struct hotspots: View {
                             .foregroundColor(Color(hex: "8C52FF"))
                             .padding(.leading, 15)
                         
-                        TextField("Places, hotels, restaurants, friends", text: $place)
+                        TextField("Places, hotels, restaurants, friends", text: $place, onCommit: performSearch)
                             .font(.custom("Sansation", size: 20))
                             .padding(.trailing, 17)
                             .frame(height: 50)
@@ -114,39 +219,43 @@ struct hotspots: View {
                 VStack{
                     LazyVGrid(columns: gridItems, spacing: 0) {
                         ForEach(suggestions, id: \.0) { image in
-                            NavigationLink(destination: Text("Detail for \(image.1)")) {
-                                ZStack(alignment: .bottomLeading) {
-                                    // Displaying image
-                                    Image(image.0)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 174, height: 142)
-                                        .clipped()
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        .overlay(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.1)))
-                                        .padding(.bottom, 18)
-                                    
-                                    //Displaying Text
-                                    Text(image.1)
-                                        .font(.system(size: 25, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .multilineTextAlignment(.leading)
-                                        .padding(.horizontal, 10)
-                                        .frame(width: 163, alignment: .leading)
-                                        .padding(.bottom, 20)
-                                }
-                            
+                            ZStack(alignment: .bottomLeading) {
+                                // Displaying image
+                                Image(image.0)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(width: 174, height: 142)
+                                    .clipped()
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.1)))
+                                    .padding(.bottom, 18)
+                                
+                                //Displaying Text
+                                Text(image.1)
+                                    .font(.system(size: 25, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .multilineTextAlignment(.leading)
+                                    .padding(.horizontal, 10)
+                                    .frame(width: 163, alignment: .leading)
+                                    .padding(.bottom, 20)
                             }
-                            .buttonStyle(PlainButtonStyle())
+                            .onTapGesture {
+                                let locationCoordinates = locationCoordinatesForImage(image.0) // Function to get the coordinates
+                                handleTap(locationName: image.0, coordinates: locationCoordinates)
+                            }
                         }
                     }
-                    
                 }
                 .padding(.horizontal, 10)
                 .padding(.top, 22)
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .topLeading)
+            .onChange(of: place) { newValue in
+                if newValue.isEmpty {
+                    isSearching = false
+                }
+            }
         }
         
     }
