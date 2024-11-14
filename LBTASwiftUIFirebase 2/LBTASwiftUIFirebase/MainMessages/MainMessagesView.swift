@@ -49,7 +49,7 @@ class MainMessagesViewModel: ObservableObject {
             .collection("recent_messages")
             .document(uid)
             .collection("messages")
-            .order(by: FirebaseConstants.timestamp, descending: false)
+            .order(by: FirebaseConstants.timestamp, descending: true)
             .addSnapshotListener { querySnapshot, error in
                 if let error = error {
                     self.errorMessage = "Failed to fetch recent messages: \(error)"
@@ -356,15 +356,8 @@ struct MainMessagesView: View {
                 secondaryButton: .cancel()
             )
         }
-        // Need to fix the sorting of the messages that appears in the chatview.
-//        .onAppear(){
-//            sortMessages()
-//        }
+        
     }
-    
-//    func sortMessages(){
-//        vm.recentMessages.sort { $0.timestamp.dateValue() > $1.timestamp.dateValue() }
-//    }
     
     private func showDeleteAccountConfirmation() {
         let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
