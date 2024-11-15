@@ -88,37 +88,40 @@ struct NotificationView: View {
                                 {
                                     // Confirm button
                                     Button(action: {
-                                        // Handle Confirm button action here
-                                        print ("Accepting friend request")
-                                        let senderId   = user.notification.senderId
-                                        let receiverId = user.notification.receiverId
-                                        let requestId = senderId + "_" + receiverId
-                                        print ("requestID: \(requestId)")
-                                        print ("senderID: \(senderId)")
-                                        print ("receiverID: \(receiverId)")
-                                        // Update status in the model first
-                                        //needs to update notification And send notification to accepted user
-                                        if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
-                                            viewModel.notificationUsers[index].notification.status = "accepted"
-                                            viewModel.notificationUsers[index].notification.message = "You and $NAME are now friends."
-                                        }
-                                        acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
-                                        //__ accepted your friend request
-                                        sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
-                                            if success {
-                                                print("Notification sent successfully")
-                                            } else {
-                                                print("Error sending notification: \(String(describing: error))")
+                                        if (user.notification.status == "pending")
+                                        {
+                                            // Handle Confirm button action here
+                                            print ("Accepting friend request")
+                                            let senderId   = user.notification.senderId
+                                            let receiverId = user.notification.receiverId
+                                            let requestId = senderId + "_" + receiverId
+                                            print ("requestID: \(requestId)")
+                                            print ("senderID: \(senderId)")
+                                            print ("receiverID: \(receiverId)")
+                                            // Update status in the model first
+                                            //needs to update notification And send notification to accepted user
+                                            if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
+                                                viewModel.notificationUsers[index].notification.status = "accepted"
+                                                viewModel.notificationUsers[index].notification.message = "You and $NAME are now friends."
                                             }
+                                            acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
+                                            //__ accepted your friend request
+                                            sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                                if success {
+                                                    print("Notification sent successfully")
+                                                } else {
+                                                    print("Error sending notification: \(String(describing: error))")
+                                                }
+                                            }
+                                            //can be combined with updateNotificationStatus for efficiency
+                                            //You and __ are now friends
+                                            updateNotificationAccepted (user)
                                         }
-                                        //can be combined with updateNotificationStatus for efficiency
-                                        //You and __ are now friends
-                                        updateNotificationAccepted (user)
                                     }) {
                                         Text(user.notification.status == "pending" ? "Confirm" : "Friends")
-                                            .font(.body)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 6)
+                                            .font(.subheadline)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 3)
                                             .background(user.notification.status == "pending" ? Color(red: 140/255, green: 82/255, blue: 255/255) : Color.gray)
                                             .foregroundColor(.white)
                                             .cornerRadius(8)

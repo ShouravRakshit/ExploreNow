@@ -938,6 +938,7 @@ struct ProfileView: View {
                 }
                 .navigationBarBackButtonHidden(false)
                 .navigationBarTitleDisplayMode(.inline)
+                /*
                 .toolbar {
                     // Toolbar with the gear icon
                     ToolbarItem(placement: .principal) {
@@ -954,7 +955,7 @@ struct ProfileView: View {
                             }
                         }
                     }
-                }
+                }*/
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Color.white)
                 .fullScreenCover(isPresented: $showProfileSettings) {
