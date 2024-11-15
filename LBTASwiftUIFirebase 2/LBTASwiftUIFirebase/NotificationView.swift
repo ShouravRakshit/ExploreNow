@@ -102,9 +102,12 @@ struct NotificationView: View {
                                             // Update status in the model first
                                             //needs to update notification And send notification to accepted user
                                             if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
-                                                viewModel.notificationUsers[index].notification.status = "accepted"
-                                                viewModel.notificationUsers[index].notification.message = "You and $NAME are now friends."
+                                                var updatedUser = viewModel.notificationUsers[index]
+                                                updatedUser.notification.status = "accepted"
+                                                updatedUser.notification.message = "You and $NAME are now friends."
+                                                viewModel.notificationUsers[index] = updatedUser // Replace the element
                                             }
+                                            
                                             acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
                                             //__ accepted your friend request
                                             sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
@@ -204,10 +207,10 @@ struct NotificationView: View {
             isLoading = false
 
             markNotificationsAsRead()
-            userManager.fetchNotifications()// Re-fetch notifications to ensure the read status is reflected
+            userManager.fetchNotifications() // Re-fetch notifications to ensure the read status is reflected
             }
         .onDisappear(){
-            userManager.fetchNotifications()
+            userManager.fetchNotifications() // Re-fetch notifications to ensure the read status is reflected
         }
         .navigationBarTitle("Notifications", displayMode: .inline)
         
