@@ -206,6 +206,9 @@ struct NotificationView: View {
             markNotificationsAsRead()
             userManager.fetchNotifications()// Re-fetch notifications to ensure the read status is reflected
             }
+        .onDisappear(){
+            userManager.fetchNotifications()
+        }
         .navigationBarTitle("Notifications", displayMode: .inline)
         
     }

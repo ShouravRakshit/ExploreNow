@@ -88,7 +88,7 @@ struct HomeViewTest: View {
         }
          */
         .onAppear {
-            //print("ON APPEAR")
+            print("ON APPEAR")
             // Make sure the current user is available before checking notifications
             if userManager.currentUser != nil {
                 checkIfNotifications()
