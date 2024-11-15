@@ -25,15 +25,15 @@ struct HomeViewTest: View {
                         
                         Spacer()
                         
-                        Button(action: {
-                            navigateToNotifications = true
-                        }) {
+                        // NavigationLink that wraps the bell icon
+                        NavigationLink(destination: NotificationView(userManager: userManager), isActive: $navigateToNotifications) {
                             ZStack {
                                 Image(systemName: "bell.fill")
                                     .resizable()
                                     .frame(width: 24, height: 24)
                                     .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
                                 
+                                // Show unread notification indicator if there are unread notifications
                                 if userManager.hasUnreadNotifications {
                                     Circle()
                                         .fill(Color.red)
@@ -41,7 +41,12 @@ struct HomeViewTest: View {
                                         .offset(x: 8, y: -8)
                                 }
                             }
+                            .onTapGesture {
+                                // Trigger navigation to NotificationView
+                                navigateToNotifications = true
+                            }
                         }
+                        .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
                         .padding(.trailing)
                     }
                     .padding(.top)
@@ -76,10 +81,12 @@ struct HomeViewTest: View {
             }
         }
         .edgesIgnoringSafeArea(.top) // To avoid clipping at the top edge of the screen
+        /*
         .fullScreenCover(isPresented: $navigateToNotifications) {
             NotificationView(userManager: userManager)
                 .environmentObject(userManager)
         }
+         */
         .onAppear {
             //print("ON APPEAR")
             // Make sure the current user is available before checking notifications

@@ -744,8 +744,21 @@ struct ProfileView: View {
     var user_uid: String // The UID of the user whose profile is being viewed
     
     var body: some View {
-        NavigationView {
+        //NavigationView {
             VStack(alignment: .leading) {
+                
+                if !viewingOtherProfile {
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            shouldShowLogOutOptions = true
+                        }) {
+                            Image(systemName: "gearshape.fill")
+                                .font(.system(size: 25))
+                                .foregroundColor(Color.customPurple)
+                        }
+                    }
+                }
                 
                 ScrollView {
                     
@@ -920,7 +933,7 @@ struct ProfileView: View {
                             .padding(.horizontal, 2)
                         }
     
-                    }
+                    //}
                     Spacer()
                 }
                 .navigationBarBackButtonHidden(false)

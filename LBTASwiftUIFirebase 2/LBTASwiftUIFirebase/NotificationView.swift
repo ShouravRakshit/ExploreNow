@@ -9,6 +9,7 @@ struct NotificationView: View {
     @StateObject private var viewModel: NotificationViewModel
     @State private var showingProfile = false // State to manage the full screen cover
     @State private var selectedUser: NotificationUser? // Store selected user to pass to ProfileView
+    @State private var isProfilePresented = false
     
     // Custom initializer to pass userManager to the view model
     init(userManager: UserManager) {
@@ -22,28 +23,8 @@ struct NotificationView: View {
     let db = Firestore.firestore()
     
     var body: some View {
+        
         VStack{
-            //----- TOP ROW --------------------------------------
-            HStack {
-                Image(systemName: "chevron.left")
-                    .resizable() // Make the image resizable
-                    .aspectRatio(contentMode: .fit) // Maintain the aspect ratio
-                    .frame(width: 30, height: 30) // Set size
-                    .padding()
-                    .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF
-                    .onTapGesture {
-                        // Go back to profile page
-                        self.userManager.hasUnreadNotifications = false
-                        userManager.fetchNotifications()
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                Spacer() // Pushes the text to the center
-                Text("Notifications")
-                    .font(.custom("Sansation-Regular", size: 30))
-                    .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF
-                    .offset(x: -30)
-                Spacer() // Pushes the text to the center
-            }
             //------------------------------------------------
             Spacer()
             if isLoading
@@ -70,7 +51,7 @@ struct NotificationView: View {
                                     // Circular border
                                     Circle()
                                         .stroke(Color.black, lineWidth: 4) // Black border
-                                        .frame(width: 51, height: 51) // Slightly larger than the image
+                                        .frame(width: 41, height: 41) // Slightly larger than the image
                                     
                                     if !user.profileImageUrl.isEmpty
                                         {
@@ -78,33 +59,31 @@ struct NotificationView: View {
                                             .resizable()
                                             .scaledToFill()
                                             .clipShape(Circle()) // Clip to circle shape
-                                            .frame(width: 50, height: 50) // Set size
+                                            .frame(width: 40, height: 40) // Set size
                                         }
                                     else
                                         {
                                         Image(systemName: "person.fill")
-                                            .font(.system(size: 50))
+                                            .font(.system(size: 40))
                                             .padding()
                                             .foregroundColor(Color(.label))
-                                            .frame(width: 50, height: 50) // Set size for placeholder
+                                            .frame(width: 40, height: 40) // Set size for placeholder
                                             .background(Color.gray.opacity(0.2)) // Optional background
                                             .clipShape(Circle()) // Clip to circle shape
                                         }
                                 }
 
 
-                                Text(user.full_message ?? "")  // Show notification message
-                                    .font(.body)
-                                    .padding(.bottom, 5)
-                                    .lineLimit(nil)  // Allow unlimited lines
-                                    .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .onTapGesture {
-                                        // When the user taps on the notification message, show the full screen cover
-                                        self.selectedUser = user
-                                        self.showingProfile.toggle()
-                                    }
-                                
+                                NavigationLink(destination: ProfileView(user_uid: user.uid)) {
+                                    Text(user.full_message ?? "")  // Show notification message
+                                        .font(.subheadline)
+                                        .padding(.bottom, 5)
+                                        .lineLimit(nil)  // Allow unlimited lines
+                                        .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .buttonStyle(PlainButtonStyle()) // Prevent default button styling (optional)
+
                                 if user.notification.type == "friendRequest"
                                 {
                                     // Confirm button
@@ -163,9 +142,9 @@ struct NotificationView: View {
                                     .foregroundColor(.gray)
                                 }
                             
-                            Divider() // Divider for each notification
+                            //Divider() // Divider for each notification
                         }
-                        .padding(.vertical, 5)
+                        //.padding(.vertical, 5)
                     }
                 }
             }
@@ -185,14 +164,7 @@ struct NotificationView: View {
             markNotificationsAsRead()
             userManager.fetchNotifications()// Re-fetch notifications to ensure the read status is reflected
             }
-        .fullScreenCover(isPresented: $showingProfile)
-            {
-            /*
-           if let selectedUser = selectedUser {
-               ProfileView(user_uid: selectedUser.uid)  // Show the profile view with the selected user
-                   .environmentObject(userManager)
-           }*/
-       }
+        .navigationBarTitle("Notifications", displayMode: .inline)
         
     }
 
@@ -455,11 +427,11 @@ class NotificationViewModel: ObservableObject {
                     self.unreadNotificationUsers = notificationUsers.filter { !$0.notification.isRead }
                     self.restNotificationUsers = notificationUsers.filter { $0.notification.isRead }
                     
-                    print("Fetched \(notificationUsers.count) notification users")
+                    print("After sorting:")
                     
                     // Loop through each notification user and print their full_message
                     for user in notificationUsers {
-                        print("User Full Message: \(user.full_message ?? "No message") timestamp: \(user.notification.timestamp)")
+                        print("User Full Message: \(user.full_message ?? "No message") timestamp: \(user.notification.timestamp.dateValue())")
                     }
                 case .failure(let error):
                     print("Failed to fetch notification users: \(error.localizedDescription)")

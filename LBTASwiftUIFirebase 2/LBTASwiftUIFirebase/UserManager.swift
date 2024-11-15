@@ -264,7 +264,7 @@ class UserManager: ObservableObject {
                             
                            print("Notification message: \(message) with timestamp: \(timestamp.dateValue())") // Print the timestamp to confirm order
                             
-                            let notification = Notification(receiverId: receiverId,
+                            var notification = Notification(receiverId: receiverId,
                                                             senderId: senderId,
                                                             message: message,
                                                             timestamp: timestamp,
@@ -274,7 +274,7 @@ class UserManager: ObservableObject {
                             notifications.append(notification)
                         }
                     }
-                    
+                   
                     // Set the fetched notifications for the current user
                     self.setNotificationsForCurrentUser(newNotifications: notifications)
                     if let currentUser = self.currentUser{
