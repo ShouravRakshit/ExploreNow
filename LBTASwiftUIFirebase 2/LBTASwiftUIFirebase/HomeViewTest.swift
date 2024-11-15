@@ -223,7 +223,7 @@ struct HomeViewTest: View {
 
     private func checkIfNotifications() {
         userManager.fetchNotifications()
-        hasNotifications = !(userManager.currentUser?.notifications.isEmpty ?? true)
+        //hasNotifications = !(userManager.currentUser?.notifications.isEmpty ?? true)
     }
     
     // Helper function to get safe area top padding

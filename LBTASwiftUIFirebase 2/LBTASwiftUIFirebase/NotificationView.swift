@@ -66,6 +66,7 @@ struct NotificationView: View {
                                         Image(systemName: "person.fill")
                                             .font(.system(size: 40))
                                             .padding()
+                                            .scaledToFill()
                                             .foregroundColor(Color(.label))
                                             .frame(width: 40, height: 40) // Set size for placeholder
                                             .background(Color.gray.opacity(0.2)) // Optional background
@@ -128,6 +129,44 @@ struct NotificationView: View {
                                     }
                                     .contentShape(Rectangle())  // Ensure the button area is tappable
                                     .buttonStyle(PlainButtonStyle())  // Avoid default button styles
+                                    
+                                    if user.notification.status == "pending"{
+                                        // Confirm button
+                                        Button(action: {
+                                            deleteFriendRequest (notificationUser: user)
+                                            
+                                        }) {
+                                            Text("Delete")
+                                                .font(.subheadline)
+                                                .padding(.horizontal, 8)
+                                                .padding(.vertical, 3)
+                                                .background(Color.gray)
+                                                .foregroundColor(.white)
+                                                .cornerRadius(8)
+                                        }
+                                        .contentShape(Rectangle())  // Ensure the button area is tappable
+                                        .buttonStyle(PlainButtonStyle())  // Avoid default button styles
+                                        
+                                    }
+                                    
+                                }
+                                //like, comment - show pic of post
+                            else
+                                {
+                                if let post = user.post, user.post_url != nil {
+                                    /*
+                                    NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
+                                        WebImage(url: URL(string: user.post_url ?? ""))
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 40, height: 40) // Set size
+                                    }
+                                    .buttonStyle(PlainButtonStyle()) */
+                                    WebImage(url: URL(string: user.post_url ?? ""))
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 40, height: 40) // Set size
+                                }
                                 }
                             }
                             HStack
@@ -170,6 +209,66 @@ struct NotificationView: View {
         .navigationBarTitle("Notifications", displayMode: .inline)
         
     }
+    
+    private func deleteFriendRequest(notificationUser: NotificationUser) {
+        let senderId = notificationUser.notification.senderId
+        let receiverId = notificationUser.notification.receiverId
+        let requestId = "\(senderId)_\(receiverId)" // Construct the request ID
+
+        // Reference to the friend request document
+        let requestRef = db.collection("friendRequests").document(requestId)
+
+        // Delete the friend request
+        requestRef.delete { error in
+            if let error = error {
+                print("Error deleting friend request: \(error.localizedDescription)")
+            } else {
+                print("Friend request deleted successfully!")
+                
+                deleteNotification (notificationUser: notificationUser)
+            }
+        }
+    }
+    
+    private func deleteNotification(notificationUser: NotificationUser) {
+        guard let currentUser = userManager.currentUser else { return }
+        let db = FirebaseManager.shared.firestore
+        let notificationsRef = db.collection("notifications")
+        
+        // Find the notification by its timestamp and receiverId
+        notificationsRef
+            .whereField("timestamp", isEqualTo: notificationUser.notification.timestamp)
+            .whereField("receiverId", isEqualTo: currentUser.uid)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Failed to find notification: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let documents = snapshot?.documents, !documents.isEmpty else {
+                    print("No matching notification found.")
+                    return
+                }
+
+                // Delete the notification
+                for document in documents {
+                    document.reference.delete { error in
+                        if let error = error {
+                            print("Error deleting notification: \(error.localizedDescription)")
+                            return
+                        }
+                        print("Notification deleted successfully.")
+                    }
+                }
+
+                // Remove the notificationUser from viewModel.notificationUsers
+                if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == notificationUser.uid }) {
+                    viewModel.notificationUsers.remove(at: index)
+                    print("Notification user removed from viewModel.notificationUsers.")
+                }
+            }
+    }
+
 
     
     // Function to mark all notifications as read
@@ -279,7 +378,8 @@ struct NotificationView: View {
             "timestamp": notification.timestamp,
             "status": notification.status,
             "isRead": notification.isRead,
-            "type"  : notification.type
+            "type"  : notification.type,
+            "post_id": notification.post_id ?? ""
         ]
         
         notificationRef.setData(notificationData) { error in
@@ -430,6 +530,7 @@ class NotificationViewModel: ObservableObject {
                     self.unreadNotificationUsers = notificationUsers.filter { !$0.notification.isRead }
                     self.restNotificationUsers = notificationUsers.filter { $0.notification.isRead }
                     
+                    
                     print("After sorting:")
                     
                     // Loop through each notification user and print their full_message
@@ -443,4 +544,6 @@ class NotificationViewModel: ObservableObject {
         }
         
     }
+    
+
 }

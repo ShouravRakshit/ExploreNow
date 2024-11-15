@@ -192,7 +192,8 @@ class UserManager: ObservableObject {
                 "message": "sent you a friend request.",
                 "timestamp": Timestamp(),
                 "isRead": false, // Initially unread,
-                "status": "pending"
+                "status": "pending",
+                "post_id": ""
             ]
             
             // Add notification to the notifications collection
@@ -216,7 +217,8 @@ class UserManager: ObservableObject {
                 "message": "accepted your friend request.",
                 "timestamp": Timestamp(),
                 "isRead": false, // Initially unread
-                "status": "accepted"
+                "status": "accepted",
+                "post_id": ""
             ]
             
             // Add notification to the notifications collection
@@ -257,6 +259,7 @@ class UserManager: ObservableObject {
                         if let receiverId = data["receiverId"] as? String,
                            let senderId = data["senderId"] as? String,
                            let type = data["type"] as? String,
+                           let post_id = data["post_id"] as? String,
                            let message = data["message"] as? String,
                            let timestamp = data["timestamp"] as? Timestamp,
                            let status = data["status"] as? String,
@@ -270,7 +273,8 @@ class UserManager: ObservableObject {
                                                             timestamp: timestamp,
                                                             isRead: isRead,
                                                             status: status,
-                                                            type: type)
+                                                            type: type,
+                                                            post_id: post_id)
                             notifications.append(notification)
                         }
                     }
@@ -308,7 +312,8 @@ class UserManager: ObservableObject {
                 timestamp: timestamp,
                 isRead: false,
                 status: "Like",
-                type: "Like"
+                type: "Like",
+                post_id: post.id
             )
             
             
@@ -339,7 +344,8 @@ class UserManager: ObservableObject {
                 timestamp: timestamp,
                 isRead: false,
                 status: "Comment",
-                type: "Comment"
+                type: "Comment",
+                post_id: post.id
             )
             
             // Save the notification to Firestore
@@ -364,7 +370,8 @@ class UserManager: ObservableObject {
             "timestamp": notification.timestamp,
             "status": notification.status,
             "isRead": notification.isRead,
-            "type"  : notification.type
+            "type"  : notification.type,
+            "post_id": notification.post_id ?? ""
         ]
         
         notificationRef.setData(notificationData) { error in
@@ -442,6 +449,7 @@ struct Notification {
     var status: String
     var isRead: Bool
     let type: String
+    let post_id: String? //Optional
     
     // Initializer that takes a Firestore document
     init(from document: QueryDocumentSnapshot) {
@@ -453,10 +461,11 @@ struct Notification {
         self.isRead = data["isRead"] as? Bool ?? false // Default to unread
         self.status = data ["status"] as? String ?? ""
         self.type = data ["type"] as? String ?? ""
+        self.post_id = data ["post_id"] as? String ?? ""
     }
     
     // Initializer to create a Notification from Firestore data
-    init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool, status: String, type: String) {
+    init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool, status: String, type: String, post_id: String? = nil) {
         self.receiverId = receiverId
         self.senderId = senderId
         self.message = message
@@ -464,6 +473,7 @@ struct Notification {
         self.isRead = isRead
         self.status = status
         self.type   = type
+        self.post_id = post_id // This can be nil if no post_id is passed
     }
     
     // You can add a computed property to display the time nicely
