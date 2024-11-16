@@ -7,7 +7,8 @@ struct NotificationView: View {
     @EnvironmentObject var userManager: UserManager
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel: NotificationViewModel
-    @State private var showingProfile = false // State to manage the full screen cover
+    @State private var navigateToProfile = false // State to manage the full screen cover
+    @State private var selectedUserUID: String? = nil
     @State private var selectedUser: NotificationUser? // Store selected user to pass to ProfileView
     @State private var isProfilePresented = false
     
@@ -74,7 +75,7 @@ struct NotificationView: View {
                                         }
                                 }
 
-
+                                /*
                                 NavigationLink(destination: ProfileView(user_uid: user.uid)) {
                                     Text(user.full_message ?? "")  // Show notification message
                                         .font(.subheadline)
@@ -84,6 +85,20 @@ struct NotificationView: View {
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                 }
                                 .buttonStyle(PlainButtonStyle()) // Prevent default button styling (optional)
+                                .opacity(0) // Hide the arrow*/
+                                Text(user.full_message ?? "")  // Show notification message
+                                    .font(.subheadline)
+                                    .bold()
+                                    .padding(.bottom, 5)
+                                    .lineLimit(nil)  // Allow unlimited lines
+                                    .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.customPurple)  // Optional: To make the text look clickable
+                                    .onTapGesture {
+                                        // Set the selected user and navigation flag
+                                        selectedUserUID = user.uid
+                                        navigateToProfile = true
+                                    }
 
                                 if user.notification.type == "friendRequest"
                                 {
@@ -195,6 +210,15 @@ struct NotificationView: View {
             
             Spacer() // Pushes content to the top
   
+            // Conditional NavigationLink
+            if navigateToProfile {
+                NavigationLink(
+                    destination: ProfileView(user_uid: selectedUserUID ?? ""),
+                    isActive: $navigateToProfile,
+                    label: { EmptyView() }
+                )
+                .hidden() // Hide the NavigationLink in the UI
+            }
         }
         .onAppear
             {
