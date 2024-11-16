@@ -873,6 +873,7 @@ struct ProfileView: View {
                                     self.friendshipLabelText = "Friends"
                                     self.isFriends = true
                                     //userManager.fetchNotifications()
+                                    friendsList.append("Friend")
                                 }
                                 }
                             else if !isFriends
