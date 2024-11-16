@@ -32,7 +32,7 @@ class NotificationManager {
         
         // Reset notification users so it's not appended each time the view is called
         notificationUsers = []
-        
+        print ("notifications count before fetch user from firestore: \(notifications.count)")
         // Loop over each notification and fetch user data
         for notification in notifications {
             
@@ -48,6 +48,8 @@ class NotificationManager {
                 case .success(let user):
                     // Create a notification user object based on the fetched user
                     notificationUser = user
+                    
+                    print ("fetched user from firestore: \(notificationUser?.username) message: \(notificationUser?.full_message)")
                     
                     // Check if there's a post_id, and fetch the post data if it exists
                     if let postId = notification.post_id, !postId.isEmpty {
@@ -88,6 +90,7 @@ class NotificationManager {
                             group.leave()
                         }*/
                     } else {
+                        print ("no post id, appending user to list")
                         // No postId, just append the user to the list
                         if let notificationUser = notificationUser {
                             self.notificationUsers.append(notificationUser)
@@ -106,6 +109,7 @@ class NotificationManager {
         
         // Notify when all async fetches are done
         group.notify(queue: .main) {
+            print ("notification user count after fetching: \(self.notificationUsers.count)")
             // Call the completion handler once all users have been fetched
             completion(.success(self.notificationUsers))
         }
@@ -245,6 +249,8 @@ class NotificationManager {
                         return
                     }
                     
+                    print ("before changing full message: \(notification.message)")
+                    
                     // Create a NotificationUser object and return it
                     var user = NotificationUser(uid: uid, name: name, username: username, profileImageUrl: profileImageUrl, notification: notification)
                     let name_string = "\(name) (@\(username))"
@@ -257,6 +263,7 @@ class NotificationManager {
                         user.full_message = "\(name_string) \(notification.message)"
                     }
 
+                    print ("after changing full message: \(user.full_message)")
                     
                     completion(.success(user))
                 } else {

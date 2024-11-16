@@ -290,9 +290,21 @@ class UserManager: ObservableObject {
     }
     
     // Manually update the notifications for the current user
-    func setNotificationsForCurrentUser(newNotifications: [Notification]) {
+    func setNotificationsForCurrentUser2(newNotifications: [Notification]) {
         currentUser?.notifications = newNotifications
         print ("Setting notifications size: \(currentUser?.notifications.count)")
+    }
+    
+    // Function to update the notifications for the current user using timestamp as unique identifier
+    func setNotificationsForCurrentUser(newNotifications: [Notification]) {
+        currentUser?.notifications = []
+        // Assuming each Notification has a unique timestamp
+        for newNotification in newNotifications {
+            currentUser?.notifications.append(newNotification)
+        }
+        
+        // Print the updated size of the notifications array
+        print("Setting notifications size: \(currentUser?.notifications.count)")
     }
     
     func sendLikeNotification(likerId: String, post: Post, completion: @escaping (Bool, Error?) -> Void) {
@@ -381,6 +393,172 @@ class UserManager: ObservableObject {
                 completion(true, nil)
             }
         }
+    }
+    
+    
+    func acceptFriendRequest(requestId: String, receiverId: String, senderId: String) {
+        let db = Firestore.firestore()
+        // Step 1: Update the request status to "accepted"
+        let requestRef = db.collection("friendRequests").document(requestId)
+        requestRef.updateData([
+            "status": "accepted"
+        ]) { error in
+            if let error = error {
+                print("Error updating request status: \(error.localizedDescription)")
+                return
+            }
+            print("Friend request accepted successfully!")
+
+            // Step 2: Add sender and receiver to each other's friends list
+            
+            // Add senderId to receiver's friends list (if the document exists, update it; if not, create it)
+            let receiverRef = db.collection("friends").document(receiverId)
+            receiverRef.getDocument { document, error in
+                if let error = error {
+                    print("Error checking receiver's friends document: \(error.localizedDescription)")
+                    return
+                }
+                
+                if let document = document, document.exists {
+                    // Document exists, update the friends list
+                    receiverRef.updateData([
+                        "friends": FieldValue.arrayUnion([senderId])
+                    ]) { error in
+                        if let error = error {
+                            print("Error adding sender to receiver's friends list: \(error.localizedDescription)")
+                        } else {
+                            print("Sender added to receiver's friends list.")
+                        }
+                    }
+                } else {
+                    // Document does not exist, create it with senderId as the first friend
+                    receiverRef.setData([
+                        "friends": [senderId]
+                    ]) { error in
+                        if let error = error {
+                            print("Error creating receiver's friends list: \(error.localizedDescription)")
+                        } else {
+                            print("Receiver's friends list created with sender.")
+                        }
+                    }
+                }
+            }
+
+            // Add receiverId to sender's friends list (same logic as above)
+            let senderRef = db.collection("friends").document(senderId)
+            senderRef.getDocument { document, error in
+                if let error = error {
+                    print("Error checking sender's friends document: \(error.localizedDescription)")
+                    return
+                }
+                
+                if let document = document, document.exists {
+                    // Document exists, update the friends list
+                    senderRef.updateData([
+                        "friends": FieldValue.arrayUnion([receiverId])
+                    ]) { error in
+                        if let error = error {
+                            print("Error adding receiver to sender's friends list: \(error.localizedDescription)")
+                        } else {
+                            print("Receiver added to sender's friends list.")
+                        }
+                    }
+                } else {
+                    // Document does not exist, create it with receiverId as the first friend
+                    senderRef.setData([
+                        "friends": [receiverId]
+                    ]) { error in
+                        if let error = error {
+                            print("Error creating sender's friends list: \(error.localizedDescription)")
+                        } else {
+                            print("Sender's friends list created with receiver.")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    //The user who sent the friend request should be notified it was accepted
+    func sendNotificationToAcceptedUser(receiverId: String, senderId: String, completion: @escaping (Bool, Error?) -> Void) {
+        sendRequestAcceptedNotification(to: receiverId, senderId: senderId) { success, error in
+            if success {
+                completion(true, nil)
+            } else {
+                completion(false, error)
+            }
+        }
+    }
+    
+    // Helper function to update the notification as read in Firestore
+    func updateNotificationAccepted(_ notificationUser: NotificationUser) {
+        guard let currentUser = currentUser else { return }
+
+        let db = FirebaseManager.shared.firestore
+        let notificationsRef = db.collection("notifications")
+        
+        // Find the notification by its timestamp and receiverId and order by timestamp descending
+        notificationsRef
+            .whereField("receiverId", isEqualTo: currentUser.uid)
+            .order(by: "timestamp", descending: true)  // Order by timestamp in descending order
+            .whereField("timestamp", isEqualTo: notificationUser.notification.timestamp)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Failed to update notification status: \(error.localizedDescription)")
+                    return
+                }
+                
+                // If the notification exists, update the isRead field
+                if let document = snapshot?.documents.first {
+                    document.reference.updateData([
+                        "status": "accepted",
+                        "message": "You and $NAME are now friends.",
+                        "timestamp": Timestamp()
+                    ]) { error in
+                        if let error = error {
+                            print("Error updating notification: \(error.localizedDescription)")
+                        } else {
+                            print("Notification marked as read")
+                        }
+                    }
+                }
+            }
+    }
+    
+    // Helper function to update the notification as read in Firestore
+    func updateNotificationAccepted(senderId: String) {
+        //change "__ sent you a friend request" to "you and __ are now friends"
+        guard let currentUser = currentUser else { return }
+
+        let db = FirebaseManager.shared.firestore
+        let notificationsRef = db.collection("notifications")
+        
+        // Find the notification by its receiverId and type (filter by "friendRequest" type)
+        notificationsRef
+            .whereField("senderId", isEqualTo: senderId)
+            .whereField("receiverId", isEqualTo: currentUser.uid) // Filter by receiverId
+            .whereField("type", isEqualTo: "friendRequest")  // Filter by type == "friendRequest"
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Failed to update notification status: \(error.localizedDescription)")
+                    return
+                }
+                
+                // If the notification exists, update the isRead field
+                if let document = snapshot?.documents.first {
+                    document.reference.updateData([
+                        "status": "accepted",
+                        "message": "You and $NAME are now friends.", // Replace $NAME with userName or other field
+                        "timestamp": Timestamp() // Optionally update timestamp
+                    ]) { error in
+                        if let error = error {
+                            print("Error updating notification: \(error.localizedDescription)")
+                        } else {
+                            print("Notification marked as read")
+                        }
+                    }
+                }
+            }
     }
     
     

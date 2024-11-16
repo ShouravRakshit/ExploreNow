@@ -106,18 +106,19 @@ struct NotificationView: View {
                                                 viewModel.notificationUsers[index].notification.message = "You and $NAME are now friends."
                                                 viewModel.notificationUsers[index].full_message = "You and \(user.name) (@\(user.username) are now friends."
                                             }
-                                            acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
+                                            userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
                                             //__ accepted your friend request
-                                            sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                            userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
                                                 if success {
                                                     print("Notification sent successfully")
+                                                    //can be combined with updateNotificationStatus for efficiency
+                                                    //You and __ are now friends
+                                                    userManager.updateNotificationAccepted (user)
                                                 } else {
                                                     print("Error sending notification: \(String(describing: error))")
                                                 }
                                             }
-                                            //can be combined with updateNotificationStatus for efficiency
-                                            //You and __ are now friends
-                                            updateNotificationAccepted (user)
+
                                         }
                                     }) {
                                         Text(user.notification.status == "pending" ? "Confirm" : "Friends")
@@ -197,6 +198,7 @@ struct NotificationView: View {
         }
         .onAppear
             {
+            print ("notifications view appeared")
             //viewModel.resetNotificationUsers()
             //populate notifications
             isLoading = true
@@ -301,40 +303,6 @@ struct NotificationView: View {
         }
     }
     
-    // Helper function to update the notification as read in Firestore
-    private func updateNotificationAccepted(_ notificationUser: NotificationUser) {
-        guard let currentUser = userManager.currentUser else { return }
-
-        let db = FirebaseManager.shared.firestore
-        let notificationsRef = db.collection("notifications")
-        
-        // Find the notification by its timestamp and receiverId and order by timestamp descending
-        notificationsRef
-            .whereField("receiverId", isEqualTo: currentUser.uid)
-            .order(by: "timestamp", descending: true)  // Order by timestamp in descending order
-            .whereField("timestamp", isEqualTo: notificationUser.notification.timestamp)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Failed to update notification status: \(error.localizedDescription)")
-                    return
-                }
-                
-                // If the notification exists, update the isRead field
-                if let document = snapshot?.documents.first {
-                    document.reference.updateData([
-                        "status": "accepted",
-                        "message": "You and $NAME are now friends.",
-                        "timestamp": Timestamp()
-                    ]) { error in
-                        if let error = error {
-                            print("Error updating notification: \(error.localizedDescription)")
-                        } else {
-                            print("Notification marked as read")
-                        }
-                    }
-                }
-            }
-    }
 
     
     // Helper function to update the notification as read in Firestore
@@ -397,101 +365,11 @@ struct NotificationView: View {
     
 
 
-    
-    private func acceptFriendRequest(requestId: String, receiverId: String, senderId: String) {
-        // Step 1: Update the request status to "accepted"
-        let requestRef = db.collection("friendRequests").document(requestId)
-        requestRef.updateData([
-            "status": "accepted"
-        ]) { error in
-            if let error = error {
-                print("Error updating request status: \(error.localizedDescription)")
-                return
-            }
-            print("Friend request accepted successfully!")
 
-            // Step 2: Add sender and receiver to each other's friends list
-            
-            // Add senderId to receiver's friends list (if the document exists, update it; if not, create it)
-            let receiverRef = db.collection("friends").document(receiverId)
-            receiverRef.getDocument { document, error in
-                if let error = error {
-                    print("Error checking receiver's friends document: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let document = document, document.exists {
-                    // Document exists, update the friends list
-                    receiverRef.updateData([
-                        "friends": FieldValue.arrayUnion([senderId])
-                    ]) { error in
-                        if let error = error {
-                            print("Error adding sender to receiver's friends list: \(error.localizedDescription)")
-                        } else {
-                            print("Sender added to receiver's friends list.")
-                        }
-                    }
-                } else {
-                    // Document does not exist, create it with senderId as the first friend
-                    receiverRef.setData([
-                        "friends": [senderId]
-                    ]) { error in
-                        if let error = error {
-                            print("Error creating receiver's friends list: \(error.localizedDescription)")
-                        } else {
-                            print("Receiver's friends list created with sender.")
-                        }
-                    }
-                }
-            }
-
-            // Add receiverId to sender's friends list (same logic as above)
-            let senderRef = db.collection("friends").document(senderId)
-            senderRef.getDocument { document, error in
-                if let error = error {
-                    print("Error checking sender's friends document: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let document = document, document.exists {
-                    // Document exists, update the friends list
-                    senderRef.updateData([
-                        "friends": FieldValue.arrayUnion([receiverId])
-                    ]) { error in
-                        if let error = error {
-                            print("Error adding receiver to sender's friends list: \(error.localizedDescription)")
-                        } else {
-                            print("Receiver added to sender's friends list.")
-                        }
-                    }
-                } else {
-                    // Document does not exist, create it with receiverId as the first friend
-                    senderRef.setData([
-                        "friends": [receiverId]
-                    ]) { error in
-                        if let error = error {
-                            print("Error creating sender's friends list: \(error.localizedDescription)")
-                        } else {
-                            print("Sender's friends list created with receiver.")
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     
     
-    //The user who sent the friend request should be notified it was accepted
-    private func sendNotificationToAcceptedUser(receiverId: String, senderId: String, completion: @escaping (Bool, Error?) -> Void) {
-        userManager.sendRequestAcceptedNotification(to: receiverId, senderId: senderId) { success, error in
-            if success {
-                completion(true, nil)
-            } else {
-                completion(false, error)
-            }
-        }
-    }
+
     
 }
 
@@ -537,10 +415,12 @@ class NotificationViewModel: ObservableObject {
                     
                     print("After sorting:")
                     
+                    
                     // Loop through each notification user and print their full_message
-                    for user in notificationUsers {
+                    for user in notificationUsers
+                        {
                         print("User Full Message: \(user.full_message ?? "No message") timestamp: \(user.notification.timestamp.dateValue())")
-                    }
+                        }
                 case .failure(let error):
                     print("Failed to fetch notification users: \(error.localizedDescription)")
                 }

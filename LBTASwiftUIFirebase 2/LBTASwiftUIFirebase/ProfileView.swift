@@ -851,14 +851,41 @@ struct ProfileView: View {
                     // Friendship status - add friend, friends
                     if viewingOtherProfile {
                         Button(action: {
+                            
+                            if (self.didUserSendMeRequest)
+                                {
+                                let senderId   = user_uid
+                                
+                                if let receiverId = userManager.currentUser?.uid {
+                                    let requestId = senderId + "_" + receiverId
+                                    userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
+                                    //__ accepted your friend request
+                                    userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                        if success {
+                                            print("Notification sent successfully")
+                                            //can be combined with updateNotificationStatus for efficiency
+                                            //You and __ are now friends
+                                            userManager.updateNotificationAccepted (senderId: user_uid)
+                                        } else {
+                                            print("Error sending notification: \(String(describing: error))")
+                                        }
+                                    }
+                                    self.friendshipLabelText = "Friends"
+                                    self.isFriends = true
+                                    userManager.fetchNotifications()
+                                }
+                                }
+                            else if !isFriends
+                            {
                             // Call the function to send the friend request
-                            userManager.sendFriendRequest(to: user_uid) { success, error in
-                                if success {
-                                    self.isRequestSentToOtherUser = true
-                                    self.friendshipLabelText = "Requested"
-                                    print("Friend request and notification sent successfully.")
-                                } else {
-                                    print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
+                                userManager.sendFriendRequest(to: user_uid) { success, error in
+                                    if success {
+                                        self.isRequestSentToOtherUser = true
+                                        self.friendshipLabelText = "Requested"
+                                        print("Friend request and notification sent successfully.")
+                                    } else {
+                                        print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
+                                    }
                                 }
                             }
                         }) {
@@ -1073,7 +1100,7 @@ struct ProfileView: View {
                     } else if !snapshot2!.isEmpty {
                         // If we find any document with status "pending", a request has been sent
                         didUserSendMeRequest = true
-                        friendshipLabelText = "Add Friend"
+                        friendshipLabelText = "Accept Friend"
                         print ("Status: other user sent me request")
                     }
                     else{
