@@ -353,20 +353,32 @@ struct ChatLogView: View {
     
     private var messagesView: some View {
         ScrollViewReader { scrollViewProxy in
-            ScrollView {
-                ForEach(vm.chatMessages) { message in
-                    MessageView(message: message) { messageId in
-                        vm.deleteMessage(messageId)
+            if vm.chatMessages.isEmpty {
+                // Empty state view
+                VStack {
+                    Spacer()
+                    Text("No messages yet")
+                        .foregroundColor(.gray)
+                        .font(.system(size: 16))
+                    Spacer()
+                }
+            } else {
+                // Show messages if available
+                ScrollView {
+                    ForEach(vm.chatMessages) { message in
+                        MessageView(message: message) { messageId in
+                            vm.deleteMessage(messageId)
+                        }
+                        .id(message.id)
                     }
-                    .id(message.id)
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                    .onChange(of: vm.chatMessages.count) { _ in
+                        scrollToBottom(scrollViewProxy: scrollViewProxy)
+                    }
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
-                .onChange(of: vm.chatMessages.count) { _ in
-                    scrollToBottom(scrollViewProxy: scrollViewProxy)
-                }
+                .background(Color(.init(white: 0.95, alpha: 1)))
             }
-            .background(Color(.init(white: 0.95, alpha: 1)))
         }
     }
     
