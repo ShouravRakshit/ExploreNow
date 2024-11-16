@@ -52,7 +52,18 @@ class UserManager: ObservableObject {
                     self?.currentUser = User(data: data, uid: uid)
                     if let currentUser = self?.currentUser {
                         print("User Manager - Fetched User: \(currentUser.name)")
-                        self?.fetchNotifications()
+                        //self?.fetchNotifications()
+                        
+                        self?.fetchNotifications {result in
+                            switch result {
+                            case .success(let notifications):
+                                print("Fetched \(notifications.count) notifications successfully.")
+
+                            case .failure(let error):
+                                print("Error fetching notifications: \(error.localizedDescription)")
+                                // Handle the error, e.g., show an alert or log the issue
+                            }
+                        }
                     } else {
                         print("User Manager - Failed to initialize current user.")
                     }
@@ -231,7 +242,7 @@ class UserManager: ObservableObject {
             }
         }
     }
-    
+    /*
     func fetchNotifications() {
         print ("Calling fetchNotifications")
         if let receiver_uid = currentUser?.uid {
@@ -287,7 +298,74 @@ class UserManager: ObservableObject {
                     
                 })
         }
+    }*/
+    
+    func fetchNotifications(completion: @escaping (Result<[Notification], Error>) -> Void) {
+        print("Calling fetchNotifications")
+        
+        if let receiver_uid = currentUser?.uid {
+            print("Fetching notifications for receiver \(receiver_uid)")
+            
+            FirebaseManager.shared.firestore.collection("notifications")
+                .whereField("receiverId", isEqualTo: receiver_uid)  // Get notifications for this user
+                .order(by: "timestamp", descending: true)  // Order by timestamp, descending (most recent first)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Failed to fetch notifications: \(error.localizedDescription)")
+                        // Return the error via the completion handler
+                        completion(.failure(error))
+                        return
+                    }
+                    
+                    // Check if the snapshot has documents
+                    guard let documents = snapshot?.documents, !documents.isEmpty else {
+                        print("No notifications found.")
+                        completion(.success([]))  // Return an empty array if no notifications are found
+                        return
+                    }
+                    
+                    // Parse the notifications into an array
+                    var notifications: [Notification] = []
+                    snapshot?.documents.forEach { document in
+                        let data = document.data()
+                        
+                        if let receiverId = data["receiverId"] as? String,
+                           let senderId = data["senderId"] as? String,
+                           let type = data["type"] as? String,
+                           let post_id = data["post_id"] as? String,
+                           let message = data["message"] as? String,
+                           let timestamp = data["timestamp"] as? Timestamp,
+                           let status = data["status"] as? String,
+                           let isRead = data["isRead"] as? Bool {
+                            
+                            print("Notification message: \(message) with timestamp: \(timestamp.dateValue())") // Print the timestamp to confirm order
+                            
+                            let notification = Notification(receiverId: receiverId,
+                                                            senderId: senderId,
+                                                            message: message,
+                                                            timestamp: timestamp,
+                                                            isRead: isRead,
+                                                            status: status,
+                                                            type: type,
+                                                            post_id: post_id)
+                            notifications.append(notification)
+                        }
+                    }
+                    
+                    // Set the fetched notifications for the current user
+                    self.setNotificationsForCurrentUser(newNotifications: notifications)
+                    
+                    // Update unread notifications flag
+                    if let currentUser = self.currentUser {
+                        self.hasUnreadNotifications = currentUser.notifications.contains { !$0.isRead }
+                    }
+                    
+                    // Return the notifications array via the completion handler
+                    completion(.success(notifications))
+                }
+        }
     }
+
     
     // Manually update the notifications for the current user
     func setNotificationsForCurrentUser2(newNotifications: [Notification]) {
@@ -297,14 +375,18 @@ class UserManager: ObservableObject {
     
     // Function to update the notifications for the current user using timestamp as unique identifier
     func setNotificationsForCurrentUser(newNotifications: [Notification]) {
+        print ("After fetchUserFromFireStore")
         currentUser?.notifications = []
         // Assuming each Notification has a unique timestamp
         for newNotification in newNotifications {
             currentUser?.notifications.append(newNotification)
         }
         
-        // Print the updated size of the notifications array
-        print("Setting notifications size: \(currentUser?.notifications.count)")
+        for newNotification in newNotifications {
+            // Print the updated size of the notifications array
+            print("SettingNotificationsForCurrentUser: \(newNotification.message)")
+        }
+        
     }
     
     func sendLikeNotification(likerId: String, post: Post, completion: @escaping (Bool, Error?) -> Void) {

@@ -222,7 +222,16 @@ struct HomeViewTest: View {
     }
 
     private func checkIfNotifications() {
-        userManager.fetchNotifications()
+        userManager.fetchNotifications {result in
+            switch result {
+            case .success(let notifications):
+                print("Fetched \(notifications.count) notifications successfully.")
+                
+            case .failure(let error):
+                print("Error fetching notifications: \(error.localizedDescription)")
+                // Handle the error, e.g., show an alert or log the issue
+            }
+        }
         //hasNotifications = !(userManager.currentUser?.notifications.isEmpty ?? true)
     }
     
