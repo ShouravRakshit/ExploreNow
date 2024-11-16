@@ -39,23 +39,69 @@ class ChatLogViewModel: ObservableObject {
     @Published var chatMessages = [ChatMessage]()
     @Published var blockedUsers: [String] = []
     @EnvironmentObject var userManager: UserManager
-    
+    @Published var blockedByUsers: [String] = []
+
     let chatUser: ChatUser?
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
         fetchBlockedUsers()
         fetchMessages()
+        fetchBlockedByUsers()
     }
+    
+//    private func fetchMessages() {
+//        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+//        guard let toId = chatUser?.uid else { return }
+//
+//        if blockedUsers.contains(toId) {
+//            print("You cannot see messages from this user as you are blocked.")
+//            return
+//        }
+//
+//        FirebaseManager.shared.firestore.collection("messages")
+//            .document(fromId)
+//            .collection(toId)
+//            .order(by: FirebaseConstants.timestamp, descending: false)
+//            .addSnapshotListener { querySnapshot, error in
+//                if let error = error {
+//                    self.errorMessage = "Failed to listen for messages: \(error)"
+//                    print(error)
+//                    return
+//                }
+//                
+//                self.chatMessages.removeAll()
+//
+//                querySnapshot?.documents.forEach { queryDocumentSnapshot in
+//                    let data = queryDocumentSnapshot.data()
+//                    let docId = queryDocumentSnapshot.documentID
+//
+//                    if let messageSenderId = data[FirebaseConstants.fromId] as? String, !self.blockedUsers.contains(messageSenderId) {
+//                        self.chatMessages.append(.init(documentId: docId, data: data))
+//                    }
+//                }
+//            }
+//    }
+
+    private func fetchBlockedByUsers() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+
+        FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+            .addSnapshotListener { documentSnapshot, error in
+                if let error = error {
+                    print("Error fetching blockedBy users: \(error)")
+                    return
+                }
+                if let data = documentSnapshot?.data() {
+                    self.blockedByUsers = data["blockedByIds"] as? [String] ?? []
+                }
+            }
+    }
+
     
     private func fetchMessages() {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         guard let toId = chatUser?.uid else { return }
-
-        if blockedUsers.contains(toId) {
-            print("You cannot see messages from this user as you are blocked.")
-            return
-        }
 
         FirebaseManager.shared.firestore.collection("messages")
             .document(fromId)
@@ -67,19 +113,19 @@ class ChatLogViewModel: ObservableObject {
                     print(error)
                     return
                 }
-                
+
                 self.chatMessages.removeAll()
 
                 querySnapshot?.documents.forEach { queryDocumentSnapshot in
                     let data = queryDocumentSnapshot.data()
                     let docId = queryDocumentSnapshot.documentID
 
-                    if let messageSenderId = data[FirebaseConstants.fromId] as? String, !self.blockedUsers.contains(messageSenderId) {
-                        self.chatMessages.append(.init(documentId: docId, data: data))
-                    }
+                    // Allow fetching all messages, even if the user is blocked
+                    self.chatMessages.append(.init(documentId: docId, data: data))
                 }
             }
     }
+
     
     private func fetchBlockedUsers() {
         guard let userId = FirebaseManager.shared.auth.currentUser?.uid else { return }
@@ -95,55 +141,78 @@ class ChatLogViewModel: ObservableObject {
             }
     }
 
+    
+    private func sendMessageBatch(fromId: String, toId: String, messageData: [String: Any]) {
+        let firestore = FirebaseManager.shared.firestore
+
+        let messageId = firestore.collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .document().documentID
+
+        let senderMessageRef = firestore.collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .document(messageId)
+
+        let recipientMessageRef = firestore.collection("messages")
+            .document(toId)
+            .collection(fromId)
+            .document(messageId)
+
+        let batch = firestore.batch()
+        batch.setData(messageData, forDocument: senderMessageRef)
+        batch.setData(messageData, forDocument: recipientMessageRef)
+
+        batch.commit { error in
+            if let error = error {
+                self.errorMessage = "Failed to send message: \(error)"
+                print("Error sending message: \(error)")
+                return
+            }
+            print("Successfully sent message with ID: \(messageId)")
+            self.persistRecentMessage()
+            self.chatText = ""
+        }
+    }
+
+    
     func handleSend() {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         guard let toId = chatUser?.uid else { return }
 
+        // Check if the sender has blocked the recipient
         if blockedUsers.contains(toId) {
-            print("You are blocked by this user. You cannot send messages.")
+            print("You have blocked this user. You cannot send messages.")
             return
         }
 
-        if let recipientBlockedUsers = chatUser?.blockedUsers, recipientBlockedUsers.contains(fromId) {
-            print("You have blocked this user.")
-            return
-        }
+        // Fetch the recipient's blocked status
+        let firestore = FirebaseManager.shared.firestore
+        firestore.collection("blocks").document(toId).getDocument { document, error in
+            if let error = error {
+                print("Error fetching recipient block status: \(error)")
+                return
+            }
 
-        let messageData = [
-            FirebaseConstants.fromId: fromId,
-            FirebaseConstants.toId: toId,
-            FirebaseConstants.text: self.chatText,
-            FirebaseConstants.timestamp: Timestamp()
-        ] as [String: Any]
-        
-        let document = FirebaseManager.shared.firestore.collection("messages")
-            .document(fromId)
-            .collection(toId)
-            .document()
-        
-        document.setData(messageData) { error in
-            if let error = error {
-                self.errorMessage = "Failed to save message into Firestore: \(error)"
+            let recipientBlockedUsers = document?.data()?["blockedByIds"] as? [String] ?? []
+            if recipientBlockedUsers.contains(fromId) {
+                print("This user has blocked you. You cannot send messages.")
                 return
             }
-            print("Successfully saved current user sending message")
-            self.persistRecentMessage()
-            self.chatText = ""
-        }
-        
-        let recipientMessagesDocument = FirebaseManager.shared.firestore.collection("messages")
-            .document(toId)
-            .collection(fromId)
-            .document()
-        
-        recipientMessagesDocument.setData(messageData) { error in
-            if let error = error {
-                self.errorMessage = "Failed to save message into Firestore: \(error)"
-                return
-            }
-            print("Recipient saved message as well")
+
+            // Proceed with sending the message
+            let messageData: [String: Any] = [
+                FirebaseConstants.fromId: fromId,
+                FirebaseConstants.toId: toId,
+                FirebaseConstants.text: self.chatText,
+                FirebaseConstants.timestamp: Timestamp()
+            ]
+
+            self.sendMessageBatch(fromId: fromId, toId: toId, messageData: messageData)
         }
     }
+
     
     private func persistRecentMessage() {
         guard let chatUser = chatUser else { return }
@@ -211,6 +280,8 @@ class ChatLogViewModel: ObservableObject {
                     print("Failed to delete message: \(error)")
                 } else {
                     print("Successfully deleted message")
+                    self.updateRecentMessagesAfterDeletion(fromId: fromId, toId: toId)
+
                 }
             }
 
@@ -223,16 +294,58 @@ class ChatLogViewModel: ObservableObject {
                     print("Failed to delete message for recipient: \(error)")
                 } else {
                     print("Successfully deleted message for recipient")
+                    self.updateRecentMessagesAfterDeletion(fromId: toId, toId: fromId)
+
+                }
+            }
+    }
+    
+    private func updateRecentMessagesAfterDeletion(fromId: String, toId: String) {
+        FirebaseManager.shared.firestore.collection("messages")
+            .document(fromId)
+            .collection(toId)
+            .order(by: FirebaseConstants.timestamp, descending: true)
+            .limit(to: 1)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Failed to fetch last message: \(error)")
+                    return
+                }
+
+                if let lastMessage = snapshot?.documents.first?.data() {
+                    // Update recent_messages with the last message
+                    FirebaseManager.shared.firestore.collection("recent_messages")
+                        .document(fromId)
+                        .collection("messages")
+                        .document(toId)
+                        .setData(lastMessage) { error in
+                            if let error = error {
+                                print("Failed to update recent_messages: \(error)")
+                            }
+                        }
+                } else {
+                    // No more messages, delete the recent_messages document
+                    FirebaseManager.shared.firestore.collection("recent_messages")
+                        .document(fromId)
+                        .collection("messages")
+                        .document(toId)
+                        .delete { error in
+                            if let error = error {
+                                print("Failed to delete recent_messages: \(error)")
+                            }
+                        }
                 }
             }
     }
 
     func blockUser(userId: String) {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        
-        let blocksDocument = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
-        
-        blocksDocument.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
+
+        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+
+        // Add the blocked user to the current user's blocks list
+        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
             if let error = error {
                 print("Error blocking user: \(error)")
             } else {
@@ -240,14 +353,23 @@ class ChatLogViewModel: ObservableObject {
                 self.blockedUsers.append(userId)
             }
         }
+
+        // Add the current user to the blocked user's 'blockedBy' list
+        blockedUserRef.setData(["blockedByIds": FieldValue.arrayUnion([currentUserId])], merge: true) { error in
+            if let error = error {
+                print("Error adding blockedBy for user: \(error)")
+            }
+        }
     }
-    
+
     func unblockUser(userId: String) {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        
-        let blocksDocument = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
-        
-        blocksDocument.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
+
+        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+
+        // Remove the blocked user from the current user's blocks list
+        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
             if let error = error {
                 print("Error unblocking user: \(error)")
             } else {
@@ -255,7 +377,15 @@ class ChatLogViewModel: ObservableObject {
                 self.blockedUsers.removeAll { $0 == userId }
             }
         }
+
+        // Remove the current user from the blocked user's 'blockedBy' list
+        blockedUserRef.setData(["blockedByIds": FieldValue.arrayRemove([currentUserId])], merge: true) { error in
+            if let error = error {
+                print("Error removing blockedBy for user: \(error)")
+            }
+        }
     }
+
 }
 
 struct ChatLogView: View {
@@ -310,15 +440,12 @@ struct ChatLogView: View {
             }
             .padding()
         }
+        
+        
         //.navigationTitle(chatUser?.email ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-        .navigationBarTitle("", displayMode: .inline) // Optional, customize the title
-        // Set the left bar button to make the email clickable
-        // Use toolbar modifier to center the email
-//        .onDisappear {
-//            print("Debug: Back button pressed - Leaving chat with \(chatUser?.email ?? "unknown user")")
-//        }
+        .navigationBarTitle("", displayMode: .inline) // Optional, customize
         .toolbar {
             ToolbarItem(placement: .principal) {
                 HStack {
@@ -346,7 +473,7 @@ struct ChatLogView: View {
             ) {
                 EmptyView() // NavigationLink content is invisible; it only triggers navigation
             }
-//            .hidden() // Hide the NavigationLink content to avoid extra UI elements
+
         )
 
     }
@@ -381,6 +508,7 @@ struct ChatLogView: View {
             }
         }
     }
+
     
     private func scrollToBottom(scrollViewProxy: ScrollViewProxy) {
         DispatchQueue.main.async {
@@ -390,49 +518,61 @@ struct ChatLogView: View {
         }
     }
     
+
     private var chatBottomBar: some View {
-        HStack(spacing: 16) {
-            Button(action: {
-                withAnimation {
-                    showEmojiPicker.toggle()
-                }
-            }) {
-                Image(systemName: "face.smiling")
-                    .font(.system(size: 24))
-                    .foregroundColor(Color(.darkGray))
-            }
-            
-            ZStack(alignment: .leading) {
-                if vm.chatText.isEmpty {
-                    Text("Type your message...")
-                        .foregroundColor(.gray)
-                        .padding(.leading, 5)
-                }
-                TextEditor(text: $vm.chatText)
-                    .frame(height: 40)
-                    .opacity(vm.chatText.isEmpty ? 0.5 : 1)
-                    .onChange(of: selectedEmoji) { newEmoji in
-                        if !newEmoji.isEmpty {
-                            vm.chatText += newEmoji
-                            selectedEmoji = ""  // Clear the selected emoji after adding
-                        }
+        HStack {
+            if vm.blockedUsers.contains(chatUser?.uid ?? "") {
+                Spacer()
+                Text("You have blocked this person.")
+                    .foregroundColor(.red)
+                    .font(.system(size: 16, weight: .bold))
+                    .multilineTextAlignment(.center)
+                Spacer()
+            } else if vm.blockedByUsers.contains(chatUser?.uid ?? "") {
+                Spacer()
+                Text("You can't message this person.")
+                    .foregroundColor(.red)
+                    .font(.system(size: 16, weight: .bold))
+                    .multilineTextAlignment(.center)
+                Spacer()
+            } else {
+                Button(action: {
+                    withAnimation {
+                        showEmojiPicker.toggle()
                     }
+                }) {
+                    Image(systemName: "face.smiling")
+                        .font(.system(size: 24))
+                        .foregroundColor(Color(.darkGray))
+                }
+
+                ZStack(alignment: .leading) {
+                    if vm.chatText.isEmpty {
+                        Text("Type your message...")
+                            .foregroundColor(.gray)
+                            .padding(.leading, 5)
+                    }
+                    TextEditor(text: $vm.chatText)
+                        .frame(height: 40)
+                        .opacity(vm.chatText.isEmpty ? 0.5 : 1)
+                }
+
+                Button {
+                    vm.handleSend()
+                } label: {
+                    Text("Send")
+                        .foregroundColor(.white)
+                }
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+                .background(Color.blue)
+                .cornerRadius(4)
             }
-            
-            Button {
-                vm.handleSend()
-            } label: {
-                Text("Send")
-                    .foregroundColor(.white)
-            }
-            .padding(.horizontal)
-            .padding(.vertical, 8)
-            .background(Color.blue)
-            .cornerRadius(4)
         }
         .padding(.horizontal)
         .padding(.vertical, 8)
     }
+
     
     private var emojiPicker: some View {
         let emojis: [String] = ["😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳"]
