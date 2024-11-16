@@ -59,11 +59,12 @@ class NotificationManager {
                                 // Handle the post here, e.g., update your UI or process the post object
                                 print("Fetched Post: \(fetchedPost.description)")
                                 notificationUser?.post = fetchedPost
-                                notificationUser?.post_url = fetchedPost.imageUrls [0]
+                                
+                                notificationUser?.post_url = fetchedPost.imageUrls.count > 0 ? fetchedPost.imageUrls [0] : ""
                                 // Append the NotificationUser with the fetched post URL to the list
                                 if let notificationUser = notificationUser {
                                     self.notificationUsers.append(notificationUser)
-                                    print("Fetched User: \(user.name), Post URL: \(fetchedPost.imageUrls [0])")
+                                    print("Fetched User: \(user.name), Post URL: \(notificationUser.post_url)")
                                 }
                                 
                                 // Call group.leave() after both user and post fetches are done

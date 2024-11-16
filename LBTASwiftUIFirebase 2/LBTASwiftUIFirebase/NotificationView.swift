@@ -179,10 +179,11 @@ struct NotificationView: View {
                                             .frame(width: 40, height: 40) // Set size
                                     }
                                     .buttonStyle(PlainButtonStyle()) */
-                                    WebImage(url: URL(string: user.post_url ?? ""))
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 40, height: 40) // Set size
+
+                                WebImage(url: URL(string: user.post_url ?? ""))
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 40, height: 40) // Set size
                                 }
                                 }
                             }
