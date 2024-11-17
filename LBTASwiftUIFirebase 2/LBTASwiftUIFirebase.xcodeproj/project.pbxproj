@@ -50,6 +50,7 @@
 		B02392912CBDD511007CC920 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B02392902CBDD511007CC920 /* GoogleService-Info.plist */; };
 		B02A96A92CC0AB81008B6E8B /* Sansation-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */; };
 		B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */; };
+		B036A85B2CEA764D00820825 /* UserSettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B036A85A2CEA764800820825 /* UserSettingsManager.swift */; };
 		B09365862CDC231F00126005 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09365852CDC231900126005 /* NotificationView.swift */; };
 		B09365882CDC952400126005 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B09365872CDC951E00126005 /* NotificationManager.swift */; };
 		B0F30F2A2CE9863400F4EFE4 /* FriendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F30F292CE9863100F4EFE4 /* FriendsView.swift */; };
@@ -102,6 +103,7 @@
 		B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Sansation-Regular.ttf"; sourceTree = "<group>"; };
 		B02A96AA2CC0AC21008B6E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		B036A85A2CEA764800820825 /* UserSettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserSettingsManager.swift; sourceTree = "<group>"; };
 		B09365852CDC231900126005 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		B09365872CDC951E00126005 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		B0F30F292CE9863100F4EFE4 /* FriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsView.swift; sourceTree = "<group>"; };
@@ -161,6 +163,7 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
 				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				B0F30F292CE9863100F4EFE4 /* FriendsView.swift */,
 				2C1967AC2CE0404E00765C63 /* SplashScreen.swift */,
@@ -343,6 +346,7 @@
 				B0F30F2A2CE9863400F4EFE4 /* FriendsView.swift in Sources */,
 				B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */,
 				68D3B3982CCA37A200166069 /* AddPhotos.swift in Sources */,
+				B036A85B2CEA764D00820825 /* UserSettingsManager.swift in Sources */,
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
 				10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */,
 				B0F30F2C2CE988CA00F4EFE4 /* FriendsManager.swift in Sources */,

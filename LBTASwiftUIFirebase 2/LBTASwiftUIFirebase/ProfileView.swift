@@ -725,6 +725,7 @@ import FirebaseFirestore
 struct ProfileView: View {
     @EnvironmentObject var userManager: UserManager
     @EnvironmentObject var appState: AppState
+    let settingsManager = UserSettingsManager()
     
     @State private var profileUser: User? // Holds the profile being viewed (other user)
     @State private var userPosts: [Post] = []
@@ -734,6 +735,7 @@ struct ProfileView: View {
     @State private var isRequestSentToOtherUser = false
     @State private var didUserSendMeRequest = false
     @State private var isFriends = false
+    @State private var isPublic  = false
     @State private var friendshipLabelText = "Add Friend..."
     @State private var friendsList: [String] = []
     //for navigating to different pages
@@ -814,8 +816,12 @@ struct ProfileView: View {
                         }
                         .padding(.horizontal, 10)
                         .onTapGesture {
-                            print ("Showing friends list")
-                            showFriendsList = true
+                            //show friends list if you're their friend, they're public, or its your own profile
+                            if (isFriends || isPublic) || !viewingOtherProfile
+                                {
+                                print ("Showing friends list")
+                                showFriendsList = true
+                                }
                             }
                         
                         Spacer()
@@ -919,7 +925,7 @@ struct ProfileView: View {
                         }
     
                         // If viewing your own profile or a friend's profile with no posts
-                        else if (!viewingOtherProfile || isFriends) && userPosts.isEmpty {
+                        else if (!viewingOtherProfile || isFriends || isPublic) && userPosts.isEmpty {
                             VStack(spacing: 20) {
                                 Image(systemName: "camera.fill")
                                     .font(.system(size: 50))
@@ -956,7 +962,9 @@ struct ProfileView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 50)
-                        } else if isFriends || !viewingOtherProfile {
+                        }
+                    //show posts if you're friends with the person, they're public, or its your own profile
+                    else if (isFriends || isPublic) || !viewingOtherProfile {
                             LazyVStack {
                                 ForEach(userPosts) { post in
                                     UserPostCard(post: post, onDelete: { deletedPost in
@@ -1156,8 +1164,7 @@ struct ProfileView: View {
                 //self.profileUser = nil
                 self.profileUser = self.userManager.currentUser
                 // Fetch own friends list
-                checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
-                
+                //checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
             } else {
                 viewingOtherProfile = true
                 // Fetch other user's data with a snapshot listener
@@ -1175,6 +1182,11 @@ struct ProfileView: View {
                     
                     DispatchQueue.main.async {
                         self.profileUser = User(data: data, uid: self.user_uid)
+                        settingsManager.fetchUserSettings(userId: profileUser?.uid ?? "") { isPublic in
+                            print("Is public account: \(isPublic)")
+                            // You can now use the `publicAccount` value
+                            self.isPublic = isPublic
+                        }
                         // After fetching profile user, check friendship status
                         checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
                         // Posts will be fetched separately
@@ -1414,7 +1426,7 @@ struct ProfileView: View {
                     
                     HStack {
                         Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
-                        Text("600") // Placeholder for comments count
+                        Text("\(post.commentCount)") // Placeholder for comments count
                         
                         Spacer()
                         
