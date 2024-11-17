@@ -782,7 +782,6 @@ struct ProfileView: View {
     
     // Profile content for when the user is not blocked
     private var profileContent: some View {
-        NavigationView {
             
             VStack(alignment: .leading) {
                 
@@ -952,9 +951,22 @@ struct ProfileView: View {
                             
                             if (isFriends || isPublic)
                                 {
-                                Button(action: {
+                                
                                     //Link to Messages page
-                                }) {
+                            NavigationLink(
+                            destination: ChatLogView(
+                                chatUser: ChatUser(
+                                    data: [
+                                        "uid": profileUser?.uid ?? "",
+                                        "email": profileUser?.email ?? "",
+                                        "username": profileUser?.username ?? "",
+                                        "profileImageUrl": profileUser?.profileImageUrl ?? "",
+                                        "name": profileUser?.name ?? ""
+                                    ]
+                                )
+                            )
+                        )
+                                 {
                                     Text("Message")
                                         .font(.system(size: 15, weight: .bold))
                                         .foregroundColor(.white) // White text color
@@ -1116,7 +1128,7 @@ struct ProfileView: View {
                         .cancel()
                     ])
                 }
-            }
+            
         }
         
         // Function to check friendship status
