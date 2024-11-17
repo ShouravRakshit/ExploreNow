@@ -1,10 +1,3 @@
-
-import SwiftUI
-import Firebase
-import MapKit
-import FirebaseFirestore
-import SDWebImageSwiftUI  // For WebImage
-
 import SwiftUI
 import CoreLocation
 import MapKit
@@ -17,6 +10,8 @@ struct LocationPostsPage: View {
     @State private var locationPosts: [Post] = []
     @State private var locationDetails: LocationDetails?
     @State private var isLoading = true
+    @State private var headerImageUrl: String? = nil  // Add this property
+
 }
 
 struct LocationDetails {
@@ -26,6 +21,7 @@ struct LocationDetails {
 }
 
 extension LocationPostsPage {
+
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -34,12 +30,24 @@ extension LocationPostsPage {
                 } else {
                     // Header Image with location and rating
                     ZStack(alignment: .bottom) {
-                        Image("banff") // we gotta add custom images later. either through the app or using apple maps api/google api
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 250)
-                            .clipped()
-                        
+                        if let imageUrl = headerImageUrl {
+                            WebImage(url: URL(string: imageUrl))
+                                .resizable()
+                                .scaledToFill()
+                                .frame(height: 250)
+                                .clipped()
+                        } else {
+                            // Fallback image or color when no images are available
+                            Rectangle()
+                                .fill(Color.gray.opacity(0.3))
+                                .frame(height: 250)
+                                .overlay(
+                                    Image(systemName: "photo")
+                                        .foregroundColor(.gray)
+                                        .font(.system(size: 40))
+                                )
+                        }
+
                         // Location info overlay
                         VStack(spacing: 8) {
                             // Main address (POI)
@@ -167,36 +175,82 @@ extension LocationPostsPage {
     }
     
     private func fetchLocationPosts() {
+        print("DEBUG: Starting to fetch posts for location: \(locationRef.documentID)")
+        
         FirebaseManager.shared.firestore
             .collection("user_posts")
             .whereField("locationRef", isEqualTo: locationRef)
             .order(by: "timestamp", descending: true)
             .addSnapshotListener { querySnapshot, error in
                 if let error = error {
-                    print("Error fetching posts: \(error)")
+                    print("DEBUG: Error fetching posts: \(error)")
                     return
                 }
+                
+                print("DEBUG: Received \(querySnapshot?.documentChanges.count ?? 0) post changes")
                 
                 querySnapshot?.documentChanges.forEach { change in
                     if change.type == .added {
                         let data = change.document.data()
+                        let postId = change.document.documentID
+                        if let imageUrls = data["images"] as? [String], !imageUrls.isEmpty {
+                            // If we don't have a header image yet, set one
+                            if self.headerImageUrl == nil {
+                                // Get a random image from the post's images
+                                self.headerImageUrl = imageUrls.randomElement()
+                                print("DEBUG: Set header image from post: \(change.document.documentID)")
+                            }
+                        }
+
+                        print("DEBUG: Processing post: \(postId)")
                         
-                        let post = Post(
-                            id: change.document.documentID,
-                            description: data["description"] as? String ?? "",
-                            rating: data["rating"] as? Int ?? 0,
-                            locationRef: locationRef,
-                            locationAddress: locationDetails?.mainAddress ?? "",
-                            imageUrls: data["images"] as? [String] ?? [],
-                            timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
-                            uid: data["uid"] as? String ?? "",
-                            username: "User", // have to change these to actual user info
-                            userProfileImageUrl: ""
-                        )
-                        
-                        if !locationPosts.contains(where: { $0.id == post.id }) {
-                            locationPosts.append(post)
-                            locationPosts.sort { $0.timestamp > $1.timestamp }
+                        // Get the user ID from the post
+                        if let userId = data["uid"] as? String {
+                            print("DEBUG: Fetching user details for user: \(userId)")
+                            
+                            // Fetch user details
+                            FirebaseManager.shared.firestore
+                                .collection("users")
+                                .document(userId)
+                                .getDocument { userSnapshot, userError in
+                                    if let userError = userError {
+                                        print("DEBUG: Error fetching user details: \(userError)")
+                                        return
+                                    }
+                                    
+                                    // Get user data
+                                    let userData = userSnapshot?.data() ?? [:]
+                                    let username = userData["username"] as? String ?? "Unknown User"
+                                    let userProfileImageUrl = userData["profileImageUrl"] as? String ?? ""
+                                    
+                                    print("DEBUG: Found user: \(username)")
+                                    
+                                    let post = Post(
+                                        id: postId,
+                                        description: data["description"] as? String ?? "",
+                                        rating: data["rating"] as? Int ?? 0,
+                                        locationRef: self.locationRef,
+                                        locationAddress: self.locationDetails?.mainAddress ?? "",
+                                        imageUrls: data["images"] as? [String] ?? [],
+                                        timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
+                                        uid: userId,
+                                        username: username,
+                                        userProfileImageUrl: userProfileImageUrl
+                                    )
+                                    
+                                    DispatchQueue.main.async {
+                                        if !self.locationPosts.contains(where: { $0.id == post.id }) {
+                                            self.locationPosts.append(post)
+                                            self.locationPosts.sort { $0.timestamp > $1.timestamp }
+                                            if headerImageUrl == nil, let firstImage = post.imageUrls.first {
+                                                headerImageUrl = firstImage
+                                                print("DEBUG: Set header image from new post: \(post.id)")
+                                            }
+
+                                            print("DEBUG: Added post to location posts. Total posts: \(self.locationPosts.count)")
+                                        }
+                                    }
+                                }
                         }
                     }
                 }
