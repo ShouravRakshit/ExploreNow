@@ -1458,101 +1458,201 @@ struct ProfileView: View {
         }
     }
     
-    // Updated UserPostCard to show actual post data
-    struct UserPostCard: View {
-        let post: Post
-        let onDelete: (Post) -> Void
-        @State private var showingAlert = false
-        @State private var currentImageIndex = 0
-        @State private var showingError = false
-        @State private var errorMessage = ""
-        
-        var body: some View {
-            NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            showingAlert = true
-                        }) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                        }
+struct UserPostCard: View {
+    let post: Post
+    let onDelete: (Post) -> Void
+    @State private var showingAlert = false
+    @State private var currentImageIndex = 0
+    @State private var comments: [Comment] = []
+    @State private var likesCount: Int = 0  // Track the like count
+    @State private var likedByUserIds: [String] = []  // Track the list of users who liked the post
+    @State private var liked: Bool = false  // Track if the current user has liked the post
+    
+    var body: some View {
+        NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showingAlert = true
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
                     }
-                    .padding([.top, .trailing])
-                    
-                    if !post.imageUrls.isEmpty {
-                        TabView(selection: $currentImageIndex) {
-                            ForEach(post.imageUrls.indices, id: \.self) { index in
-                                if let url = URL(string: post.imageUrls[index]), !post.imageUrls[index].isEmpty {
-                                    WebImage(url: url)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 172)
-                                        .clipped()
-                                        .tag(index)
-                                } else {
-                                    // Placeholder Image
-                                    Image(systemName: "photo")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 172)
-                                        .clipped()
-                                        .tag(index)
-                                }
+                }
+                .padding([.top, .trailing])
+                
+                if !post.imageUrls.isEmpty {
+                    TabView(selection: $currentImageIndex) {
+                        ForEach(post.imageUrls.indices, id: \.self) { index in
+                            if let url = URL(string: post.imageUrls[index]), !post.imageUrls[index].isEmpty {
+                                WebImage(url: url)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 172)
+                                    .clipped()
+                                    .tag(index)
+                            } else {
+                                // Placeholder Image
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 172)
+                                    .clipped()
+                                    .tag(index)
                             }
                         }
-                        .tabViewStyle(PageTabViewStyle())
-                        .frame(height: 172)
-                        .padding(.horizontal, 10)
-                        .padding(.top, 6)
+                    }
+                    .tabViewStyle(PageTabViewStyle())
+                    .frame(height: 172)
+                    .padding(.horizontal, 10)
+                    .padding(.top, 6)
+                }
+                
+                Text(post.description)
+                    .font(.system(size: 14))
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
+                HStack {
+                    Button(action: {
+                        toggleLike()
+                    }) {
+                        HStack(spacing: 4) {
+                            // Heart icon that changes based on whether the post is liked
+                            Image(systemName: liked ? "heart.fill" : "heart")  // Filled heart if liked, empty if not
+                                .foregroundColor(liked ? .red : .gray)  // Red if liked, gray if not
+                                .padding(5)
+                            
+                            // Display like count
+                            Text("\(likesCount)")
+                                .foregroundColor(.gray)  // Like count in gray
+                        }
                     }
                     
-                    Text(post.description)
-                        .font(.system(size: 14))
-                        .padding(.horizontal)
-                        .padding(.top, 8)
+                    Spacer()
+                        .frame(width: 20)
                     
                     HStack {
                         Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
-                        Text("\(post.commentCount)") // Placeholder for comments count
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 10) {
-                            Image(systemName: "star.fill").foregroundColor(Color.customPurple)
-                            Text("\(post.rating)")
-                            
-                            Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
-                            Text(post.locationAddress)
-                                .lineLimit(1)
+                        Text("\(comments.count)") // Display comment count
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 10) {
+                        Image(systemName: "star.fill").foregroundColor(Color.customPurple)
+                        Text("\(post.rating)")
+                        Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
+                        Text(post.locationAddress)
+                            .lineLimit(1)
+                    }
+                }
+                .font(.system(size: 14))
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+            }
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 5)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
+            .alert(isPresented: $showingAlert) {
+                Alert(
+                    title: Text("Delete Post"),
+                    message: Text("Are you sure you want to delete this post? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        onDelete(post)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+            .onAppear {
+                fetchLikes()
+                fetchComments() // Fetch comments when the view appears
+            }
+        }
+    }
+    
+    private func fetchLikes() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("likes")
+            .whereField("postId", isEqualTo: post.id) // Filter likes by post ID
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching likes: \(error)")
+                } else {
+                    // Count how many users liked the post
+                    self.likesCount = snapshot?.documents.count ?? 0
+                    
+                    // Track users who liked this post
+                    self.likedByUserIds = snapshot?.documents.compactMap { document in
+                        return document.data()["userId"] as? String
+                    } ?? []
+                    
+                    // Check if the current user liked the post
+                    if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid {
+                        self.liked = self.likedByUserIds.contains(currentUserId)
+                    }
+                }
+            }
+    }
+
+    private func toggleLike() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        let db = FirebaseManager.shared.firestore
+        
+        if liked {
+            // If the post is already liked by the current user, remove the like
+            db.collection("likes")
+                .whereField("postId", isEqualTo: post.id)
+                .whereField("userId", isEqualTo: currentUserId)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Error removing like: \(error)")
+                    } else if let document = snapshot?.documents.first {
+                        document.reference.delete { err in
+                            if let err = err {
+                                print("Error removing like: \(err)")
+                            } else {
+                                self.likesCount -= 1
+                                self.liked = false
+                            }
                         }
                     }
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
                 }
-                .background(Color.white)
-                .cornerRadius(12)
-                .shadow(radius: 5)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
-                .alert(isPresented: $showingAlert) {
-                    Alert(
-                        title: Text("Delete Post"),
-                        message: Text("Are you sure you want to delete this post? This action cannot be undone."),
-                        primaryButton: .destructive(Text("Delete")) {
-                            onDelete(post)
-                        },
-                        secondaryButton: .cancel()
-                    )
-                }
-                .alert("Error", isPresented: $showingError) {
-                    Button("OK", role: .cancel) { }
-                } message: {
-                    Text(errorMessage)
+        } else {
+            // Otherwise, add a like
+            db.collection("likes").addDocument(data: [
+                "postId": post.id,
+                "userId": currentUserId,
+                "timestamp": Timestamp()
+            ]) { error in
+                if let error = error {
+                    print("Error adding like: \(error)")
+                } else {
+                    self.likesCount += 1
+                    self.liked = true
                 }
             }
         }
     }
-
+    
+    private func fetchComments() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("comments")
+            .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching comments: \(error)")
+                } else {
+                    // Decode Firestore documents into Comment objects
+                    self.comments = snapshot?.documents.compactMap { document in
+                        Comment(document: document)
+                    } ?? []
+                }
+            }
+    }
+}
