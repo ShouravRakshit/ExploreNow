@@ -61,6 +61,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     private var scaleView: MKScaleView!
     private let locationInfoScrollView = UIScrollView()
     private var locationInfoViews: [LocationInfoView] = [] // To hold instances
+    private var hotspotButtonBottomConstraint: NSLayoutConstraint? // Add this property
 
         
     private lazy var dimmingView: UIView = {
@@ -78,7 +79,51 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     }()
         
     @objc private func mapTapped() {
-        locationInfoScrollView.isHidden = true 
+        locationInfoScrollView.isHidden = true
+        adjustHotspotButtonPosition(show: false)
+    }
+    
+    private let hotspotButton: UIButton = {
+        let button = UIButton(type: .system)
+                
+        let attributedString = NSMutableAttributedString(string: "Hotspots ")
+        let flameAttachment = NSTextAttachment()
+        flameAttachment.image = UIImage(systemName: "flame.fill")?.withTintColor(.black)
+        attributedString.append(NSAttributedString(attachment: flameAttachment))
+
+        button.setAttributedTitle(attributedString, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
+        button.setTitleColor(.black, for: .normal)
+        
+        // Configure appearance
+        button.backgroundColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
+        button.layer.cornerRadius = 20
+        
+        // Add shadow
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowRadius = 4
+        button.layer.shadowOpacity = 0.2
+        
+        // Add highlight state
+        button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
+        button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside])
+        
+        return button
+    }()
+
+    @objc private func buttonTouchDown() {
+        UIView.animate(withDuration: 0.1) {
+            self.hotspotButton.transform = CGAffineTransform(scaleX: 0.95, y: 0.95)
+            self.hotspotButton.backgroundColor = UIColor(red: 255/255, green: 200/255, blue: 0/255, alpha: 1.0)
+        }
+    }
+
+    @objc private func buttonTouchUp() {
+        UIView.animate(withDuration: 0.1) {
+            self.hotspotButton.transform = .identity
+            self.hotspotButton.backgroundColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
+        }
     }
 
 
@@ -90,7 +135,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         setupUserTrackingButtonAndScaleView()
         registerAnnotationViewClasses()
         setupLocationInfoScrollView()
-
+        setupHotspotButton()
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
@@ -220,6 +265,55 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
 
         locationInfoScrollView.isHidden = true // Initially hidden
     }
+    
+    private func setupHotspotButton() {
+        view.addSubview(hotspotButton)
+        hotspotButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Get safe area bottom inset
+        let window = UIApplication.shared.windows.first
+        let bottomPadding = window?.safeAreaInsets.bottom ?? 0
+        
+        // Store the bottom constraint so we can modify it later
+        let bottomConstraint = hotspotButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(bottomPadding + 100))
+        
+        NSLayoutConstraint.activate([
+            hotspotButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            hotspotButton.widthAnchor.constraint(equalToConstant: 140),
+            hotspotButton.heightAnchor.constraint(equalToConstant: 40),
+            bottomConstraint
+        ])
+        
+        hotspotButtonBottomConstraint = bottomConstraint
+        hotspotButton.addTarget(self, action: #selector(hotspotButtonTapped), for: .touchUpInside)
+    }
+
+    @objc private func hotspotButtonTapped() {
+        print("Hotspot button tapped!")
+        // Add your hotspot functionality here
+    }
+    
+    private func adjustHotspotButtonPosition(show: Bool) {
+        let window = UIApplication.shared.windows.first
+        let bottomPadding = window?.safeAreaInsets.bottom ?? 0
+        
+        // Bring button to front
+        view.bringSubviewToFront(hotspotButton)
+        
+        // Animate the position change
+        UIView.animate(withDuration: 0.3) {
+            if show {
+                // Move button above the location info view
+                self.hotspotButtonBottomConstraint?.constant = -(bottomPadding + 100 + self.locationInfoScrollView.frame.height)
+            } else {
+                // Return to original position
+                self.hotspotButtonBottomConstraint?.constant = -(bottomPadding + 100)
+            }
+            self.view.layoutIfNeeded()
+        }
+    }
+
+
 
 
     private func registerAnnotationViewClasses() {
@@ -262,15 +356,18 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let cluster = view.annotation as? MKClusterAnnotation {
             showClusterInfo(for: cluster)
+            adjustHotspotButtonPosition(show: true)
         } else if let locationAnnotation = view.annotation as? Location {
             showLocationInfo(for: locationAnnotation)
+            adjustHotspotButtonPosition(show: true)
         }
     }
     
     func mapView(_ mapView: MKMapView, didDeselect view: MKAnnotationView) {
-        locationInfoScrollView.isHidden = true // Hide the info view when deselecting
+        locationInfoScrollView.isHidden = true
+        adjustHotspotButtonPosition(show: false)
     }
-    
+
     private func showClusterInfo(for cluster: MKClusterAnnotation) {
         // Remove any existing info views
         for infoView in locationInfoViews {

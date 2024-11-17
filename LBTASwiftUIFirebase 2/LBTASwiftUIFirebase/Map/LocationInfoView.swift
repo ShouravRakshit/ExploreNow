@@ -224,39 +224,6 @@ class LocationInfoView: UIView {
         isUserInteractionEnabled = true
     }
 
-//    private func getPointOfInterest(for coordinate: CLLocationCoordinate2D) {
-//        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-//        let geocoder = CLGeocoder()
-//        
-//        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
-//            guard let self = self else { return }
-//            
-//            DispatchQueue.main.async {
-//                if let error = error {
-//                    print("Reverse geocoding error: \(error.localizedDescription)")
-//                    self.poiLabel.text = "Location not found"
-//                    return
-//                }
-//                
-//                if let placemark = placemarks?.first {
-//                    // Try to get the most specific address component available
-//                    if let name = placemark.name {
-//                        self.poiLabel.text = name
-//                    } else if let thoroughfare = placemark.thoroughfare {
-//                        if let subThoroughfare = placemark.subThoroughfare {
-//                            self.poiLabel.text = "\(subThoroughfare) \(thoroughfare)"
-//                        } else {
-//                            self.poiLabel.text = thoroughfare
-//                        }
-//                    } else {
-//                        self.poiLabel.text = "Unknown location"
-//                    }
-//                } else {
-//                    self.poiLabel.text = "No location found"
-//                }
-//            }
-//        }
-//    }
 }
 
 extension UIView {
