@@ -862,59 +862,76 @@ struct ProfileView: View {
                     .padding(.horizontal, 21)
                     .padding(.top, 8)
                     
-                    // Friendship status - add friend, friends
+                    // Friendship status - add friend, friends + Message btn
                     if viewingOtherProfile {
-                        Button(action: {
-                            
-                            if (self.didUserSendMeRequest)
-                                {
-                                let senderId   = user_uid
+                        HStack{
+                            Button(action: {
                                 
-                                if let receiverId = userManager.currentUser?.uid {
-                                    let requestId = senderId + "_" + receiverId
-                                    userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
-                                    //__ accepted your friend request
-                                    userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                if (self.didUserSendMeRequest)
+                                {
+                                    let senderId   = user_uid
+                                    
+                                    if let receiverId = userManager.currentUser?.uid {
+                                        let requestId = senderId + "_" + receiverId
+                                        userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
+                                        //__ accepted your friend request
+                                        userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                            if success {
+                                                print("Notification sent successfully")
+                                                //can be combined with updateNotificationStatus for efficiency
+                                                //You and __ are now friends
+                                                userManager.updateNotificationAccepted (senderId: user_uid)
+                                            } else {
+                                                print("Error sending notification: \(String(describing: error))")
+                                            }
+                                        }
+                                        self.friendshipLabelText = "Friends"
+                                        self.isFriends = true
+                                        //make friends count go up by 1
+                                        friendsList.append(userManager.currentUser?.uid ?? "Friend")
+                                    }
+                                }
+                                else if !isFriends
+                                {
+                                    // Call the function to send the friend request
+                                    userManager.sendFriendRequest(to: user_uid) { success, error in
                                         if success {
-                                            print("Notification sent successfully")
-                                            //can be combined with updateNotificationStatus for efficiency
-                                            //You and __ are now friends
-                                            userManager.updateNotificationAccepted (senderId: user_uid)
+                                            self.isRequestSentToOtherUser = true
+                                            self.friendshipLabelText = "Requested"
+                                            print("Friend request and notification sent successfully.")
                                         } else {
-                                            print("Error sending notification: \(String(describing: error))")
+                                            print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
                                         }
                                     }
-                                    self.friendshipLabelText = "Friends"
-                                    self.isFriends = true
-                                    //make friends count go up by 1
-                                    friendsList.append(userManager.currentUser?.uid ?? "Friend")
                                 }
-                                }
-                            else if !isFriends
-                            {
-                            // Call the function to send the friend request
-                                userManager.sendFriendRequest(to: user_uid) { success, error in
-                                    if success {
-                                        self.isRequestSentToOtherUser = true
-                                        self.friendshipLabelText = "Requested"
-                                        print("Friend request and notification sent successfully.")
-                                    } else {
-                                        print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
-                                    }
-                                }
+                            }) {
+                                Text(friendshipLabelText)
+                                    .font(.system(size: 15, weight: .bold))
+                                    .foregroundColor(.white) // White text color
+                                    .padding() // Add padding inside the button
+                                    .frame(maxWidth: .infinity) // Make the button expand to full width
+                                    .background((isRequestSentToOtherUser || isFriends) ? Color.gray : Color.customPurple) // Gray if requested or friends, else purple
+                                    .cornerRadius(25) // Rounded corners
+                                    .shadow(radius: 5) // Optional shadow for depth
                             }
-                        }) {
-                            Text(friendshipLabelText)
-                                .font(.system(size: 15, weight: .bold))
-                                .foregroundColor(.white) // White text color
-                                .padding() // Add padding inside the button
-                                .frame(maxWidth: .infinity) // Make the button expand to full width
-                                .background((isRequestSentToOtherUser || isFriends) ? Color.gray : Color.customPurple) // Gray if requested or friends, else purple
-                                .cornerRadius(25) // Rounded corners
-                                .shadow(radius: 5) // Optional shadow for depth
+                            
+                            if (isFriends || isPublic)
+                                {
+                                Button(action: {
+                                    //Link to Messages page
+                                }) {
+                                    Text("Message")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(.white) // White text color
+                                        .padding() // Add padding inside the button
+                                        .frame(maxWidth: .infinity) // Make the button expand to full width
+                                        .background(Color.customPurple) // Gray if requested or friends, else purple
+                                        .cornerRadius(25) // Rounded corners
+                                        .shadow(radius: 5) // Optional shadow for depth
+                                }
+                                }
                         }
-                        .padding (.top, 10)
-                        .padding(10) // Padding outside the button
+                        .padding (2)
                     }
                     
                     // Posts Section
