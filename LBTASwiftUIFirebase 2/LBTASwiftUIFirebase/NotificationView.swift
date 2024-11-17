@@ -7,151 +7,88 @@ struct NotificationView: View {
     @EnvironmentObject var userManager: UserManager
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var viewModel: NotificationViewModel
-    @State private var navigateToProfile = false // State to manage the full screen cover
-    @State private var selectedUserUID: String? = nil
-    @State private var selectedUser: NotificationUser? // Store selected user to pass to ProfileView
-    @State private var isProfilePresented = false
+    @State private var selectedUserUID: String? = nil  // UID of the selected user
+    
+    @State private var isLoading = true
+    let db = Firestore.firestore()
     
     // Custom initializer to pass userManager to the view model
     init(userManager: UserManager) {
         _viewModel = StateObject(wrappedValue: NotificationViewModel(userManager: userManager))
     }
-    
-    var notificationUsers_all  : [NotificationUser] = []
-    
-    @State private var isLoading = true
-    
-    let db = Firestore.firestore()
-    
+
     var body: some View {
-        
-        VStack{
-            //------------------------------------------------
+        VStack {
             Spacer()
-            if isLoading
-                {
+            if isLoading {
                 Text("Loading...")
                     .font(.system(size: 24, weight: .bold))
-                }
-            
-            else
-                {
-                if viewModel.notificationUsers.isEmpty
-                    {
+            } else {
+                if viewModel.notificationUsers.isEmpty {
                     Text("No notifications available.")
                         .foregroundColor(.gray)
                         .padding()
-                    }
-                else
-                {
+                } else {
                     List(viewModel.notificationUsers, id: \.notification.timestamp) { user in
                         VStack(alignment: .leading) {
-                            HStack{
-                                ZStack
-                                {
-                                    // Circular border
+                            HStack {
+                                ZStack {
                                     Circle()
-                                        .stroke(Color.black, lineWidth: 4) // Black border
-                                        .frame(width: 41, height: 41) // Slightly larger than the image
+                                        .stroke(Color.black, lineWidth: 4)
+                                        .frame(width: 41, height: 41)
                                     
-                                    if !user.profileImageUrl.isEmpty
-                                        {
+                                    if !user.profileImageUrl.isEmpty {
                                         WebImage(url: URL(string: user.profileImageUrl))
                                             .resizable()
                                             .scaledToFill()
-                                            .clipShape(Circle()) // Clip to circle shape
-                                            .frame(width: 40, height: 40) // Set size
-                                        }
-                                    else
-                                        {
+                                            .clipShape(Circle())
+                                            .frame(width: 40, height: 40)
+                                    } else {
                                         Image(systemName: "person.fill")
                                             .font(.system(size: 40))
                                             .padding()
                                             .scaledToFill()
                                             .foregroundColor(Color(.label))
-                                            .frame(width: 40, height: 40) // Set size for placeholder
-                                            .background(Color.gray.opacity(0.2)) // Optional background
-                                            .clipShape(Circle()) // Clip to circle shape
-                                        }
+                                            .frame(width: 40, height: 40)
+                                            .background(Color.gray.opacity(0.2))
+                                            .clipShape(Circle())
+                                    }
                                 }
 
-                                /*
-                                NavigationLink(destination: ProfileView(user_uid: user.uid)) {
-                                    Text(user.full_message ?? "")  // Show notification message
-                                        .font(.subheadline)
-                                        .padding(.bottom, 5)
-                                        .lineLimit(nil)  // Allow unlimited lines
-                                        .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                                .buttonStyle(PlainButtonStyle()) // Prevent default button styling (optional)
-                                .opacity(0) // Hide the arrow*/
-                                Text(user.full_message ?? "")  // Show notification message
+                                Text(user.full_message ?? "")
                                     .font(.subheadline)
                                     .bold()
                                     .padding(.bottom, 5)
-                                    .lineLimit(nil)  // Allow unlimited lines
-                                    .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
+                                    .lineLimit(nil)
+                                    .fixedSize(horizontal: false, vertical: true)
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.customPurple)  // Optional: To make the text look clickable
+                                    .foregroundColor(.customPurple)
                                     .onTapGesture {
-                                        // Set the selected user and navigation flag
+                                        // Set the selected user UID to navigate to their profile
                                         selectedUserUID = user.uid
-                                        navigateToProfile = true
                                     }
 
-                                if user.notification.type == "friendRequest"
-                                {
-                                    // Confirm button
+                                if user.notification.type == "friendRequest" {
                                     Button(action: {
-                                        if (user.notification.status == "pending")
-                                        {
-                                            // Handle Confirm button action here
-                                            print ("Accepting friend request")
-                                            let senderId   = user.notification.senderId
-                                            let receiverId = user.notification.receiverId
-                                            let requestId = senderId + "_" + receiverId
-                                            print ("requestID: \(requestId)")
-                                            print ("senderID: \(senderId)")
-                                            print ("receiverID: \(receiverId)")
-                                            // Update status in the model first
-                                            //needs to update notification And send notification to accepted user
-                                            if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
-                                                viewModel.notificationUsers[index].notification.status = "accepted"
-                                                viewModel.notificationUsers[index].notification.message = "You and $NAME are now friends."
-                                                viewModel.notificationUsers[index].full_message = "You and \(user.name) (@\(user.username) are now friends."
-                                            }
-                                            userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
-                                            //__ accepted your friend request
-                                            userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
-                                                if success {
-                                                    print("Notification sent successfully")
-                                                    //can be combined with updateNotificationStatus for efficiency
-                                                    //You and __ are now friends
-                                                    userManager.updateNotificationAccepted (user)
-                                                } else {
-                                                    print("Error sending notification: \(String(describing: error))")
-                                                }
-                                            }
-
+                                        if user.notification.status == "pending" {
+                                            // Handle Accept Friend Request Logic
+                                            acceptFriendRequest(user: user)
                                         }
                                     }) {
                                         Text(user.notification.status == "pending" ? "Confirm" : "Friends")
                                             .font(.subheadline)
                                             .padding(.horizontal, 6)
                                             .padding(.vertical, 3)
-                                            .background(user.notification.status == "pending" ? Color(red: 140/255, green: 82/255, blue: 255/255) : Color.gray)
+                                            .background(user.notification.status == "pending" ? Color.purple : Color.gray)
                                             .foregroundColor(.white)
                                             .cornerRadius(8)
                                     }
-                                    .contentShape(Rectangle())  // Ensure the button area is tappable
-                                    .buttonStyle(PlainButtonStyle())  // Avoid default button styles
+                                    .contentShape(Rectangle())
+                                    .buttonStyle(PlainButtonStyle())
                                     
-                                    if user.notification.status == "pending"{
-                                        // Confirm button
+                                    if user.notification.status == "pending" {
                                         Button(action: {
-                                            deleteFriendRequest (notificationUser: user)
-                                            
+                                            deleteFriendRequest(notificationUser: user)
                                         }) {
                                             Text("Delete")
                                                 .font(.subheadline)
@@ -161,110 +98,74 @@ struct NotificationView: View {
                                                 .foregroundColor(.white)
                                                 .cornerRadius(8)
                                         }
-                                        .contentShape(Rectangle())  // Ensure the button area is tappable
-                                        .buttonStyle(PlainButtonStyle())  // Avoid default button styles
-                                        
+                                        .contentShape(Rectangle())
+                                        .buttonStyle(PlainButtonStyle())
                                     }
-                                    
-                                }
-                                //like, comment - show pic of post
-                            else
-                                {
-                                if let post = user.post, user.post_url != nil {
-                                    /*
-                                    NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
-                                        WebImage(url: URL(string: user.post_url ?? ""))
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 40, height: 40) // Set size
-                                    }
-                                    .buttonStyle(PlainButtonStyle()) */
-
-                                WebImage(url: URL(string: user.post_url ?? ""))
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 40, height: 40) // Set size
-                                }
                                 }
                             }
-                            HStack
-                                {
-                                /*
-                                Text("From: \(user.notification.senderId)")  // Show sender's ID
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                                 */
-                                
+
+                            HStack {
                                 Spacer()
-                                
-                                Text(user.notification.timeAgo)  // Show timestamp
+                                Text(user.notification.timeAgo)
                                     .font(.footnote)
                                     .foregroundColor(.gray)
-                                }
-                            
-                            //Divider() // Divider for each notification
+                            }
                         }
-                        //.padding(.vertical, 5)
                     }
                 }
             }
-            
             Spacer() // Pushes content to the top
-  
-            // Conditional NavigationLink
-            if navigateToProfile {
+
+            // Conditional NavigationLink to navigate to ProfileView when selectedUserUID is set
+            if let selectedUserUID = selectedUserUID {
                 NavigationLink(
-                    destination: ProfileView(user_uid: selectedUserUID ?? ""),
-                    isActive: $navigateToProfile,
+                    destination: ProfileView(user_uid: selectedUserUID),
+                    isActive: .constant(true),
                     label: { EmptyView() }
                 )
-                .hidden() // Hide the NavigationLink in the UI
+                .hidden() // Hide the NavigationLink UI but it still triggers the navigation
             }
         }
-        .onAppear
-            {
-            print ("notifications view appeared")
-            //viewModel.resetNotificationUsers()
-            //populate notifications
-            isLoading = true
+        .onAppear {
+                    print("notifications view appeared")
+                    isLoading = true
+                    userManager.fetchNotifications { result in
+                        switch result {
+                        case .success(let notifications):
+                            print("Fetched \(notifications.count) notifications")
+                            viewModel.populateNotificationUsers(notifications: notifications)
+                            isLoading = false
+                            markNotificationsAsRead()
+                        case .failure(let error):
+                            print("Error fetching notifications: \(error.localizedDescription)")
+                        }
+                    }
+                }
+                .navigationBarTitle("Notifications", displayMode: .inline)
+            }
+
+            private func acceptFriendRequest(user: NotificationUser) {
+                let senderId = user.notification.senderId
+                let receiverId = user.notification.receiverId
+                let requestId = "\(senderId)_\(receiverId)"
+
+                // Update status in the model first
+                if let index = viewModel.notificationUsers.firstIndex(where: { $0.uid == user.uid }) {
+                    viewModel.notificationUsers[index].notification.status = "accepted"
+                    viewModel.notificationUsers[index].full_message = "You and \(user.name) are now friends."
+                }
                 
-            userManager.fetchNotifications { result in
-                switch result {
-                case .success(let notifications):
-                    // Now you have the notifications, you can populate the users
-                    print("Fetched \(notifications.count) notifications")
-                    viewModel.populateNotificationUsers(notifications: notifications)
-                    isLoading = false
-                    markNotificationsAsRead()
-                    
-                case .failure(let error):
-                    print("Error fetching notifications: \(error.localizedDescription)")
-                    // Handle the error appropriately (e.g., show an error message to the user)
+                userManager.acceptFriendRequest(requestId: requestId, receiverId: receiverId, senderId: senderId)
+                userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                    if success {
+                        print("Notification sent successfully")
+                        userManager.updateNotificationAccepted(user)
+                    } else {
+                        print("Error sending notification: \(String(describing: error))")
+                    }
                 }
             }
-                
-            //viewModel.populateNotificationUsers()  // Fetch users when view appears
-            //userManager.fetchNotifications()
-            }
-        .onDisappear(){
-            // Re-fetch notifications to ensure the read status is reflected
-            userManager.fetchNotifications { result in
-                switch result {
-                case .success(let notifications):
-                    // Now you have the notifications, you can populate the users
-                    print("Fetched \(notifications.count) notifications")
-                    viewModel.populateNotificationUsers(notifications: notifications)
-                    
-                case .failure(let error):
-                    print("Error fetching notifications: \(error.localizedDescription)")
-                    // Handle the error appropriately (e.g., show an error message to the user)
-                }
-            }
-        }
-        .navigationBarTitle("Notifications", displayMode: .inline)
-        
-    }
-    
+
     private func deleteFriendRequest(notificationUser: NotificationUser) {
         let senderId = notificationUser.notification.senderId
         let receiverId = notificationUser.notification.receiverId
