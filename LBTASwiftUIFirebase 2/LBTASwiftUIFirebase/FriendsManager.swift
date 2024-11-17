@@ -12,7 +12,9 @@ import FirebaseFirestore
 //------------------------------------------------------------------------------------------------
 class FriendManager: ObservableObject {
     //------------------------------------------------------------------------------------------------
-    @Published var friends: [User] = []  // The list of friends, wrapped in User objects
+    @Published var friends      : [User] = []  // The list of friends, wrapped in User objects
+    @Published var filteredUsers: [User] = []
+    //self.filteredUsers = self.users
     @Published var isLoading: Bool = false
     @Published var error: Error? = nil
     
@@ -77,7 +79,8 @@ class FriendManager: ObservableObject {
 
         // Once all friends are fetched, update the state
         group.notify(queue: .main) {
-            self.friends = fetchedFriends
+            self.friends       = fetchedFriends
+            self.filteredUsers = self.friends
         }
     }
     //------------------------------------------------------------------------------------------------
@@ -173,4 +176,6 @@ class FriendManager: ObservableObject {
             }
     }
     //------------------------------------------------------------------------------------------------
+    
+    
 }
