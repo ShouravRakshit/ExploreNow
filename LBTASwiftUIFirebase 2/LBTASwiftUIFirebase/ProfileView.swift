@@ -729,7 +729,6 @@ struct ProfileView: View {
     @State private var profileUser: User? // Holds the profile being viewed (other user)
     @State private var userPosts: [Post] = []
     @State private var isLoading = false
-    @State private var showProfileSettings = false
     @State private var showAddPost = false
     @State private var viewingOtherProfile = true
     @State private var isRequestSentToOtherUser = false
@@ -737,14 +736,17 @@ struct ProfileView: View {
     @State private var isFriends = false
     @State private var friendshipLabelText = "Add Friend..."
     @State private var friendsList: [String] = []
+    //for navigating to different pages
     @State private var shouldShowLogOutOptions = false
+    @State private var showProfileSettings = false
+    @State private var showFriendsList = false
 //    @EnvironmentObject var appState: AppState
    
     
     var user_uid: String // The UID of the user whose profile is being viewed
     
     var body: some View {
-        //NavigationView {
+        NavigationView {
             VStack(alignment: .leading) {
                 
                 if !viewingOtherProfile {
@@ -758,6 +760,7 @@ struct ProfileView: View {
                                 .foregroundColor(Color.customPurple)
                         }
                     }
+                    .padding (.trailing, 10)
                 }
                 
                 ScrollView {
@@ -765,7 +768,7 @@ struct ProfileView: View {
                     VStack {
                         Text ("")
                     }
-                    .padding(.top, 20)  // Optional: Add horizontal padding to give some space on the sides
+                    .padding(.top, 5)  // Optional: Add horizontal padding to give some space on the sides
                     
                     // Profile Info Section
                     HStack {
@@ -808,7 +811,12 @@ struct ProfileView: View {
                                 .font(.system(size: 20, weight: .bold))
                             Text("\(friendsList.count == 1 ? "Friend" : "Friends")")
                                 .font(.system(size: 16))
-                        }.padding(.horizontal, 10)
+                        }
+                        .padding(.horizontal, 10)
+                        .onTapGesture {
+                            print ("Showing friends list")
+                            showFriendsList = true
+                            }
                         
                         Spacer()
                     }
@@ -872,8 +880,8 @@ struct ProfileView: View {
                                     }
                                     self.friendshipLabelText = "Friends"
                                     self.isFriends = true
-                                    //userManager.fetchNotifications()
-                                    friendsList.append("Friend")
+                                    //make friends count go up by 1
+                                    friendsList.append(userManager.currentUser?.uid ?? "Friend")
                                 }
                                 }
                             else if !isFriends
@@ -961,8 +969,18 @@ struct ProfileView: View {
                             .padding(.horizontal, 2)
                         }
     
-                    //}
+                    }
                     Spacer()
+                    
+                    // Conditional NavigationLink
+                    if showFriendsList {
+                        NavigationLink(
+                            destination: FriendsView (user_uid: profileUser?.uid ?? ""),
+                            isActive: $showFriendsList,
+                            label: { EmptyView() }
+                        )
+                        .hidden() // Hide the NavigationLink in the UI
+                    }
                 }
                 .navigationBarBackButtonHidden(false)
                 .navigationBarTitleDisplayMode(.inline)
@@ -1007,7 +1025,7 @@ struct ProfileView: View {
                         }
                     }
                 }
-                
+                //.navigationBarTitle("@\(profileUser?.username)", displayMode: .inline)
                 .onChange(of: showProfileSettings) { newValue in
                     if !newValue {
                         // When the full screen cover is dismissed
@@ -1135,9 +1153,11 @@ struct ProfileView: View {
                 viewingOtherProfile = false
                 // No need to fetch data; currentUser is already available
                 // Reset profileUser
-                self.profileUser = nil
+                //self.profileUser = nil
+                self.profileUser = self.userManager.currentUser
                 // Fetch own friends list
                 checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
+                
             } else {
                 viewingOtherProfile = true
                 // Fetch other user's data with a snapshot listener

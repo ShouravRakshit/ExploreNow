@@ -669,7 +669,7 @@ class UserManager: ObservableObject {
 
 }
 
-struct User
+struct User: Identifiable
     {
     let uid: String
     let name: String
@@ -679,6 +679,8 @@ struct User
     let profileImageUrl: String?
     
     var notifications: [Notification] = []
+    // Conformance to Identifiable (use uid as the unique identifier)
+    var id: String { uid }
 
     // Conformance to Equatable
     static func ==(lhs: User, rhs: User) -> Bool {
@@ -710,6 +712,7 @@ struct Notification {
     var isRead: Bool
     let type: String
     let post_id: String? //Optional
+    
     
     // Initializer that takes a Firestore document
     init(from document: QueryDocumentSnapshot) {
