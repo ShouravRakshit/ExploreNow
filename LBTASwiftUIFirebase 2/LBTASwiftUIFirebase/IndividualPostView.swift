@@ -499,6 +499,19 @@ struct PostView: View {
                         liked = true
                     }
                 }
+            
+            userManager.sendLikeNotification(likerId: userManager.currentUser?.uid ?? "", post: post) { success, error in
+                if success {
+                    print("Like notification sent successfully!")
+                } else {
+                    if let error = error {
+                        print("Failed to send like notification: \(error.localizedDescription)")
+                    } else {
+                        print("Failed to send like notification for an unknown reason.")
+                    }
+                }
+            }
+            
         }
     }
     // Fetch Likes

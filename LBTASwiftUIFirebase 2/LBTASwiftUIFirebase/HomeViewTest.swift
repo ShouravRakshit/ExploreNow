@@ -322,17 +322,6 @@ struct PostCard: View {
                 HStack {
                     Button(action: {
                         toggleLike()
-                        userManager.sendLikeNotification(likerId: userManager.currentUser?.uid ?? "", post: post) { success, error in
-                            if success {
-                                print("Like notification sent successfully!")
-                            } else {
-                                if let error = error {
-                                    print("Failed to send like notification: \(error.localizedDescription)")
-                                } else {
-                                    print("Failed to send like notification for an unknown reason.")
-                                }
-                            }
-                        }
                     }) {
                         HStack(spacing: 4) {
                             // Heart icon that changes based on whether the post is liked
@@ -455,6 +444,19 @@ struct PostCard: View {
                     self.liked = true
                 }
             }
+            
+        userManager.sendLikeNotification(likerId: userManager.currentUser?.uid ?? "", post: post) { success, error in
+            if success {
+                print("Like notification sent successfully!")
+            } else {
+                if let error = error {
+                    print("Failed to send like notification: \(error.localizedDescription)")
+                } else {
+                    print("Failed to send like notification for an unknown reason.")
+                }
+            }
+        }
+            
         }
     }
     
