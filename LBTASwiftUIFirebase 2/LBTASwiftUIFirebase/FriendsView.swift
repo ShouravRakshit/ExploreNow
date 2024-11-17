@@ -61,7 +61,7 @@ struct FriendsView: View {
                     .foregroundColor(.red)
                     .padding()
             } else {
-                List(friendManager.friends) { friend in
+                List(friendManager.filteredUsers) { friend in
                     // Row content for each friend
                     row(for: friend)
                         .onTapGesture {
