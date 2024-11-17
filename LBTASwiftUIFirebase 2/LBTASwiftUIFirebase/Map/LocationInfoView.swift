@@ -9,20 +9,22 @@ class LocationInfoView: UIView {
     private let poiLabel = UILabel()
     private var loadingIndicator: UIActivityIndicatorView?
     private var currentLocation: Location?
-
+    private weak var userManager: UserManager?
     
-    override init(frame: CGRect) {
+    init(frame: CGRect, userManager: UserManager) {
+        self.userManager = userManager
         super.init(frame: frame)
         setupUI()
         setupGesture()
     }
     
     required init?(coder: NSCoder) {
+        self.userManager = nil
         super.init(coder: coder)
         setupUI()
         setupGesture()
     }
-    
+
     private func setupUI() {
         backgroundColor = .white
         layer.cornerRadius = 12
@@ -90,6 +92,11 @@ class LocationInfoView: UIView {
         
     @objc private func handleTap() {
         guard let location = currentLocation else { return }
+        guard let userManager = self.userManager else { // Unwrap userManager
+            print("DEBUG: UserManager not available")
+            return
+        }
+
         showLoading()
         
         let db = FirebaseManager.shared.firestore
@@ -108,7 +115,9 @@ class LocationInfoView: UIView {
                     let locationRef = locationDoc.reference
                     let locationPostsPage = UIHostingController(rootView:
                         LocationPostsPage(locationRef: locationRef)
+                            .environmentObject(userManager)
                     )
+
                     
                     if let parentVC = self.parentViewController {
                         parentVC.present(locationPostsPage, animated: true, completion: nil)

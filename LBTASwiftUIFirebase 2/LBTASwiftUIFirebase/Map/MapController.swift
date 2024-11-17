@@ -52,7 +52,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
     private let mapView = MKMapView()
     private let searchBar = UISearchBar()
     private let containerView = UIView()
-
+    private let userManager = UserManager()
     private let locationManager = CLLocationManager()
     private let locationDataManager = LocationManager.shared
     private var eventLocations: [(String, Double, CLLocationCoordinate2D)] = []
@@ -283,7 +283,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         var previousInfoView: LocationInfoView?
 
         for location in clusterLocations {
-            let infoView = LocationInfoView()
+            let infoView = LocationInfoView(frame: .zero, userManager: userManager)
             infoView.configure(with: location)
             infoView.translatesAutoresizingMaskIntoConstraints = false
             locationInfoScrollView.addSubview(infoView)
@@ -321,7 +321,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         }
         locationInfoViews.removeAll()
         
-        let infoView = LocationInfoView()
+        let infoView = LocationInfoView(frame: .zero, userManager: userManager)
         infoView.configure(with: location)
         locationInfoScrollView.addSubview(infoView)
         locationInfoViews.append(infoView)
