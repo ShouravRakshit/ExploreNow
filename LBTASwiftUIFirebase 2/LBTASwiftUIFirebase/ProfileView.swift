@@ -742,13 +742,48 @@ struct ProfileView: View {
     @State private var shouldShowLogOutOptions = false
     @State private var showProfileSettings = false
     @State private var showFriendsList = false
-//    @EnvironmentObject var appState: AppState
-   
+    
+    @State private var isBlocked: Bool = false
+    @State private var isCheckingBlockedStatus: Bool = true // Track the status check
+
     
     var user_uid: String // The UID of the user whose profile is being viewed
     
     var body: some View {
         NavigationView {
+            VStack {
+                if isCheckingBlockedStatus {
+                                // Show a loading indicator while checking the blocked status
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                } else if isBlocked {
+                    // If blocked, show "Can't Find this Person" view
+                    VStack {
+                        Spacer()
+                        Text("Can't Find this Person")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Spacer()
+                    }
+                } else {
+                    // Render the actual profile content if not blocked
+                    profileContent
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                // Check if the user is blocked
+                checkBlockedStatus()
+            }
+        }
+    }
+    
+    // Profile content for when the user is not blocked
+    private var profileContent: some View {
+        NavigationView {
+            
             VStack(alignment: .leading) {
                 
                 if !viewingOtherProfile {
@@ -1038,6 +1073,7 @@ struct ProfileView: View {
                 }
                 .onAppear {
                     print ("Profile view appeared")
+                    checkBlockedStatus() // Check if either user is blocked
                     fetchUserData()
                     fetchUserPosts(uid: user_uid)
                     fetchUserFriends(userId: user_uid) { friends, error in
@@ -1212,6 +1248,42 @@ struct ProfileView: View {
             }
         }
         
+    func checkBlockedStatus() {
+        let currentUserId = userManager.currentUser?.uid ?? ""
+        let userBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+        let profileBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(user_uid)
+
+        // Fetch block status for both users
+        userBlocksRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching current user's blocked list: \(error.localizedDescription)")
+                isCheckingBlockedStatus = false // Stop loading even if there's an error
+                return
+            }
+
+            let currentUserBlockedList = document?.data()?["blockedUserIds"] as? [String] ?? []
+
+            profileBlocksRef.getDocument { profileDocument, error in
+                if let error = error {
+                    print("Error fetching profile user's blocked list: \(error.localizedDescription)")
+                    isCheckingBlockedStatus = false // Stop loading even if there's an error
+                    return
+                }
+
+                let profileUserBlockedList = profileDocument?.data()?["blockedUserIds"] as? [String] ?? []
+
+                // Check if either user is blocked
+                if currentUserBlockedList.contains(user_uid) || profileUserBlockedList.contains(currentUserId) {
+                    self.isBlocked = true
+                } else {
+                    self.isBlocked = false
+                }
+
+                isCheckingBlockedStatus = false // Status check complete
+            }
+        }
+    }
+    
         private func fetchUserPosts(uid: String) {
             isLoading = true
             
