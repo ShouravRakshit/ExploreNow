@@ -10,106 +10,107 @@ struct HomeViewTest: View {
     @State private var posts: [Post] = []
     @State private var isLoading = true
     @State private var friendIds: Set<String> = []
-
+    
     var body: some View {
         NavigationView {
-            ZStack {
-                Color.white.edgesIgnoringSafeArea(.all)
-                
-                VStack {
-                    // Header with notification bell
-                    HStack {
-                        Text("ExploreNow")
-                            .font(.title)
-                            .fontWeight(.bold)
-                            .padding(.leading)
-                        
-                        Spacer()
-                        
-                        // NavigationLink that wraps the bell icon
-                        NavigationLink(destination: NotificationView(userManager: userManager), isActive: $navigateToNotifications) {
-                            ZStack {
-                                Image(systemName: "bell.fill")
-                                    .resizable()
-                                    .frame(width: 24, height: 24)
-                                    .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
-                                
-                                // Show unread notification indicator if there are unread notifications
-                                if userManager.hasUnreadNotifications {
-                                    Circle()
-                                        .fill(Color.red)
-                                        .frame(width: 10, height: 10)
-                                        .offset(x: 8, y: -8)
-                                }
-                            }
-                            .onTapGesture {
-                                // Trigger navigation to NotificationView
-                                navigateToNotifications = true
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
-                        .padding(.trailing)
-                    }
-                    .padding(.top)
+            VStack {
+                // Header with notification bell
+                HStack {
+                    Text("ExploreNow")
+                        .font(.title)
+                        .fontWeight(.bold)
+                        .padding(.leading)
                     
+                    Spacer()
+                    
+                    // NavigationLink that wraps the bell icon
+                    NavigationLink(destination: NotificationView(userManager: userManager), isActive: $navigateToNotifications) {
+                        ZStack {
+                            Image(systemName: "bell.fill")
+                                .resizable()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
+                            
+                            // Show unread notification indicator if there are unread notifications
+                            if userManager.hasUnreadNotifications {
+                                Circle()
+                                    .fill(Color.red)
+                                    .frame(width: 10, height: 10)
+                                    .offset(x: 8, y: -8)
+                            }
+                        }
+                        .onTapGesture {
+                            // Trigger navigation to NotificationView
+                            navigateToNotifications = true
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
+                    .padding(.trailing)
+                }
+                .padding(.top)
+                
+                // Loading and empty states
+                if isLoading {
+                    Spacer()
+                    VStack(spacing: 20) {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .tint(Color.customPurple)
+                            .padding()
+                        
+                        Text("Loading your feed...")
+                            .foregroundColor(.gray)
+                            .font(.subheadline)
+                        
+                        // Optional: Add a subtle animation
+                        HStack(spacing: 4) {
+                            ForEach(0..<3) { index in
+                                Circle()
+                                    .fill(Color.customPurple)
+                                    .frame(width: 8, height: 8)
+                                    .opacity(0.3)
+                                    .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.2 * Double(index)))
+                            }
+                        }
+                    }
+                    Spacer()
+                } else if friendIds.isEmpty {
+                    Spacer()
+                    VStack(spacing: 20) {
+                        Image(systemName: "person.2")
+                            .font(.system(size: 50))
+                            .foregroundColor(.gray)
+                        Text("Add friends to see their posts")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    Spacer()
+                } else if posts.isEmpty {
+                    Spacer()
+                    VStack(spacing: 20) {
+                        Image(systemName: "photo.stack")
+                            .font(.system(size: 50))
+                            .foregroundColor(.gray)
+                        Text("No posts from friends yet")
+                            .foregroundColor(.gray)
+                    }
+                    .padding()
+                    Spacer()
+                } else {
                     // Posts feed
-                    if isLoading {
-                        Spacer()
-                        VStack(spacing: 20) {
-                            ProgressView()
-                                .scaleEffect(1.5)
-                                .tint(Color.customPurple)
-                                .padding()
-                            
-                            Text("Loading your feed...")
-                                .foregroundColor(.gray)
-                                .font(.subheadline)
-                            
-                            // Optional: Add a subtle animation
-                            HStack(spacing: 4) {
-                                ForEach(0..<3) { index in
-                                    Circle()
-                                        .fill(Color.customPurple)
-                                        .frame(width: 8, height: 8)
-                                        .opacity(0.3)
-                                        .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.2 * Double(index)))
-                                }
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(posts) { post in
+                                PostCard(post: post)
+                                    .environmentObject(userManager)
+                                    .padding(.horizontal)
                             }
                         }
-                        Spacer()
-                    } else if friendIds.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "person.2")
-                                .font(.system(size: 50))
-                                .foregroundColor(.gray)
-                            Text("Add friends to see their posts")
-                                .foregroundColor(.gray)
-                        }
-                        .padding()
-                    } else if posts.isEmpty {
-                        VStack(spacing: 20) {
-                            Image(systemName: "photo.stack")
-                                .font(.system(size: 50))
-                                .foregroundColor(.gray)
-                            Text("No posts from friends yet")
-                                .foregroundColor(.gray)
-                        }
-                        .padding()
-                    } else {
-                        ScrollView {
-                            LazyVStack(spacing: 16) {
-                                ForEach(posts) { post in
-                                    PostCard(post: post)
-                                        .environmentObject(userManager)
-                                        .padding(.horizontal)
-                                }
-                            }
-                            .padding(.top)
-                        }
+                        .padding(.top)
                     }
                 }
-                .navigationBarHidden(true)
             }
+            .navigationBarHidden(true)
         }
         .edgesIgnoringSafeArea(.top)
         .onAppear {
@@ -119,6 +120,7 @@ struct HomeViewTest: View {
             fetchAllPosts()
         }
     }
+
 
     private func fetchFriends(completion: @escaping () -> Void) {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else {
@@ -131,32 +133,51 @@ struct HomeViewTest: View {
         let db = FirebaseManager.shared.firestore
         
         // Get the friends document for the current user using their UID
-        db.collection("friends").document(currentUserId).getDocument { document, error in
-            if let error = error {
-                print("DEBUG: Error fetching friends: \(error)")
+        db.collection("friends").document(currentUserId).getDocument { friendsSnapshot, friendsError in
+            if let friendsError = friendsError {
+                print("DEBUG: Error fetching friends: \(friendsError)")
+                completion()
                 return
             }
             
-            if let document = document, document.exists {
+            if let friendsSnapshot = friendsSnapshot, friendsSnapshot.exists {
                 print("DEBUG: Found friends document for user: \(currentUserId)")
                 
                 // Get the friends array from the document
-                if let friendsArray = document.data()?["friends"] as? [String] {
+                if let friendsArray = friendsSnapshot.data()?["friends"] as? [String] {
                     print("DEBUG: Found \(friendsArray.count) friends")
                     
-                    // Add all friends to the Set
-                    self.friendIds = Set(friendsArray)
-                    
-                    print("DEBUG: Total friends found: \(self.friendIds.count)")
-                    print("DEBUG: Friends list: \(self.friendIds)")
+                    // Fetch blocked users
+                    db.collection("blocks").document(currentUserId).getDocument { blocksSnapshot, blocksError in
+                        if let blocksError = blocksError {
+                            print("DEBUG: Error fetching blocked users: \(blocksError)")
+                            completion()
+                            return
+                        }
+                        
+                        let blockedUserIds = blocksSnapshot?.data()?["blockedUserIds"] as? [String] ?? []
+                        print("DEBUG: Blocked user IDs: \(blockedUserIds)")
+                        
+                        // Filter out blocked users from the friends list
+                        let filteredFriendIds = friendsArray.filter { !blockedUserIds.contains($0) }
+                        print("DEBUG: Filtered friend IDs: \(filteredFriendIds)")
+                        
+                        // Add filtered friends to the Set
+                        self.friendIds = Set(filteredFriendIds)
+                        
+                        print("DEBUG: Total non-blocked friends found: \(self.friendIds.count)")
+                        print("DEBUG: Non-blocked friends list: \(self.friendIds)")
+                        
+                        completion()
+                    }
                 } else {
                     print("DEBUG: No friends array found in document")
+                    completion()
                 }
             } else {
                 print("DEBUG: No friends document found for user")
+                completion()
             }
-            
-            completion()
         }
     }
 
