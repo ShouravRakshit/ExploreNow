@@ -64,22 +64,47 @@ extension LocationPostsPage {
                                     .font(.subheadline)
                                     .foregroundColor(.white.opacity(0.9))
                                     .multilineTextAlignment(.center)
+                                    .onTapGesture {
+                                        openInMaps()
+                                    }
                                     .padding(.horizontal)
                             }
                             
-                            // Rating
-                            HStack(spacing: 4) {
-                                Text(String(format: "%.1f", locationDetails?.averageRating ?? 0))
-                                    .font(.headline)
-                                    .foregroundColor(.black)
-                                Image(systemName: "star.fill")
-                                    .foregroundColor(.yellow)
+                            // Ratings and car button side by side
+                            HStack(spacing: 16) {
+                                // Rating display
+                                HStack(spacing: 4) {
+                                    Text(String(format: "%.1f", locationDetails?.averageRating ?? 0))
+                                        .font(.headline)
+                                        .foregroundColor(.black)
+                                    Image(systemName: "star.fill")
+                                        .foregroundColor(.yellow)
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Color.white)
+                                .clipShape(Capsule())
+                                .shadow(radius: 3)
+                                
+                                // Car button
+                                Button(action: {
+                                    openInMapsWithDirections()
+                                }) {
+                                    HStack {
+                                        Image(systemName: "car.fill")
+                                            .foregroundColor(.white)
+                                    }
+                                    .frame(width: 44, height: 44)
+                                    .background(Color.blue)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 3)
+                                }
                             }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.white)
-                            .clipShape(Capsule())
-                            .shadow(radius: 3)
+                            .padding(.horizontal)
+                            .padding(.vertical, 8)
+                        }
+
+
                         }
                         .padding(.bottom, 50)
                         .shadow(radius: 5)
@@ -110,7 +135,7 @@ extension LocationPostsPage {
                 fetchLocationDetails()
                 fetchLocationPosts()
             }
-        }
+        
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
@@ -176,6 +201,62 @@ extension LocationPostsPage {
             }
         }
     }
+    
+    private func openInMaps() {
+        fetchLocationCoordinates { coordinates in
+            guard let coordinates = coordinates else { return }
+            
+            let coordinate = CLLocationCoordinate2D(
+                latitude: coordinates[0],
+                longitude: coordinates[1]
+            )
+            let placemark = MKPlacemark(coordinate: coordinate)
+            let mapItem = MKMapItem(placemark: placemark)
+            mapItem.name = locationDetails?.mainAddress
+            mapItem.openInMaps(launchOptions: nil)
+        }
+    }
+
+    private func openInMapsWithDirections() {
+        fetchLocationCoordinates { coordinates in
+            guard let coordinates = coordinates else { return }
+            
+            let coordinate = CLLocationCoordinate2D(
+                latitude: coordinates[0],
+                longitude: coordinates[1]
+            )
+            let placemark = MKPlacemark(coordinate: coordinate)
+            let mapItem = MKMapItem(placemark: placemark)
+            mapItem.name = locationDetails?.mainAddress
+            
+            // Set launch options for directions
+            let launchOptions = [
+                MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
+            ]
+            
+            mapItem.openInMaps(launchOptions: launchOptions)
+        }
+    }
+    
+    private func fetchLocationCoordinates(completion: @escaping ([Double]?) -> Void) {
+        locationRef.getDocument { snapshot, error in
+            if let error = error {
+                print("Error fetching location: \(error)")
+                completion(nil)
+                return
+            }
+            
+            if let data = snapshot?.data(),
+               let coordinates = data["location_coordinates"] as? [Double],
+               coordinates.count == 2 {
+                completion(coordinates)
+            } else {
+                completion(nil)
+            }
+        }
+    }
+
+
     
     private func fetchLocationPosts() {
         print("DEBUG: Starting to fetch posts for location: \(locationRef.documentID)")
