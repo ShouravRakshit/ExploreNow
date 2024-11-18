@@ -131,32 +131,51 @@ struct HomeViewTest: View {
         let db = FirebaseManager.shared.firestore
         
         // Get the friends document for the current user using their UID
-        db.collection("friends").document(currentUserId).getDocument { document, error in
-            if let error = error {
-                print("DEBUG: Error fetching friends: \(error)")
+        db.collection("friends").document(currentUserId).getDocument { friendsSnapshot, friendsError in
+            if let friendsError = friendsError {
+                print("DEBUG: Error fetching friends: \(friendsError)")
+                completion()
                 return
             }
             
-            if let document = document, document.exists {
+            if let friendsSnapshot = friendsSnapshot, friendsSnapshot.exists {
                 print("DEBUG: Found friends document for user: \(currentUserId)")
                 
                 // Get the friends array from the document
-                if let friendsArray = document.data()?["friends"] as? [String] {
+                if let friendsArray = friendsSnapshot.data()?["friends"] as? [String] {
                     print("DEBUG: Found \(friendsArray.count) friends")
                     
-                    // Add all friends to the Set
-                    self.friendIds = Set(friendsArray)
-                    
-                    print("DEBUG: Total friends found: \(self.friendIds.count)")
-                    print("DEBUG: Friends list: \(self.friendIds)")
+                    // Fetch blocked users
+                    db.collection("blocks").document(currentUserId).getDocument { blocksSnapshot, blocksError in
+                        if let blocksError = blocksError {
+                            print("DEBUG: Error fetching blocked users: \(blocksError)")
+                            completion()
+                            return
+                        }
+                        
+                        let blockedUserIds = blocksSnapshot?.data()?["blockedUserIds"] as? [String] ?? []
+                        print("DEBUG: Blocked user IDs: \(blockedUserIds)")
+                        
+                        // Filter out blocked users from the friends list
+                        let filteredFriendIds = friendsArray.filter { !blockedUserIds.contains($0) }
+                        print("DEBUG: Filtered friend IDs: \(filteredFriendIds)")
+                        
+                        // Add filtered friends to the Set
+                        self.friendIds = Set(filteredFriendIds)
+                        
+                        print("DEBUG: Total non-blocked friends found: \(self.friendIds.count)")
+                        print("DEBUG: Non-blocked friends list: \(self.friendIds)")
+                        
+                        completion()
+                    }
                 } else {
                     print("DEBUG: No friends array found in document")
+                    completion()
                 }
             } else {
                 print("DEBUG: No friends document found for user")
+                completion()
             }
-            
-            completion()
         }
     }
 
