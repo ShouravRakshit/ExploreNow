@@ -10,7 +10,8 @@ struct LocationPostsPage: View {
     @State private var locationPosts: [Post] = []
     @State private var locationDetails: LocationDetails?
     @State private var isLoading = true
-    @State private var headerImageUrl: String? = nil  // Add this property
+    @State private var headerImageUrl: String? = nil
+    @EnvironmentObject var userManager: UserManager
 
 }
 
@@ -92,7 +93,9 @@ extension LocationPostsPage {
                                     .padding()
                             } else {
                                 ForEach(locationPosts) { post in
-                                    LocationPostView(post: post)
+                                    PostCard(post: post)
+                                        .environmentObject(userManager)
+                                        .padding(.horizontal)
                                 }
                             }
                         }
@@ -255,106 +258,5 @@ extension LocationPostsPage {
                     }
                 }
             }
-    }
-}
-struct LocationPostView: View {
-    let post: Post
-    @State private var currentImageIndex = 0
-    
-    var body: some View {
-        NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
-            VStack(alignment: .leading, spacing: 0) {
-                // Top section with user image and username
-                HStack(alignment: .center) {
-                    if let imageUrl = URL(string: post.userProfileImageUrl) {
-                        WebImage(url: imageUrl)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 60, height: 60)
-                            .clipShape(Circle())
-                    } else {
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .foregroundColor(.gray)
-                            .frame(width: 60, height: 60)
-                            .clipShape(Circle())
-                    }
-                    
-                    Text(post.username)
-                        .font(.custom("Sansation", size: 14))
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 5)
-                        .background(Color(red: 140/255, green: 82/255, blue: 255/255))
-                        .cornerRadius(15)
-                    
-                    Spacer()
-                }
-                .padding([.top, .horizontal])
-                
-                // Post images carousel
-                if !post.imageUrls.isEmpty {
-                    TabView(selection: $currentImageIndex) {
-                        ForEach(post.imageUrls.indices, id: \.self) { index in
-                            if let imageUrl = URL(string: post.imageUrls[index]) {
-                                WebImage(url: imageUrl)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(height: 150)
-                                    .clipped()
-                                    .tag(index)
-                            } else {
-                                Rectangle()
-                                    .fill(Color.gray.opacity(0.3))
-                                    .frame(height: 150)
-                                    .overlay(
-                                        Image(systemName: "photo")
-                                            .foregroundColor(.gray)
-                                    )
-                                    .tag(index)
-                            }
-                        }
-                    }
-                    .tabViewStyle(PageTabViewStyle())
-                    .frame(height: 150)
-                    .padding(.horizontal)
-                    .padding(.top, 6)
-                }
-                
-                // Description if any
-                if !post.description.isEmpty {
-                    Text(post.description)
-                        .font(.system(size: 14))
-                        .padding(.horizontal)
-                        .padding(.top, 8)
-                }
-                
-                // Bottom section with rating and timestamp
-                HStack {
-                    Image(systemName: "star.fill").foregroundColor(Color.customPurple)
-                    Text("\(post.rating)")
-                    
-                    Spacer()
-                    
-                    Text(formatDate(post.timestamp))
-                        .font(.caption)
-                        .foregroundColor(.gray)
-                }
-                .font(.system(size: 14))
-                .padding(.horizontal)
-                .padding(.vertical, 8)
-            }
-            .background(Color.white)
-            .cornerRadius(12)
-            .shadow(radius: 5)
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
-        }
-    }
-    
-    // Helper function to format the date
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
     }
 }

@@ -10,6 +10,7 @@
 		101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */; };
 		10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */; };
 		10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */; };
+		10B59CC92CEA7B9000306357 /* PostCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B59CC82CEA7B9000306357 /* PostCard.swift */; };
 		10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2A2CC3AA8800F6F7DD /* Location.swift */; };
 		10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */; };
 		10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10E35B2C2CC3AA8800F6F7DD /* MapController.swift */; };
@@ -66,6 +67,7 @@
 		101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfoView.swift; sourceTree = "<group>"; };
 		10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterAnnotationView.swift; sourceTree = "<group>"; };
 		10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchControllerDelegate.swift; sourceTree = "<group>"; };
+		10B59CC82CEA7B9000306357 /* PostCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCard.swift; sourceTree = "<group>"; };
 		10E35B2A2CC3AA8800F6F7DD /* Location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Location.swift; sourceTree = "<group>"; };
 		10E35B2B2CC3AA8800F6F7DD /* LocationAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationAnnotationView.swift; sourceTree = "<group>"; };
 		10E35B2C2CC3AA8800F6F7DD /* MapController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapController.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				10B59CC82CEA7B9000306357 /* PostCard.swift */,
 				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
 				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				B0F30F292CE9863100F4EFE4 /* FriendsView.swift */,
@@ -381,6 +384,7 @@
 				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,
 				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */,
+				10B59CC92CEA7B9000306357 /* PostCard.swift in Sources */,
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				B09365882CDC952400126005 /* NotificationManager.swift in Sources */,
