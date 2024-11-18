@@ -37,6 +37,9 @@ class MainMessagesViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var isUserCurrentlyLoggedOut = false
     @Published var recentMessages = [RecentMessage]()
+    @Published var filteredMessages = [RecentMessage]() // For search results
+    @State private var searchQuery = "" // Search query for filtering messages
+
 
     init() {
         fetchRecentMessages()
@@ -61,24 +64,42 @@ class MainMessagesViewModel: ObservableObject {
                     let data = document.data()
                     return RecentMessage(documentId: document.documentID, data: data)
                 }) ?? []
-                self.updateRecentMessagesWithUserData()
 
+                DispatchQueue.main.async {
+                    // Initialize filteredMessages with recentMessages
+                    self.filteredMessages = self.recentMessages
+                }
+
+                self.updateRecentMessagesWithUserData()
             }
     }
     
+    func filterMessages(query: String) {
+        if query.isEmpty {
+            filteredMessages = recentMessages // Reset to show all messages
+        } else {
+            filteredMessages = recentMessages.filter { recentMessage in
+                recentMessage.name?.lowercased().contains(query.lowercased()) ?? false
+            }
+        }
+    }
+    
     func updateRecentMessagesWithUserData() {
-            for (index, recentMessage) in recentMessages.enumerated() {
-                let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+        for (index, recentMessage) in recentMessages.enumerated() {
+            let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
 
-                fetchUserData(uid: uid) { [weak self] user in
-                    guard let self = self else { return }
-                    DispatchQueue.main.async {
-                        self.recentMessages[index].name = user.name
-                        self.recentMessages[index].profileImageUrl = user.profileImageUrl
-                    }
+            fetchUserData(uid: uid) { [weak self] user in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    self.recentMessages[index].name = user.name
+                    self.recentMessages[index].profileImageUrl = user.profileImageUrl
+
+                    // Update filteredMessages to reflect changes
+                    self.filterMessages(query: self.filteredMessages.isEmpty ? "" : self.searchQuery)
                 }
             }
         }
+    }
     
     func fetchUserData(uid: String, completion: @escaping (ChatUser) -> Void) {
             let userRef = FirebaseManager.shared.firestore.collection("users").document(uid)
@@ -149,6 +170,8 @@ struct MainMessagesView: View {
     @State private var shouldNavigateToChatLogView = false
     @State private var shouldShowChangePasswordConfirmation = false
     @State private var shouldShowNewMessageScreen = false
+    
+    @State private var searchQuery = "" // Search query for filtering messages
 
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var userManager: UserManager
@@ -159,6 +182,8 @@ struct MainMessagesView: View {
         NavigationView {
             VStack {
                 customNavBar
+                
+//                searchBar
 
                 messagesView
 
@@ -182,74 +207,100 @@ struct MainMessagesView: View {
             }
         }
     }
+    
+    private var searchBar: some View {
+        HStack {
+            TextField("Search users...", text: $searchQuery)
+                .padding(10)
+                .background(Color.white)
+                .cornerRadius(10)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(Color.gray, lineWidth: 1)
+                )
+                .padding(.horizontal)
+                .onChange(of: searchQuery) { newValue in
+                    vm.filterMessages(query: newValue)
+                }
+        }
+        .padding(.top, 10)
+    }
 
     private var messagesView: some View {
-        ScrollView {
-            if vm.recentMessages.isEmpty {
-                VStack {
-                    Spacer()
-                    Button(action: {
-                        shouldShowNewMessageScreen = true
-                    }) {
-                        Text("Click here to start a new chat")
-                            .foregroundColor(.blue)
-                            .font(.system(size: 16, weight: .semibold))
-                    }
-                    Spacer()
-                }
-            } else {
-                ForEach(vm.recentMessages) { recentMessage in
+        VStack {
+            
+            ScrollView {
+                if vm.filteredMessages.isEmpty {
                     VStack {
-                        Button {
-                            let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
-                            
-                            let data = [
-                                "uid": uid,
-                                "email": recentMessage.email,
-                                "profileImageUrl": recentMessage.profileImageUrl,
-                                "name": recentMessage.name
-                            ]
-                            let chatUser = ChatUser(data: data)
-                            self.selectedChatUser = chatUser
-                            self.shouldNavigateToChatLogView = true
-                        } label: {
-                            HStack(spacing: 16) {
-                                WebImage(url: URL(string: recentMessage.profileImageUrl))
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 50, height: 50)
-                                    .clipped()
-                                    .cornerRadius(25)
-                                    .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color(.label), lineWidth: 1))
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(recentMessage.name ?? "")
-                                        .font(.system(size: 16, weight: .bold))
-                                        .foregroundColor(Color(.label))
-                                    Text(recentMessage.text)
-                                        .font(.system(size: 14))
-                                        .foregroundColor(Color(.darkGray))
-                                        .lineLimit(1)
-                                }
-                                Spacer()
-
-                                Text(timeAgo(recentMessage.timestamp.dateValue()))
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(Color(.lightGray))
+                        Spacer()
+                        if searchQuery.isEmpty {
+                            Button(action: {
+                                shouldShowNewMessageScreen = true
+                            }) {
+                                Text("Click here to start a new chat")
+                                    .foregroundColor(.blue)
+                                    .font(.system(size: 16, weight: .semibold))
                             }
-                            .padding(.horizontal)
+                        } else {
+                            Text("No matches found.")
+                                .foregroundColor(.gray)
+                                .font(.system(size: 16, weight: .semibold))
                         }
-                        Divider()
+                        Spacer()
                     }
-                    .padding(.vertical, 8)
-                    .onAppear(){
-                        updateRecentMessagesWithNames ()
+                } else {
+                    ForEach(vm.filteredMessages) { recentMessage in
+                        VStack {
+                            Button {
+                                let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+                                
+                                let data = [
+                                    "uid": uid,
+                                    "email": recentMessage.email,
+                                    "profileImageUrl": recentMessage.profileImageUrl,
+                                    "name": recentMessage.name
+                                ]
+                                let chatUser = ChatUser(data: data)
+                                self.selectedChatUser = chatUser
+                                self.shouldNavigateToChatLogView = true
+                            } label: {
+                                HStack(spacing: 16) {
+                                    WebImage(url: URL(string: recentMessage.profileImageUrl))
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 50, height: 50)
+                                        .clipped()
+                                        .cornerRadius(25)
+                                        .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color(.label), lineWidth: 1))
+
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Text(recentMessage.name ?? "")
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundColor(Color(.label))
+                                        Text(recentMessage.text)
+                                            .font(.system(size: 14))
+                                            .foregroundColor(Color(.darkGray))
+                                            .lineLimit(1)
+                                    }
+                                    Spacer()
+
+                                    Text(timeAgo(recentMessage.timestamp.dateValue()))
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundColor(Color(.lightGray))
+                                }
+                                .padding(.horizontal)
+                            }
+                            Divider()
+                        }
+                        .padding(.vertical, 8)
+                        .onAppear {
+                            updateRecentMessagesWithNames()
+                        }
                     }
                 }
             }
         }
     }
-
     func timeAgo(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .short
@@ -425,11 +476,11 @@ struct MainMessagesView: View {
     
 }
 
-struct MainMessagesView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainMessagesView()
-            .preferredColorScheme(.dark)
-
-        MainMessagesView()
-    }
-}
+//struct MainMessagesView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MainMessagesView()
+//            .preferredColorScheme(.dark)
+//
+//        MainMessagesView()
+//    }
+//}

@@ -460,11 +460,25 @@ struct ChatLogView: View {
             } else {
                 // Show messages if available
                 ScrollView {
-                    ForEach(vm.chatMessages) { message in
-                        MessageView(message: message) { messageId in
-                            vm.deleteMessage(messageId)
+                    let groupedMessages = vm.groupMessagesByDate()
+                    ForEach(groupedMessages.keys.sorted(), id: \.self) { date in
+                        VStack(alignment: .leading, spacing: 12) {
+                            // Date Header
+                            Text(date)
+                                .font(.footnote)
+                                .foregroundColor(.gray)
+                                .padding(.leading)
+                                .frame(maxWidth: .infinity) // Expand the frame
+                                .multilineTextAlignment(.center)
+                                .padding(.top, 8)
+                            
+                            // Messages for the specific date
+                            ForEach(groupedMessages[date] ?? []) { message in
+                                MessageView(message: message, onDelete: { messageId in
+                                    vm.deleteMessage(messageId)
+                                })
+                            }
                         }
-                        .id(message.id)
                     }
                     .padding(.horizontal)
                     .padding(.top, 8)
@@ -568,39 +582,80 @@ struct ChatLogView: View {
 struct MessageView: View {
     let message: ChatMessage
     let onDelete: (String) -> Void // Closure to handle deletion
-    
+
     var body: some View {
-        Group {
+        HStack {
             if message.fromId == FirebaseManager.shared.auth.currentUser?.uid {
-                HStack {
-                    Spacer()
+                Spacer()
+                VStack(alignment: .trailing, spacing: 4) {
                     HStack {
-                        Text(message.text)
-                            .foregroundColor(.white)
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Text(message.text)
+                                .foregroundColor(.white)
+                                .font(.body)
+
+                            // Timestamp inside the bubble
+                            Text(formatTimestamp(message.timestamp.dateValue()))
+                                .foregroundColor(.white.opacity(0.8))
+                                .font(.caption2)
+                        }
+
+                        // Delete button for the message
                         Button(action: {
-                            onDelete(message.id) // Call the delete function
+                            onDelete(message.id)
                         }) {
                             Image(systemName: "trash")
                                 .foregroundColor(.white)
-                                .padding(.leading, 8)
                         }
                     }
                     .padding()
                     .background(Color.blue)
-                    .cornerRadius(8)
+                    .cornerRadius(12)
                 }
             } else {
-                HStack {
-                    HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(message.text)
                             .foregroundColor(.black)
+                            .font(.body)
+
+                        // Timestamp inside the bubble
+                        Text(formatTimestamp(message.timestamp.dateValue()))
+                            .foregroundColor(.gray)
+                            .font(.caption2)
                     }
                     .padding()
                     .background(Color.white)
-                    .cornerRadius(8)
-                    Spacer()
+                    .cornerRadius(12)
                 }
+                Spacer()
             }
         }
+    }
+
+    private func formatTimestamp(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
+    }
+}
+
+extension ChatLogViewModel {
+    func groupMessagesByDate() -> [String: [ChatMessage]] {
+        var groupedMessages = [String: [ChatMessage]]()
+
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/dd/yy" // Example: 11/18/24
+
+        for message in chatMessages {
+            let dateKey = dateFormatter.string(from: message.timestamp.dateValue())
+            if groupedMessages[dateKey] == nil {
+                groupedMessages[dateKey] = []
+            }
+            groupedMessages[dateKey]?.append(message)
+        }
+
+        return groupedMessages
     }
 }

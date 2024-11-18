@@ -5,6 +5,7 @@ import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
 import SDWebImageSwiftUI
+import CoreLocation
 
 struct AddPostView: View {
     @State private var descriptionText: String = ""
@@ -20,6 +21,7 @@ struct AddPostView: View {
     @Environment(\.dismiss) var dismiss
     @StateObject private var searchCompleter = LocationSearchCompleter()
     @EnvironmentObject var userManager: UserManager //Current user
+    @StateObject private var locationManager = CustomLocationManager()
 
     let columns = [
         GridItem(.flexible()),
