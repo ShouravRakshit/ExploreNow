@@ -317,6 +317,7 @@ class ChatLogViewModel: ObservableObject {
             } else {
                 print("User blocked successfully.")
                 self.blockedUsers.append(userId)
+                self.removeFriend (currentUserUID: currentUserId, friend_uid: userId)
             }
         }
 
@@ -349,6 +350,56 @@ class ChatLogViewModel: ObservableObject {
             if let error = error {
                 print("Error removing blockedBy for user: \(error)")
             }
+        }
+    }
+    
+    // Remove a friend from both users' friend lists
+    func removeFriend(currentUserUID: String, friend_uid: String) {
+        let db = Firestore.firestore()
+        let currentUserRef = db.collection("friends").document(currentUserUID)
+        let friendUserRef  = db.collection("friends").document(friend_uid)
+        
+        // Fetch the current user's friend list and the friend's list
+        db.runTransaction { (transaction, errorPointer) -> Any? in
+            do {
+                // Fetch current user's friend list
+                let currentUserDoc = try transaction.getDocument(currentUserRef)
+                guard let currentUserFriends = currentUserDoc.data()?["friends"] as? [String] else {
+                    return nil
+                }
+                
+                // Fetch the friend's friend list
+                let friendUserDoc = try transaction.getDocument(friendUserRef)
+                guard let friendUserFriends = friendUserDoc.data()?["friends"] as? [String] else {
+                    return nil
+                }
+                
+                // Remove friend from both lists
+                var updatedCurrentUserFriends = currentUserFriends
+                var updatedFriendUserFriends = friendUserFriends
+                
+                // Remove each other from the respective lists
+                updatedCurrentUserFriends.removeAll { $0 == friend_uid }
+                updatedFriendUserFriends.removeAll { $0 == currentUserUID }
+                
+                // Update the database with the new lists
+                transaction.updateData(["friends": updatedCurrentUserFriends], forDocument: currentUserRef)
+                transaction.updateData(["friends": updatedFriendUserFriends], forDocument: friendUserRef)
+                
+            } catch {
+                print("Error during transaction: \(error)")
+                errorPointer?.pointee = error as NSError
+                return nil
+            }
+            return nil
+        } completion: { (result, error) in
+            if let error = error {
+                return
+            }
+            
+            print("Successfully removed friend!")
+            //delete all notifications associated with friend requests
+            //self.deleteFriendRequestNotifications(user1UID: currentUserUID, user2UID: friend.uid)
         }
     }
 
