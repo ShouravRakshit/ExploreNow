@@ -3,9 +3,8 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 import SDWebImageSwiftUI
-
-
-
+import MapKit
+import CoreLocation
 
 struct PostView: View {
     @EnvironmentObject var userManager: UserManager
@@ -85,14 +84,19 @@ struct PostView: View {
             
             // Location, Rating, Likes
             HStack {
-                Label {
-                    Text("\(post.locationAddress)")
-                        .font(.system(size: 16))
-                } icon: {
-                    Image(systemName: "mappin.and.ellipse")
-                        .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
+                Button(action: {
+                    openInMaps()
+                }) {
+                    HStack {
+                        Image(systemName: "mappin.and.ellipse")
+                            .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
+                        Text("\(post.locationAddress)")
+                            .font(.system(size: 16))
+                            .foregroundColor(.blue) // Make it look clickable
+                            .underline() // Optional: add underline to make it look more like a link
+                    }
                 }
-                
+
                 Spacer()
                 
                 Label {
@@ -288,6 +292,34 @@ struct PostView: View {
             fetchComments() // Fetch comments when the view appears
         }
     }
+    
+    private func openInMaps() {
+        // First, get the location reference
+        post.locationRef.getDocument { snapshot, error in
+            if let error = error {
+                print("Error fetching location: \(error)")
+                return
+            }
+            
+            if let data = snapshot?.data(),
+               let coordinates = data["location_coordinates"] as? [Double],
+               coordinates.count == 2 {
+                
+                let latitude = coordinates[0]
+                let longitude = coordinates[1]
+                
+                // Create a map item from the coordinates
+                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                let placemark = MKPlacemark(coordinate: coordinate)
+                let mapItem = MKMapItem(placemark: placemark)
+                mapItem.name = post.locationAddress
+                
+                // Open in Maps
+                mapItem.openInMaps(launchOptions: nil)
+            }
+        }
+    }
+
     
     private func toggleLikeForComment(_ comment: Comment) {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }

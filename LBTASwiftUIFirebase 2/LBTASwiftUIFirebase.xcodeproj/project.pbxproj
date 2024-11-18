@@ -26,7 +26,6 @@
 		684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510A2CE1D0AC00383B08 /* Comment.swift */; };
 		684A510D2CE1D0D500383B08 /* IndividualPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510C2CE1D0D500383B08 /* IndividualPostView.swift */; };
 		68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A04D752CCA0CFD00BCA36E /* AddPostView.swift */; };
-		68D3B3942CCA321D00166069 /* LocationSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B3932CCA321D00166069 /* LocationSearchView.swift */; };
 		68D3B3982CCA37A200166069 /* AddPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B3972CCA37A200166069 /* AddPhotos.swift */; };
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
 		81447E5C2CB31F12005BE180 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E5B2CB31F12005BE180 /* LoginView.swift */; };
@@ -82,7 +81,6 @@
 		684A510A2CE1D0AC00383B08 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		684A510C2CE1D0D500383B08 /* IndividualPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndividualPostView.swift; sourceTree = "<group>"; };
 		68A04D752CCA0CFD00BCA36E /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
-		68D3B3932CCA321D00166069 /* LocationSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationSearchView.swift; sourceTree = "<group>"; };
 		68D3B3972CCA37A200166069 /* AddPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotos.swift; sourceTree = "<group>"; };
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
@@ -183,7 +181,6 @@
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
 				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 				68D3B3972CCA37A200166069 /* AddPhotos.swift */,
-				68D3B3932CCA321D00166069 /* LocationSearchView.swift */,
 				10E35B2E2CC3AA8800F6F7DD /* Map */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
@@ -388,7 +385,6 @@
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				B09365882CDC952400126005 /* NotificationManager.swift in Sources */,
-				68D3B3942CCA321D00166069 /* LocationSearchView.swift in Sources */,
 				81447E6F2CB3306C005BE180 /* ImagePicker.swift in Sources */,
 				B01DE7132CC199A000C158DD /* MainMessagesView.swift in Sources */,
 			);
