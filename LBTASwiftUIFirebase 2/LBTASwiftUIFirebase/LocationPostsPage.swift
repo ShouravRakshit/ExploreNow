@@ -180,8 +180,9 @@ extension LocationPostsPage {
     private func fetchLocationPosts() {
         print("DEBUG: Starting to fetch posts for location: \(locationRef.documentID)")
         
-        FirebaseManager.shared.firestore
-            .collection("user_posts")
+        let db = FirebaseManager.shared.firestore
+        
+        db.collection("user_posts")
             .whereField("locationRef", isEqualTo: locationRef)
             .order(by: "timestamp", descending: true)
             .addSnapshotListener { querySnapshot, error in
@@ -192,68 +193,72 @@ extension LocationPostsPage {
                 
                 print("DEBUG: Received \(querySnapshot?.documentChanges.count ?? 0) post changes")
                 
+                // Process each document change
                 querySnapshot?.documentChanges.forEach { change in
                     if change.type == .added {
                         let data = change.document.data()
                         let postId = change.document.documentID
-                        if let imageUrls = data["images"] as? [String], !imageUrls.isEmpty {
-                            // If we don't have a header image yet, set one
-                            if self.headerImageUrl == nil {
-                                // Get a random image from the post's images
-                                self.headerImageUrl = imageUrls.randomElement()
-                                print("DEBUG: Set header image from post: \(change.document.documentID)")
-                            }
-                        }
-
-                        print("DEBUG: Processing post: \(postId)")
                         
-                        // Get the user ID from the post
-                        if let userId = data["uid"] as? String {
-                            print("DEBUG: Fetching user details for user: \(userId)")
+                        // Handle header image first
+                        if let imageUrls = data["images"] as? [String],
+                           !imageUrls.isEmpty,
+                           self.headerImageUrl == nil {
+                            self.headerImageUrl = imageUrls.randomElement()
+                            print("DEBUG: Set header image from post: \(postId)")
+                        }
+                        
+                        // Get location details first
+                        guard let locationRef = data["locationRef"] as? DocumentReference else { return }
+                        
+                        // Fetch location details
+                        locationRef.getDocument { locationSnapshot, locationError in
+                            if let locationError = locationError {
+                                print("DEBUG: Error fetching location: \(locationError)")
+                                return
+                            }
                             
-                            // Fetch user details
-                            FirebaseManager.shared.firestore
-                                .collection("users")
-                                .document(userId)
-                                .getDocument { userSnapshot, userError in
-                                    if let userError = userError {
-                                        print("DEBUG: Error fetching user details: \(userError)")
-                                        return
-                                    }
-                                    
-                                    // Get user data
-                                    let userData = userSnapshot?.data() ?? [:]
-                                    let username = userData["username"] as? String ?? "Unknown User"
-                                    let userProfileImageUrl = userData["profileImageUrl"] as? String ?? ""
-                                    
-                                    print("DEBUG: Found user: \(username)")
-                                    
-                                    let post = Post(
-                                        id: postId,
-                                        description: data["description"] as? String ?? "",
-                                        rating: data["rating"] as? Int ?? 0,
-                                        locationRef: self.locationRef,
-                                        locationAddress: self.locationDetails?.mainAddress ?? "",
-                                        imageUrls: data["images"] as? [String] ?? [],
-                                        timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
-                                        uid: userId,
-                                        username: username,
-                                        userProfileImageUrl: userProfileImageUrl
-                                    )
-                                    
-                                    DispatchQueue.main.async {
-                                        if !self.locationPosts.contains(where: { $0.id == post.id }) {
-                                            self.locationPosts.append(post)
-                                            self.locationPosts.sort { $0.timestamp > $1.timestamp }
-                                            if headerImageUrl == nil, let firstImage = post.imageUrls.first {
-                                                headerImageUrl = firstImage
-                                                print("DEBUG: Set header image from new post: \(post.id)")
+                            guard let locationData = locationSnapshot?.data(),
+                                  let address = locationData["address"] as? String else {
+                                print("DEBUG: No location data found")
+                                return
+                            }
+                            
+                            // Now fetch user details
+                            if let userId = data["uid"] as? String {
+                                db.collection("users")
+                                    .document(userId)
+                                    .getDocument { userSnapshot, userError in
+                                        if let userError = userError {
+                                            print("DEBUG: Error fetching user details: \(userError)")
+                                            return
+                                        }
+                                        
+                                        let userData = userSnapshot?.data() ?? [:]
+                                        let username = userData["username"] as? String ?? "Unknown User"
+                                        let userProfileImageUrl = userData["profileImageUrl"] as? String ?? ""
+                                        
+                                        let post = Post(
+                                            id: postId,
+                                            description: data["description"] as? String ?? "",
+                                            rating: data["rating"] as? Int ?? 0,
+                                            locationRef: locationRef,
+                                            locationAddress: address,  // Use the fetched address
+                                            imageUrls: data["images"] as? [String] ?? [],
+                                            timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
+                                            uid: userId,
+                                            username: username,
+                                            userProfileImageUrl: userProfileImageUrl
+                                        )
+                                        
+                                        DispatchQueue.main.async {
+                                            if !self.locationPosts.contains(where: { $0.id == post.id }) {
+                                                self.locationPosts.append(post)
+                                                self.locationPosts.sort { $0.timestamp > $1.timestamp }
+                                                print("DEBUG: Added post from user \(username) with location: \(address)")
                                             }
-
-                                            print("DEBUG: Added post to location posts. Total posts: \(self.locationPosts.count)")
                                         }
                                     }
-                                }
+                            }
                         }
                     }
                 }
