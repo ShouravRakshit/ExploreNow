@@ -50,39 +50,6 @@ class ChatLogViewModel: ObservableObject {
         fetchBlockedByUsers()
     }
     
-//    private func fetchMessages() {
-//        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-//        guard let toId = chatUser?.uid else { return }
-//
-//        if blockedUsers.contains(toId) {
-//            print("You cannot see messages from this user as you are blocked.")
-//            return
-//        }
-//
-//        FirebaseManager.shared.firestore.collection("messages")
-//            .document(fromId)
-//            .collection(toId)
-//            .order(by: FirebaseConstants.timestamp, descending: false)
-//            .addSnapshotListener { querySnapshot, error in
-//                if let error = error {
-//                    self.errorMessage = "Failed to listen for messages: \(error)"
-//                    print(error)
-//                    return
-//                }
-//                
-//                self.chatMessages.removeAll()
-//
-//                querySnapshot?.documents.forEach { queryDocumentSnapshot in
-//                    let data = queryDocumentSnapshot.data()
-//                    let docId = queryDocumentSnapshot.documentID
-//
-//                    if let messageSenderId = data[FirebaseConstants.fromId] as? String, !self.blockedUsers.contains(messageSenderId) {
-//                        self.chatMessages.append(.init(documentId: docId, data: data))
-//                    }
-//                }
-//            }
-//    }
-
     private func fetchBlockedByUsers() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
 
@@ -97,7 +64,22 @@ class ChatLogViewModel: ObservableObject {
                 }
             }
     }
+    
+    private func fetchBlockedUsers() {
+            guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
 
+            FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+                .addSnapshotListener { documentSnapshot, error in
+                    if let error = error {
+                        print("Error fetching blocked users: \(error)")
+                        return
+                    }
+                    if let data = documentSnapshot?.data() {
+                        self.blockedUsers = data["blockedUserIds"] as? [String] ?? []
+                    }
+                }
+        }
+    
     
     private func fetchMessages() {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else { return }
@@ -126,22 +108,6 @@ class ChatLogViewModel: ObservableObject {
             }
     }
 
-    
-    private func fetchBlockedUsers() {
-        guard let userId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        FirebaseManager.shared.firestore.collection("blocks").document(userId)
-            .addSnapshotListener { documentSnapshot, error in
-                if let error = error {
-                    print("Error fetching blocked users: \(error)")
-                    return
-                }
-                if let data = documentSnapshot?.data() {
-                    self.blockedUsers = data["blockedUserIds"] as? [String] ?? []
-                }
-            }
-    }
-
-    
     private func sendMessageBatch(fromId: String, toId: String, messageData: [String: Any]) {
         let firestore = FirebaseManager.shared.firestore
 
@@ -399,7 +365,7 @@ struct ChatLogView: View {
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
-        self.vm = .init(chatUser: chatUser)
+        self.vm = ChatLogViewModel(chatUser: chatUser)
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
@@ -442,17 +408,17 @@ struct ChatLogView: View {
         }
         
         
-        //.navigationTitle(chatUser?.email ?? "")
+        .navigationTitle(chatUser?.name ?? "")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden(false)
-        .navigationBarTitle("", displayMode: .inline) // Optional, customize
+//        .navigationBarBackButtonHidden(false)
+//        .navigationBarTitle("", displayMode: .inline) // Optional, customize
         .toolbar {
             ToolbarItem(placement: .principal) {
-                HStack {
+//                HStack {
                     //Spacer() // To center the content
                     if let name = chatUser?.name {
                         Button(action: {
-                            // Set the navigation state to true when the email is tapped
+//                            // Set the navigation state to true when the email is tapped
                             self.isNavigating = true
                         }) {
                             Text(name) // Make the email clickable
@@ -460,12 +426,14 @@ struct ChatLogView: View {
                                 .foregroundColor(.customPurple)
                                 .frame(maxWidth: .infinity, alignment: .center) // Ensure the username takes all available width and is centered
                         }
+                        
+
                     }
                     //Spacer() // To center the content
-                }
+//                }
             }
         }
-        // Use a NavigationLink triggered programmatically by `isNavigating`
+//         Use a NavigationLink triggered programmatically by `isNavigating`
         .background(
             NavigationLink(
                 destination: ProfileView(user_uid: chatUser?.uid ?? ""),

@@ -725,6 +725,7 @@ import FirebaseFirestore
 struct ProfileView: View {
     @EnvironmentObject var userManager: UserManager
     @EnvironmentObject var appState: AppState
+    let settingsManager = UserSettingsManager()
     
     @State private var profileUser: User? // Holds the profile being viewed (other user)
     @State private var userPosts: [Post] = []
@@ -734,19 +735,54 @@ struct ProfileView: View {
     @State private var isRequestSentToOtherUser = false
     @State private var didUserSendMeRequest = false
     @State private var isFriends = false
+    @State private var isPublic  = false
     @State private var friendshipLabelText = "Add Friend..."
     @State private var friendsList: [String] = []
     //for navigating to different pages
     @State private var shouldShowLogOutOptions = false
     @State private var showProfileSettings = false
     @State private var showFriendsList = false
-//    @EnvironmentObject var appState: AppState
-   
+    
+    @State private var isBlocked: Bool = false
+    @State private var isCheckingBlockedStatus: Bool = true // Track the status check
+
     
     var user_uid: String // The UID of the user whose profile is being viewed
     
     var body: some View {
         NavigationView {
+            VStack {
+                if isCheckingBlockedStatus {
+                                // Show a loading indicator while checking the blocked status
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                } else if isBlocked {
+                    // If blocked, show "Can't Find this Person" view
+                    VStack {
+                        Spacer()
+                        Text("Can't Find this Person")
+                            .font(.system(size: 28, weight: .bold))
+                            .foregroundColor(.gray)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                        Spacer()
+                    }
+                } else {
+                    // Render the actual profile content if not blocked
+                    profileContent
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .onAppear {
+                // Check if the user is blocked
+                checkBlockedStatus()
+            }
+        }
+    }
+    
+    // Profile content for when the user is not blocked
+    private var profileContent: some View {
+            
             VStack(alignment: .leading) {
                 
                 if !viewingOtherProfile {
@@ -814,8 +850,12 @@ struct ProfileView: View {
                         }
                         .padding(.horizontal, 10)
                         .onTapGesture {
-                            print ("Showing friends list")
-                            showFriendsList = true
+                            //show friends list if you're their friend, they're public, or its your own profile
+                            if (isFriends || isPublic) || !viewingOtherProfile
+                                {
+                                print ("Showing friends list")
+                                showFriendsList = true
+                                }
                             }
                         
                         Spacer()
@@ -856,59 +896,89 @@ struct ProfileView: View {
                     .padding(.horizontal, 21)
                     .padding(.top, 8)
                     
-                    // Friendship status - add friend, friends
+                    // Friendship status - add friend, friends + Message btn
                     if viewingOtherProfile {
-                        Button(action: {
-                            
-                            if (self.didUserSendMeRequest)
-                                {
-                                let senderId   = user_uid
+                        HStack{
+                            Button(action: {
                                 
-                                if let receiverId = userManager.currentUser?.uid {
-                                    let requestId = senderId + "_" + receiverId
-                                    userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
-                                    //__ accepted your friend request
-                                    userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                if (self.didUserSendMeRequest)
+                                {
+                                    let senderId   = user_uid
+                                    
+                                    if let receiverId = userManager.currentUser?.uid {
+                                        let requestId = senderId + "_" + receiverId
+                                        userManager.acceptFriendRequest (requestId: requestId, receiverId: receiverId, senderId: senderId)
+                                        //__ accepted your friend request
+                                        userManager.sendNotificationToAcceptedUser(receiverId: senderId, senderId: receiverId) { success, error in
+                                            if success {
+                                                print("Notification sent successfully")
+                                                //can be combined with updateNotificationStatus for efficiency
+                                                //You and __ are now friends
+                                                userManager.updateNotificationAccepted (senderId: user_uid)
+                                            } else {
+                                                print("Error sending notification: \(String(describing: error))")
+                                            }
+                                        }
+                                        self.friendshipLabelText = "Friends"
+                                        self.isFriends = true
+                                        //make friends count go up by 1
+                                        friendsList.append(userManager.currentUser?.uid ?? "Friend")
+                                    }
+                                }
+                                else if !isFriends
+                                {
+                                    // Call the function to send the friend request
+                                    userManager.sendFriendRequest(to: user_uid) { success, error in
                                         if success {
-                                            print("Notification sent successfully")
-                                            //can be combined with updateNotificationStatus for efficiency
-                                            //You and __ are now friends
-                                            userManager.updateNotificationAccepted (senderId: user_uid)
+                                            self.isRequestSentToOtherUser = true
+                                            self.friendshipLabelText = "Requested"
+                                            print("Friend request and notification sent successfully.")
                                         } else {
-                                            print("Error sending notification: \(String(describing: error))")
+                                            print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
                                         }
                                     }
-                                    self.friendshipLabelText = "Friends"
-                                    self.isFriends = true
-                                    //make friends count go up by 1
-                                    friendsList.append(userManager.currentUser?.uid ?? "Friend")
                                 }
-                                }
-                            else if !isFriends
-                            {
-                            // Call the function to send the friend request
-                                userManager.sendFriendRequest(to: user_uid) { success, error in
-                                    if success {
-                                        self.isRequestSentToOtherUser = true
-                                        self.friendshipLabelText = "Requested"
-                                        print("Friend request and notification sent successfully.")
-                                    } else {
-                                        print("Failed to send friend request: \(error?.localizedDescription ?? "Unknown error")")
-                                    }
-                                }
+                            }) {
+                                Text(friendshipLabelText)
+                                    .font(.system(size: 15, weight: .bold))
+                                    .foregroundColor(.white) // White text color
+                                    .padding() // Add padding inside the button
+                                    .frame(maxWidth: .infinity) // Make the button expand to full width
+                                    .background((isRequestSentToOtherUser || isFriends) ? Color.gray : Color.customPurple) // Gray if requested or friends, else purple
+                                    .cornerRadius(25) // Rounded corners
+                                    .shadow(radius: 5) // Optional shadow for depth
                             }
-                        }) {
-                            Text(friendshipLabelText)
-                                .font(.system(size: 15, weight: .bold))
-                                .foregroundColor(.white) // White text color
-                                .padding() // Add padding inside the button
-                                .frame(maxWidth: .infinity) // Make the button expand to full width
-                                .background((isRequestSentToOtherUser || isFriends) ? Color.gray : Color.customPurple) // Gray if requested or friends, else purple
-                                .cornerRadius(25) // Rounded corners
-                                .shadow(radius: 5) // Optional shadow for depth
+                            
+                            if (isFriends || isPublic)
+                                {
+                                
+                                    //Link to Messages page
+                            NavigationLink(
+                            destination: ChatLogView(
+                                chatUser: ChatUser(
+                                    data: [
+                                        "uid": profileUser?.uid ?? "",
+                                        "email": profileUser?.email ?? "",
+                                        "username": profileUser?.username ?? "",
+                                        "profileImageUrl": profileUser?.profileImageUrl ?? "",
+                                        "name": profileUser?.name ?? ""
+                                    ]
+                                )
+                            )
+                        )
+                                 {
+                                    Text("Message")
+                                        .font(.system(size: 15, weight: .bold))
+                                        .foregroundColor(.white) // White text color
+                                        .padding() // Add padding inside the button
+                                        .frame(maxWidth: .infinity) // Make the button expand to full width
+                                        .background(Color.customPurple) // Gray if requested or friends, else purple
+                                        .cornerRadius(25) // Rounded corners
+                                        .shadow(radius: 5) // Optional shadow for depth
+                                }
+                                }
                         }
-                        .padding (.top, 10)
-                        .padding(10) // Padding outside the button
+                        .padding (2)
                     }
                     
                     // Posts Section
@@ -919,7 +989,7 @@ struct ProfileView: View {
                         }
     
                         // If viewing your own profile or a friend's profile with no posts
-                        else if (!viewingOtherProfile || isFriends) && userPosts.isEmpty {
+                        else if (!viewingOtherProfile || isFriends || isPublic) && userPosts.isEmpty {
                             VStack(spacing: 20) {
                                 Image(systemName: "camera.fill")
                                     .font(.system(size: 50))
@@ -956,7 +1026,9 @@ struct ProfileView: View {
                             }
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 50)
-                        } else if isFriends || !viewingOtherProfile {
+                        }
+                    //show posts if you're friends with the person, they're public, or its your own profile
+                    else if (isFriends || isPublic) || !viewingOtherProfile {
                             LazyVStack {
                                 ForEach(userPosts) { post in
                                     UserPostCard(post: post, onDelete: { deletedPost in
@@ -1013,6 +1085,7 @@ struct ProfileView: View {
                 }
                 .onAppear {
                     print ("Profile view appeared")
+                    checkBlockedStatus() // Check if either user is blocked
                     fetchUserData()
                     fetchUserPosts(uid: user_uid)
                     fetchUserFriends(userId: user_uid) { friends, error in
@@ -1055,7 +1128,7 @@ struct ProfileView: View {
                         .cancel()
                     ])
                 }
-            }
+            
         }
         
         // Function to check friendship status
@@ -1156,8 +1229,7 @@ struct ProfileView: View {
                 //self.profileUser = nil
                 self.profileUser = self.userManager.currentUser
                 // Fetch own friends list
-                checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
-                
+                //checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
             } else {
                 viewingOtherProfile = true
                 // Fetch other user's data with a snapshot listener
@@ -1175,6 +1247,11 @@ struct ProfileView: View {
                     
                     DispatchQueue.main.async {
                         self.profileUser = User(data: data, uid: self.user_uid)
+                        settingsManager.fetchUserSettings(userId: profileUser?.uid ?? "") { isPublic in
+                            print("Is public account: \(isPublic)")
+                            // You can now use the `publicAccount` value
+                            self.isPublic = isPublic
+                        }
                         // After fetching profile user, check friendship status
                         checkFriendshipStatus(user1Id: userManager.currentUser?.uid ?? "ERROR", user2Id: user_uid)
                         // Posts will be fetched separately
@@ -1183,6 +1260,42 @@ struct ProfileView: View {
             }
         }
         
+    func checkBlockedStatus() {
+        let currentUserId = userManager.currentUser?.uid ?? ""
+        let userBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+        let profileBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(user_uid)
+
+        // Fetch block status for both users
+        userBlocksRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching current user's blocked list: \(error.localizedDescription)")
+                isCheckingBlockedStatus = false // Stop loading even if there's an error
+                return
+            }
+
+            let currentUserBlockedList = document?.data()?["blockedUserIds"] as? [String] ?? []
+
+            profileBlocksRef.getDocument { profileDocument, error in
+                if let error = error {
+                    print("Error fetching profile user's blocked list: \(error.localizedDescription)")
+                    isCheckingBlockedStatus = false // Stop loading even if there's an error
+                    return
+                }
+
+                let profileUserBlockedList = profileDocument?.data()?["blockedUserIds"] as? [String] ?? []
+
+                // Check if either user is blocked
+                if currentUserBlockedList.contains(user_uid) || profileUserBlockedList.contains(currentUserId) {
+                    self.isBlocked = true
+                } else {
+                    self.isBlocked = false
+                }
+
+                isCheckingBlockedStatus = false // Status check complete
+            }
+        }
+    }
+    
         private func fetchUserPosts(uid: String) {
             isLoading = true
             
@@ -1357,101 +1470,201 @@ struct ProfileView: View {
         }
     }
     
-    // Updated UserPostCard to show actual post data
-    struct UserPostCard: View {
-        let post: Post
-        let onDelete: (Post) -> Void
-        @State private var showingAlert = false
-        @State private var currentImageIndex = 0
-        @State private var showingError = false
-        @State private var errorMessage = ""
-        
-        var body: some View {
-            NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
-                VStack(alignment: .leading, spacing: 0) {
-                    HStack {
-                        Spacer()
-                        Button(action: {
-                            showingAlert = true
-                        }) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
-                        }
+struct UserPostCard: View {
+    let post: Post
+    let onDelete: (Post) -> Void
+    @State private var showingAlert = false
+    @State private var currentImageIndex = 0
+    @State private var comments: [Comment] = []
+    @State private var likesCount: Int = 0  // Track the like count
+    @State private var likedByUserIds: [String] = []  // Track the list of users who liked the post
+    @State private var liked: Bool = false  // Track if the current user has liked the post
+    
+    var body: some View {
+        NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
+            VStack(alignment: .leading, spacing: 0) {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showingAlert = true
+                    }) {
+                        Image(systemName: "trash")
+                            .foregroundColor(.red)
                     }
-                    .padding([.top, .trailing])
-                    
-                    if !post.imageUrls.isEmpty {
-                        TabView(selection: $currentImageIndex) {
-                            ForEach(post.imageUrls.indices, id: \.self) { index in
-                                if let url = URL(string: post.imageUrls[index]), !post.imageUrls[index].isEmpty {
-                                    WebImage(url: url)
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 172)
-                                        .clipped()
-                                        .tag(index)
-                                } else {
-                                    // Placeholder Image
-                                    Image(systemName: "photo")
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(height: 172)
-                                        .clipped()
-                                        .tag(index)
-                                }
+                }
+                .padding([.top, .trailing])
+                
+                if !post.imageUrls.isEmpty {
+                    TabView(selection: $currentImageIndex) {
+                        ForEach(post.imageUrls.indices, id: \.self) { index in
+                            if let url = URL(string: post.imageUrls[index]), !post.imageUrls[index].isEmpty {
+                                WebImage(url: url)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 172)
+                                    .clipped()
+                                    .tag(index)
+                            } else {
+                                // Placeholder Image
+                                Image(systemName: "photo")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(height: 172)
+                                    .clipped()
+                                    .tag(index)
                             }
                         }
-                        .tabViewStyle(PageTabViewStyle())
-                        .frame(height: 172)
-                        .padding(.horizontal, 10)
-                        .padding(.top, 6)
+                    }
+                    .tabViewStyle(PageTabViewStyle())
+                    .frame(height: 172)
+                    .padding(.horizontal, 10)
+                    .padding(.top, 6)
+                }
+                
+                Text(post.description)
+                    .font(.system(size: 14))
+                    .padding(.horizontal)
+                    .padding(.top, 8)
+                
+                HStack {
+                    Button(action: {
+                        toggleLike()
+                    }) {
+                        HStack(spacing: 4) {
+                            // Heart icon that changes based on whether the post is liked
+                            Image(systemName: liked ? "heart.fill" : "heart")  // Filled heart if liked, empty if not
+                                .foregroundColor(liked ? .red : .gray)  // Red if liked, gray if not
+                                .padding(5)
+                            
+                            // Display like count
+                            Text("\(likesCount)")
+                                .foregroundColor(.gray)  // Like count in gray
+                        }
                     }
                     
-                    Text(post.description)
-                        .font(.system(size: 14))
-                        .padding(.horizontal)
-                        .padding(.top, 8)
+                    Spacer()
+                        .frame(width: 20)
                     
                     HStack {
                         Image(systemName: "bubble.right").foregroundColor(Color.customPurple)
-                        Text("600") // Placeholder for comments count
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 10) {
-                            Image(systemName: "star.fill").foregroundColor(Color.customPurple)
-                            Text("\(post.rating)")
-                            
-                            Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
-                            Text(post.locationAddress)
-                                .lineLimit(1)
+                        Text("\(comments.count)") // Display comment count
+                    }
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 10) {
+                        Image(systemName: "star.fill").foregroundColor(Color.customPurple)
+                        Text("\(post.rating)")
+                        Image(systemName: "mappin.and.ellipse").foregroundColor(Color.customPurple)
+                        Text(post.locationAddress)
+                            .lineLimit(1)
+                    }
+                }
+                .font(.system(size: 14))
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+                .padding(.vertical, 8)
+            }
+            .background(Color.white)
+            .cornerRadius(12)
+            .shadow(radius: 5)
+            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
+            .alert(isPresented: $showingAlert) {
+                Alert(
+                    title: Text("Delete Post"),
+                    message: Text("Are you sure you want to delete this post? This action cannot be undone."),
+                    primaryButton: .destructive(Text("Delete")) {
+                        onDelete(post)
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+            .onAppear {
+                fetchLikes()
+                fetchComments() // Fetch comments when the view appears
+            }
+        }
+    }
+    
+    private func fetchLikes() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("likes")
+            .whereField("postId", isEqualTo: post.id) // Filter likes by post ID
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching likes: \(error)")
+                } else {
+                    // Count how many users liked the post
+                    self.likesCount = snapshot?.documents.count ?? 0
+                    
+                    // Track users who liked this post
+                    self.likedByUserIds = snapshot?.documents.compactMap { document in
+                        return document.data()["userId"] as? String
+                    } ?? []
+                    
+                    // Check if the current user liked the post
+                    if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid {
+                        self.liked = self.likedByUserIds.contains(currentUserId)
+                    }
+                }
+            }
+    }
+
+    private func toggleLike() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        let db = FirebaseManager.shared.firestore
+        
+        if liked {
+            // If the post is already liked by the current user, remove the like
+            db.collection("likes")
+                .whereField("postId", isEqualTo: post.id)
+                .whereField("userId", isEqualTo: currentUserId)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Error removing like: \(error)")
+                    } else if let document = snapshot?.documents.first {
+                        document.reference.delete { err in
+                            if let err = err {
+                                print("Error removing like: \(err)")
+                            } else {
+                                self.likesCount -= 1
+                                self.liked = false
+                            }
                         }
                     }
-                    .font(.system(size: 14))
-                    .foregroundColor(.gray)
-                    .padding(.horizontal)
-                    .padding(.vertical, 8)
                 }
-                .background(Color.white)
-                .cornerRadius(12)
-                .shadow(radius: 5)
-                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.customPurple, lineWidth: 1))
-                .alert(isPresented: $showingAlert) {
-                    Alert(
-                        title: Text("Delete Post"),
-                        message: Text("Are you sure you want to delete this post? This action cannot be undone."),
-                        primaryButton: .destructive(Text("Delete")) {
-                            onDelete(post)
-                        },
-                        secondaryButton: .cancel()
-                    )
-                }
-                .alert("Error", isPresented: $showingError) {
-                    Button("OK", role: .cancel) { }
-                } message: {
-                    Text(errorMessage)
+        } else {
+            // Otherwise, add a like
+            db.collection("likes").addDocument(data: [
+                "postId": post.id,
+                "userId": currentUserId,
+                "timestamp": Timestamp()
+            ]) { error in
+                if let error = error {
+                    print("Error adding like: \(error)")
+                } else {
+                    self.likesCount += 1
+                    self.liked = true
                 }
             }
         }
     }
-
+    
+    private func fetchComments() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("comments")
+            .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching comments: \(error)")
+                } else {
+                    // Decode Firestore documents into Comment objects
+                    self.comments = snapshot?.documents.compactMap { document in
+                        Comment(document: document)
+                    } ?? []
+                }
+            }
+    }
+}

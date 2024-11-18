@@ -246,6 +246,7 @@ struct NotificationView: View {
             //viewModel.populateNotificationUsers()  // Fetch users when view appears
             //userManager.fetchNotifications()
             }
+        /*
         .onDisappear(){
             // Re-fetch notifications to ensure the read status is reflected
             userManager.fetchNotifications { result in
@@ -260,7 +261,7 @@ struct NotificationView: View {
                     // Handle the error appropriately (e.g., show an error message to the user)
                 }
             }
-        }
+        }*/
         .navigationBarTitle("Notifications", displayMode: .inline)
         
     }

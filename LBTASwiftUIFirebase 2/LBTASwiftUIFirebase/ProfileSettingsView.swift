@@ -304,6 +304,7 @@ import SDWebImageSwiftUI
 struct ProfileSettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var userManager: UserManager
+    let settingsManager = UserSettingsManager()
 
     @State var shouldShowImagePicker = false
     @State var image: UIImage?
@@ -482,9 +483,11 @@ struct ProfileSettingsView: View {
 
                 Divider()
             }
+            
+            ToggleButtonView(userId: userManager.currentUser?.uid ?? "")
 
             Text("Change Password")
-                .padding(.top, 50)
+                .padding(.top, 25)
                 .font(.custom("Sansation-Regular", size: 23))
                 .foregroundColor(.blue)
                 .underline() // Underline the text
@@ -494,6 +497,14 @@ struct ProfileSettingsView: View {
 
             Spacer() // Pushes content to the top
         }
+        /*
+        .onAppear(){
+            settingsManager.fetchUserSettings(userId: userManager.currentUser?.uid ?? "") { isPublic in
+                print("Is public account: \(isPublic)")
+                // You can now use the `publicAccount` value
+            }
+        }
+         */
         // Attach the fullScreenCover modifier to the VStack
         .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: {
             if image != nil {
@@ -565,5 +576,78 @@ struct ProfileSettingsView: View {
                 // Refresh the currentUser data in userManager
                 self.userManager.fetchCurrentUser()
             }
+    }
+}
+
+struct ToggleButtonView: View {
+    @State private var isPublic: Bool = false // State variable for the toggle
+    @State private var isLoading: Bool = true // Loading state
+
+    let userId: String
+
+    var body: some View {
+        VStack {
+            if isLoading {
+                ProgressView("Loading...")
+            } else {
+                Toggle("Public Account", isOn: $isPublic)
+                    .toggleStyle(SwitchToggleStyle())
+                    .onChange(of: isPublic) { newValue in
+                        updatePublicSetting(isPublic: newValue)
+                    }
+                    .padding()
+            }
+        }
+        .onAppear {
+            fetchPublicSetting()
+        }
+        .padding()
+    }
+
+    /// Fetch the public field from Firestore
+    private func fetchPublicSetting() {
+        let db = Firestore.firestore()
+        let settingsRef = db.collection("settings").document(userId)
+
+        settingsRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching document: \(error.localizedDescription)")
+                isPublic = false
+                isLoading = false
+                return
+            }
+
+            if let document = document, document.exists {
+                isPublic = document.get("public") as? Bool ?? false
+            } else {
+                print("Document does not exist, creating default record.")
+                isPublic = false
+                // Create a new document with default values
+                settingsRef.setData(["public": isPublic]) { error in
+                    if let error = error {
+                        print("Error creating default document: \(error.localizedDescription)")
+                    } else {
+                        print("Default document created successfully.")
+                    }
+                }
+            }
+
+            isLoading = false
+        }
+    }
+
+
+    /// Update the public field in Firestore
+    private func updatePublicSetting(isPublic: Bool) {
+        let db = Firestore.firestore()
+        let settingsRef = db.collection("settings").document(userId)
+
+        settingsRef.setData(["public": isPublic], merge: true) { error in
+            if let error = error {
+                print("Error updating document: \(error.localizedDescription)")
+            } else {
+                print("Public setting updated to \(isPublic).")
+            }
+        }
     }
 }
