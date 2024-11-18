@@ -408,9 +408,9 @@ struct ChatLogView: View {
         }
         
         
-        .navigationTitle(chatUser?.name ?? "")
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
-//        .navigationBarBackButtonHidden(false)
+        .navigationBarBackButtonHidden(false)
 //        .navigationBarTitle("", displayMode: .inline) // Optional, customize
         .toolbar {
             ToolbarItem(placement: .principal) {
