@@ -742,7 +742,8 @@ struct ProfileView: View {
     @State private var shouldShowLogOutOptions = false
     @State private var showProfileSettings = false
     @State private var showFriendsList = false
-    
+    //for removing friend
+    @State private var showingAlert = false
     @State private var isBlocked: Bool = false
     @State private var isCheckingBlockedStatus: Bool = true // Track the status check
 
@@ -938,6 +939,9 @@ struct ProfileView: View {
                                         }
                                     }
                                 }
+                                else if isFriends{
+                                    showingAlert = true
+                                }
                             }) {
                                 Text(friendshipLabelText)
                                     .font(.system(size: 15, weight: .bold))
@@ -1047,7 +1051,7 @@ struct ProfileView: View {
                     // Conditional NavigationLink
                     if showFriendsList {
                         NavigationLink(
-                            destination: FriendsView (user_uid: profileUser?.uid ?? ""),
+                            destination: FriendsView (user_uid: profileUser?.uid ?? "", viewingOtherProfile: viewingOtherProfile),
                             isActive: $showFriendsList,
                             label: { EmptyView() }
                         )
@@ -1128,9 +1132,78 @@ struct ProfileView: View {
                         .cancel()
                     ])
                 }
+                .alert(isPresented: $showingAlert) {
+                     Alert(
+                        title: Text("Unfriend \(self.profileUser?.username ?? "")?"),
+                         message: Text("Are you sure you want to unfriend this person?"),
+                         primaryButton: .destructive(Text("Unfriend")) {
+                             // Unfriend action: Add your unfriending logic here
+                             removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", profileUser?.uid ?? "")
+                         },
+                         secondaryButton: .cancel {
+                             // Cancel action (dismiss the alert)
+                             print("Unfriend canceled.")
+                         }
+                     )
+                 }
             
         }
         
+    // Remove a friend from both users' friend lists
+    func removeFriend(currentUserUID: String, _ friend_uid: String) {
+        let db = Firestore.firestore()
+        let currentUserRef = db.collection("friends").document(currentUserUID)
+        let friendUserRef = db.collection("friends").document(friend_uid)
+        
+        // Fetch the current user's friend list and the friend's list
+        db.runTransaction { (transaction, errorPointer) -> Any? in
+            do {
+                // Fetch current user's friend list
+                let currentUserDoc = try transaction.getDocument(currentUserRef)
+                guard let currentUserFriends = currentUserDoc.data()?["friends"] as? [String] else {
+                    return nil
+                }
+                
+                // Fetch the friend's friend list
+                let friendUserDoc = try transaction.getDocument(friendUserRef)
+                guard let friendUserFriends = friendUserDoc.data()?["friends"] as? [String] else {
+                    return nil
+                }
+                
+                // Remove friend from both lists
+                var updatedCurrentUserFriends = currentUserFriends
+                var updatedFriendUserFriends = friendUserFriends
+                
+                // Remove each other from the respective lists
+                updatedCurrentUserFriends.removeAll { $0 == friend_uid }
+                updatedFriendUserFriends.removeAll { $0 == currentUserUID }
+                
+                // Update the database with the new lists
+                transaction.updateData(["friends": updatedCurrentUserFriends], forDocument: currentUserRef)
+                transaction.updateData(["friends": updatedFriendUserFriends], forDocument: friendUserRef)
+                
+            } catch {
+                print("Error during transaction: \(error)")
+                errorPointer?.pointee = error as NSError
+                return nil
+            }
+            return nil
+        } completion: { (result, error) in
+            if let error = error {
+               // self.error = error
+                return
+            }
+            
+            print("Successfully removed friend!")
+            self.friendshipLabelText = "Add Friend"
+            self.isFriends = false
+            self.friendsList.removeLast()
+            //delete all notifications associated with friend requests
+            //self.deleteFriendRequestNotifications(user1UID: currentUserUID, user2UID: friend.uid)
+            // Optionally, reload friends after removal
+        }
+    }
+    
         // Function to check friendship status
     func checkFriendshipStatus(user1Id: String, user2Id: String) {
         print ("Calling checkFriendshipStatus")

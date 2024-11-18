@@ -27,6 +27,7 @@ struct FriendsView: View {
     
     
     var user_uid: String // The UID of the user whose friends list is being viewed
+    var viewingOtherProfile: Bool
     //------------------------------------------------------------------------------------------------
     
     var body: some View {
@@ -149,23 +150,23 @@ struct FriendsView: View {
             .padding (.leading, 15)
             
             Spacer()
-            
-            // Friends button
-            Button(action: {
-                // Trigger the alert and set the user to unfriend
-                friendToUnfriend = friend
-                showingAlert = true
-            }) {
-                Text("Friends")
-                    .font(.subheadline)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.gray)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
+            if !viewingOtherProfile {
+                // Friends button
+                Button(action: {
+                    // Trigger the alert and set the user to unfriend
+                    friendToUnfriend = friend
+                    showingAlert = true
+                }) {
+                    Text("Friends")
+                        .font(.subheadline)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                }
+                .buttonStyle(PlainButtonStyle()) // Use PlainButtonStyle to ensure no default List row interactions
             }
-            .buttonStyle(PlainButtonStyle()) // Use PlainButtonStyle to ensure no default List row interactions
-            
             //Spacer() // This will push the content to the left if needed
         }
         //.padding(.vertical, 1)
