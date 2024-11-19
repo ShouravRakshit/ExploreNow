@@ -27,6 +27,25 @@ struct PostView: View {
             self._liked = State(initialValue: liked)
         }
    
+    // Computed property to return "time ago" string (e.g., "5 days ago")
+    private var timeAgo: String {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.day, .weekOfYear, .month, .year], from: post.timestamp, to: now)
+            
+        if let year = components.year, year > 0 {
+            return "\(year) year\(year > 1 ? "s" : "") ago"
+        } else if let month = components.month, month > 0 {
+            return "\(month) month\(month > 1 ? "s" : "") ago"
+        } else if let week = components.weekOfYear, week > 0 {
+            return "\(week) week\(week > 1 ? "s" : "") ago"
+        } else if let day = components.day, day > 0 {
+            return "\(day) day\(day > 1 ? "s" : "") ago"
+        } else {
+            return "Just now"
+            }
+        }
+
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -82,6 +101,12 @@ struct PostView: View {
                 .cornerRadius(12)
             }
             
+            // Display the time ago
+            Text(timeAgo)  // Show the "time ago" string
+                .font(.system(size: 12))
+                .foregroundColor(.gray)
+                .padding(.horizontal)
+            
             // Location, Rating, Likes
             HStack {
                 Button(action: {
@@ -128,6 +153,8 @@ struct PostView: View {
             .padding(.top, 10)
             .padding(.bottom, 10)
             
+         
+            
             // Description Box
             VStack(alignment: .leading, spacing: 8) {
                 if !post.description.isEmpty {
@@ -146,6 +173,8 @@ struct PostView: View {
                 }
             }
             .padding(.horizontal)
+            
+           
             
             // Comments Section
             VStack(alignment: .leading) {

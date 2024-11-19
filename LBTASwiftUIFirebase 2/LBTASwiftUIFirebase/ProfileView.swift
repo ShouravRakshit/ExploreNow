@@ -1553,6 +1553,26 @@ struct UserPostCard: View {
     @State private var likedByUserIds: [String] = []  // Track the list of users who liked the post
     @State private var liked: Bool = false  // Track if the current user has liked the post
     
+    // Computed property to return "time ago" string (e.g., "5 days ago")
+    private var timeAgo: String {
+        let calendar = Calendar.current
+        let now = Date()
+        let components = calendar.dateComponents([.day, .weekOfYear, .month, .year], from: post.timestamp, to: now)
+            
+        if let year = components.year, year > 0 {
+            return "\(year) year\(year > 1 ? "s" : "") ago"
+        } else if let month = components.month, month > 0 {
+            return "\(month) month\(month > 1 ? "s" : "") ago"
+        } else if let week = components.weekOfYear, week > 0 {
+            return "\(week) week\(week > 1 ? "s" : "") ago"
+        } else if let day = components.day, day > 0 {
+            return "\(day) day\(day > 1 ? "s" : "") ago"
+        } else {
+            return "Just now"
+         }
+        }
+
+    
     var body: some View {
         NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
             VStack(alignment: .leading, spacing: 0) {
@@ -1598,6 +1618,13 @@ struct UserPostCard: View {
                     .font(.system(size: 14))
                     .padding(.horizontal)
                     .padding(.top, 8)
+                
+                // Display the timestamp
+                // Display the time ago
+                Text(timeAgo)  // Show the "time ago" string
+                    .font(.system(size: 12))
+                    .foregroundColor(.gray)
+                    .padding(.horizontal)
                 
                 HStack {
                     Button(action: {
