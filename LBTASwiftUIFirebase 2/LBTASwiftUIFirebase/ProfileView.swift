@@ -1562,11 +1562,11 @@ struct UserPostCard: View {
         if let year = components.year, year > 0 {
             return "\(year) yr\(year > 1 ? "s" : "") ago"
         } else if let month = components.month, month > 0 {
-            return "\(month) mo\(month > 1 ? "s" : "") ago"
+            return "\(month) mo ago"
         } else if let week = components.weekOfYear, week > 0 {
             return "\(week) wk\(week > 1 ? "s" : "") ago"
         } else if let day = components.day, day > 0 {
-            return "\(day) d\(day > 1 ? "s" : "") ago"
+            return "\(day)d ago"
         } else {
             return "Just now"
          }
@@ -1621,6 +1621,7 @@ struct UserPostCard: View {
                 
                 // Display the timestamp
                 // Display the time ago
+                
                 Text(timeAgo)  // Show the "time ago" string
                     .font(.system(size: 12))
                     .foregroundColor(.gray)
