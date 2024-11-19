@@ -1560,13 +1560,13 @@ struct UserPostCard: View {
         let components = calendar.dateComponents([.day, .weekOfYear, .month, .year], from: post.timestamp, to: now)
             
         if let year = components.year, year > 0 {
-            return "\(year) year\(year > 1 ? "s" : "") ago"
+            return "\(year) yr\(year > 1 ? "s" : "") ago"
         } else if let month = components.month, month > 0 {
-            return "\(month) month\(month > 1 ? "s" : "") ago"
+            return "\(month) mo\(month > 1 ? "s" : "") ago"
         } else if let week = components.weekOfYear, week > 0 {
-            return "\(week) week\(week > 1 ? "s" : "") ago"
+            return "\(week) wk\(week > 1 ? "s" : "") ago"
         } else if let day = components.day, day > 0 {
-            return "\(day) day\(day > 1 ? "s" : "") ago"
+            return "\(day) d\(day > 1 ? "s" : "") ago"
         } else {
             return "Just now"
          }
