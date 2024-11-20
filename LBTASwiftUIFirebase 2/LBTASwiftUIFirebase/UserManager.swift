@@ -393,7 +393,7 @@ class UserManager: ObservableObject {
         // Check if the post belongs to the current user and if the liker is not the post's author
         if post.uid != likerId {
             // Create a message for the notification
-            let message = "liked your post!"
+            let message = "liked your post."
             
             // Create a timestamp for the notification
             let timestamp = Timestamp(date: Date())
@@ -425,7 +425,7 @@ class UserManager: ObservableObject {
         // Check if the post belongs to the current user and if the commenter is not the post's author
         if post.uid != commenterId {
             // Create a message for the notification
-            let message = "commented on your post: \(commentMessage)"
+            let message = "commented on your post: \"\(commentMessage)\"."
             
             // Create a timestamp for the notification
             let timestamp = Timestamp(date: Date())
@@ -434,6 +434,38 @@ class UserManager: ObservableObject {
             let notification = Notification(
                 receiverId: post.uid,
                 senderId: commenterId,
+                message: message,
+                timestamp: timestamp,
+                isRead: false,
+                status: "Comment",
+                type: "Comment",
+                post_id: post.id
+            )
+            
+            // Save the notification to Firestore
+            saveNotificationToFirestore(notification) { success, error in
+                if success {
+                    completion(true, nil)
+                } else {
+                    completion(false, error)
+                }
+            }
+        }
+    }
+    
+    func sendCommentLikeNotification(commenterId: String, post: Post, commentMessage: String, completion: @escaping (Bool, Error?) -> Void) {
+        // Check if the post belongs to the current user and if the commenter is not the post's author
+        if post.uid != commenterId {
+            // Create a message for the notification
+            let message = "liked your comment: \"\(commentMessage)\"."
+            
+            // Create a timestamp for the notification
+            let timestamp = Timestamp(date: Date())
+            
+            // Create a Notification object for the comment
+            let notification = Notification(
+                receiverId: commenterId,
+                senderId: currentUser?.uid ?? "",
                 message: message,
                 timestamp: timestamp,
                 isRead: false,

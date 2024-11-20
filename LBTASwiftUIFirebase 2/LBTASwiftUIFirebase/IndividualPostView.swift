@@ -405,6 +405,19 @@ struct PostView: View {
                 if let index = self.comments.firstIndex(where: { $0.id == comment.id }) {
                     self.comments[index].likeCount = comment.likedByCurrentUser ? comment.likeCount - 1 : comment.likeCount + 1
                     self.comments[index].likedByCurrentUser = !comment.likedByCurrentUser // Toggle like status locally
+                    
+                    //call function to send notification to user for the comment liked
+                    userManager.sendCommentLikeNotification(commenterId: comment.userID, post: post, commentMessage: comment.text) { success, error in
+                        if success {
+                            print("Comment-like notification sent successfully!")
+                        } else {
+                            if let error = error {
+                                print("Failed to send Comment-like notification: \(error.localizedDescription)")
+                            } else {
+                                print("Failed to send Comment-like notification for an unknown reason.")
+                            }
+                        }
+                    }
                 }
             }
         }
