@@ -114,12 +114,7 @@ struct ProfileView: View {
                 
                 
                 ScrollView {
-                    
-                    VStack {
-                        Text ("")
-                    }
-                    .padding(.top, 5)  // Optional: Add horizontal padding to give some space on the sides
-                    
+
                     // Profile Info Section
                     HStack {
                         let imageUrl = viewingOtherProfile ? (profileUser?.profileImageUrl ?? "") : (userManager.currentUser?.profileImageUrl ?? "")
@@ -461,7 +456,6 @@ struct ProfileView: View {
                     case .moreOptions:
                         return ActionSheet(
                             title: Text("User Actions"),
-                            message: Text(""),
                             buttons: [
                                 .destructive(Text("Block"), action: {
                                     // Call function to block user here
