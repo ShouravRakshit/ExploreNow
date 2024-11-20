@@ -16,8 +16,9 @@ struct PostView: View {
     @State private var likesCount: Int = 0  // Track the like count
     @State private var liked: Bool = false  // Track if the current user has liked the post
     @State private var post: Post
+    @State private var selectedEmoji: String? = nil // Variable to store selected emoji
     @State private var showEmojiPicker = false  // Toggle to show/hide the emoji picker
-       
+ 
    
 
         // Custom initializer to accept values passed from `PostCard`
@@ -26,6 +27,31 @@ struct PostView: View {
             self._likesCount = State(initialValue: likesCount)
             self._liked = State(initialValue: liked)
         }
+    
+      private var emojiPicker: some View {
+          let emojis: [String] = ["😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳"]
+          
+          return VStack {
+              LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                  ForEach(emojis, id: \.self) { emoji in
+                      Button(action: {
+                    // Add selected emoji to commentText
+                            commentText += emoji
+                            showEmojiPicker = false  // Hide the picker after selecting an emoji
+                    }) {
+                            Text(emoji)
+                                    .font(.largeTitle)
+                                     }
+                                 }
+                             }
+              .padding()
+              .background(Color.white)
+              .cornerRadius(10)
+              .shadow(radius: 5)
+          }
+      }
+  
+
    
     // Computed property to return "time ago" string (e.g., "5 days ago")
     private var timeAgo: String {
@@ -46,7 +72,6 @@ struct PostView: View {
             }
         }
 
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
            
@@ -297,8 +322,15 @@ struct PostView: View {
                     
                             .padding(.leading, 5)
                     
-                 
-                  
+                    Button(action: {
+                        withAnimation {
+                            showEmojiPicker.toggle()
+                        }
+                        }) {
+                            Image(systemName: "face.smiling")
+                                .font(.system(size: 24))
+                                .foregroundColor(Color(.darkGray))
+                    }
                                       
                     
                     Button(action: addComment) {
@@ -313,8 +345,14 @@ struct PostView: View {
                 }
                 .padding(.horizontal)
                 
+                // Conditional rendering of the emoji picker
+                if showEmojiPicker {
+                    emojiPicker  // Display the emoji picker when `showEmojiPicker` is true
+                        .transition(.move(edge: .bottom))  // Add a transition for a smooth animation
+                            }
+                        }
                 
-            }
+            
             
             .padding(.bottom, 20)
             .onAppear {
