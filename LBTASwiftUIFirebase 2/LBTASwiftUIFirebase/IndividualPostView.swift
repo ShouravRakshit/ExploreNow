@@ -6,6 +6,16 @@ import SDWebImageSwiftUI
 import MapKit
 import CoreLocation
 
+
+
+extension Comment {
+    func formattedTimestamp() -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full // Options: .full, .short, .abbreviated
+        return formatter.localizedString(for: timestamp, relativeTo: Date())
+    }
+}
+
 struct PostView: View {
     @EnvironmentObject var userManager: UserManager
     @State private var comments: [Comment] = []
@@ -16,8 +26,9 @@ struct PostView: View {
     @State private var likesCount: Int = 0  // Track the like count
     @State private var liked: Bool = false  // Track if the current user has liked the post
     @State private var post: Post
+    @State private var selectedEmoji: String? = nil // Variable to store selected emoji
     @State private var showEmojiPicker = false  // Toggle to show/hide the emoji picker
-       
+ 
    
 
         // Custom initializer to accept values passed from `PostCard`
@@ -26,6 +37,57 @@ struct PostView: View {
             self._likesCount = State(initialValue: likesCount)
             self._liked = State(initialValue: liked)
         }
+    
+      private var emojiPicker: some View {
+          let emojis: [String] = ["😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳"]
+          
+          return VStack {
+              LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                  ForEach(emojis, id: \.self) { emoji in
+                      Button(action: {
+                    // Add selected emoji to commentText
+                            commentText += emoji
+                            showEmojiPicker = false  // Hide the picker after selecting an emoji
+                    }) {
+                            Text(emoji)
+                                    .font(.largeTitle)
+                                     }
+                                 }
+                             }
+              .padding()
+              .background(Color.white)
+              .cornerRadius(10)
+              .shadow(radius: 5)
+          }
+      }
+  
+    private func formatCommentTimestamp(_ timestamp: Date) -> String {
+        let currentTime = Date()
+        let timeInterval = currentTime.timeIntervalSince(timestamp)
+        
+        let secondsInMinute: TimeInterval = 60
+        let secondsInHour: TimeInterval = 3600
+        let secondsInDay: TimeInterval = 86400
+        let secondsInWeek: TimeInterval = 604800
+        
+        if timeInterval < secondsInMinute {
+            return "Just now"
+        } else if timeInterval < secondsInHour {
+            let minutes = Int(timeInterval / secondsInMinute)
+            return "\(minutes) min ago"
+        } else if timeInterval < secondsInDay {
+            let hours = Int(timeInterval / secondsInHour)
+            return "\(hours) hr ago"
+        } else if timeInterval < secondsInWeek {
+            let days = Int(timeInterval / secondsInDay)
+            return "\(days) day(s) ago"
+        } else {
+            let weeks = Int(timeInterval / secondsInWeek)
+            return "\(weeks) week(s) ago"
+        }
+        
+    }
+
    
     // Computed property to return "time ago" string (e.g., "5 days ago")
     private var timeAgo: String {
@@ -46,7 +108,6 @@ struct PostView: View {
             }
         }
 
-    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
            
@@ -224,13 +285,19 @@ struct PostView: View {
                                             .clipShape(Circle())
                                     }
                                     
+                                    
+                                    
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(userData[comment.userID]?.username ?? "Loading...")
                                             .font(.subheadline)
                                             .bold()
                                         Text(comment.text)
                                             .font(.body)
+                                        Text(comment.timestampString ?? "Unknown time")
+                                                   .font(.subheadline)
+                                                   .foregroundColor(.gray)
                                     }
+                                    
                                     
                                     Spacer()
                                     
@@ -297,8 +364,15 @@ struct PostView: View {
                     
                             .padding(.leading, 5)
                     
-                 
-                  
+                    Button(action: {
+                        withAnimation {
+                            showEmojiPicker.toggle()
+                        }
+                        }) {
+                            Image(systemName: "face.smiling")
+                                .font(.system(size: 24))
+                                .foregroundColor(Color(.darkGray))
+                    }
                                       
                     
                     Button(action: addComment) {
@@ -308,13 +382,21 @@ struct PostView: View {
                         // Emoji Picker Sheet
                         // Emoji Picker Overlay
                         
+                        
                     }
                     .padding(.leading, 5)
+                    
                 }
                 .padding(.horizontal)
                 
+                // Conditional rendering of the emoji picker
+                if showEmojiPicker {
+                    emojiPicker  // Display the emoji picker when `showEmojiPicker` is true
+                        .transition(.move(edge: .bottom))  // Add a transition for a smooth animation
+                            }
+                        }
                 
-            }
+            
             
             .padding(.bottom, 20)
             .onAppear {
@@ -359,69 +441,69 @@ struct PostView: View {
 
     
     private func toggleLikeForComment(_ comment: Comment) {
-        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        
-        let db = FirebaseManager.shared.firestore
-        let commentRef = db.collection("comments").document(comment.id)
-        
-        // Update the like status in Firestore
-        db.runTransaction { (transaction, errorPointer) -> Any? in
-            let documentSnapshot: DocumentSnapshot
-            do {
-                try documentSnapshot = transaction.getDocument(commentRef)
-            } catch let error {
-                print("Failed to fetch comment: \(error)")
-                return nil
-            }
-            
-            guard let currentLikeCount = documentSnapshot.data()?["likeCount"] as? Int else {
-                print("Comment data is missing like count")
-                return nil
-            }
-            
-            // Check if the current user has already liked the comment
-            var newLikeCount = currentLikeCount
-            var newLikedByUser = comment.likedByCurrentUser
-            
-            if comment.likedByCurrentUser {
-                newLikeCount -= 1  // Dislike action
-                newLikedByUser = false
-            } else {
-                newLikeCount += 1  // Like action
-                newLikedByUser = true
-            }
-            
-            transaction.updateData([
-                "likeCount": newLikeCount,
-                "likedByCurrentUser": newLikedByUser // Update likedByCurrentUser field in Firestore
-            ], forDocument: commentRef)
-            
-            return nil
-        } completion: { _, error in
-            if let error = error {
-                print("Transaction failed: \(error)")
-            } else {
-                // Update the local state to reflect changes immediately
-                if let index = self.comments.firstIndex(where: { $0.id == comment.id }) {
-                    self.comments[index].likeCount = comment.likedByCurrentUser ? comment.likeCount - 1 : comment.likeCount + 1
-                    self.comments[index].likedByCurrentUser = !comment.likedByCurrentUser // Toggle like status locally
-                    
-                    //call function to send notification to user for the comment liked
-                    userManager.sendCommentLikeNotification(commenterId: comment.userID, post: post, commentMessage: comment.text) { success, error in
-                        if success {
-                            print("Comment-like notification sent successfully!")
-                        } else {
-                            if let error = error {
-                                print("Failed to send Comment-like notification: \(error.localizedDescription)")
-                            } else {
-                                print("Failed to send Comment-like notification for an unknown reason.")
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+          guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+          
+          let db = FirebaseManager.shared.firestore
+          let commentRef = db.collection("comments").document(comment.id)
+          
+          // Fetch current comment data from Firestore
+          commentRef.getDocument { documentSnapshot, error in
+              if let error = error {
+                  print("Failed to fetch comment data: \(error)")
+                  return
+              }
+              
+              guard let documentSnapshot = documentSnapshot, let commentData = documentSnapshot.data() else {
+                  print("Document does not exist or data is missing")
+                  return
+              }
+              
+              // Retrieve the current like count and likedByCurrentUser dictionary
+              var currentLikeCount = commentData["likeCount"] as? Int ?? 0
+              var likedByCurrentUser = commentData["likedByCurrentUser"] as? [String: Bool] ?? [:]
+              
+              // Check if the current user has already liked the comment
+              if likedByCurrentUser[currentUserId] == true {
+                  // User has liked the comment, so we'll remove their like
+                  currentLikeCount -= 1
+                  likedByCurrentUser[currentUserId] = nil // Remove the user from the likedByCurrentUser dictionary
+              } else {
+                  // User hasn't liked the comment, so we'll add their like
+                  currentLikeCount += 1
+                  likedByCurrentUser[currentUserId] = true // Add the user to the likedByCurrentUser dictionary
+              }
+              
+              // Update the comment's data in Firestore
+              commentRef.updateData([
+                  "likeCount": currentLikeCount,
+                  "likedByCurrentUser": likedByCurrentUser
+              ]) { error in
+                  if let error = error {
+                      print("Error updating like data: \(error)")
+                  } else {
+                      // After successfully updating the data, update the local state (UI)
+                      if let index = self.comments.firstIndex(where: { $0.id == comment.id }) {
+                          self.comments[index].likeCount = currentLikeCount
+                          self.comments[index].likedByCurrentUser = likedByCurrentUser[currentUserId] ?? false
+                      }
+                      
+                      // Optionally, send a notification when the comment is liked or unliked
+                      userManager.sendCommentLikeNotification(commenterId: comment.userID, post: post, commentMessage: comment.text) { success, error in
+                          if success {
+                              print("Comment-like notification sent successfully!")
+                          } else {
+                              if let error = error {
+                                  print("Failed to send Comment-like notification: \(error.localizedDescription)")
+                              } else {
+                                  print("Failed to send Comment-like notification for an unknown reason.")
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+      }
+
 
     private func addComment() {
         guard !commentText.isEmpty else { return } // Avoid posting empty comments
@@ -476,23 +558,78 @@ struct PostView: View {
         }
     }
 
-    private func fetchComments() {
-        let db = FirebaseManager.shared.firestore
-        db.collection("comments")
-            .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
-            .order(by: "timestamp", descending: true)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching comments: \(error)")
-                } else {
-                    // Decode Firestore documents into Comment objects
-                    self.comments = snapshot?.documents.compactMap { document in
-                        Comment(document: document)
-                    } ?? []
+    private func updateCommentUI() {
+          
+           for comment in self.comments {
+               
+               if let index = self.comments.firstIndex(where: { $0.id == comment.id }) {
+                   let isLiked = comment.likedByCurrentUser
                    
-                }
-            }
-    }
+                   updateLikeButtonAppearance(for: comment, isLiked: isLiked)
+               }
+           }
+       }
+
+       private func updateLikeButtonAppearance(for comment: Comment, isLiked: Bool) {
+          
+           
+           let likeButton = getLikeButton(for: comment) // A method to get the button or image view for the specific comment
+           
+           if isLiked {
+               likeButton.setImage(UIImage(named: "red_heart"), for: .normal)
+           } else {
+               likeButton.setImage(UIImage(named: "default_heart"), for: .normal)
+           }
+       }
+
+       private func getLikeButton(for comment: Comment) -> UIButton {
+           
+           
+           return UIButton()
+       }
+
+       private func fetchComments() {
+           let db = FirebaseManager.shared.firestore
+           db.collection("comments")
+               .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
+               .order(by: "timestamp", descending: true)
+               .getDocuments { snapshot, error in
+                   if let error = error {
+                       print("Error fetching comments: \(error)")
+                   } else {
+                       // Decode Firestore documents into Comment objects
+                       self.comments = snapshot?.documents.compactMap { document in
+                           // Initialize the Comment object
+                           var comment = Comment(document: document)
+                           
+                           // Fetch the 'likedByCurrentUser' dictionary to see if the current user liked the comment
+                           guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return comment }
+                           
+                           // Format the timestamp and update the comment object
+                           if let timestamp = document.data()["timestamp"] as? Timestamp {
+                               let timestampDate = timestamp.dateValue()
+                               comment?.timestampString = formatCommentTimestamp(timestampDate) // Store the formatted timestamp
+                           }
+
+
+                           
+                           // Fetch the likedByCurrentUser field
+                           if let likedByCurrentUser = document.data()["likedByCurrentUser"] as? [String: Bool],
+                              let isLikedByCurrentUser = likedByCurrentUser[currentUserId] {
+                               comment?.likedByCurrentUser = isLikedByCurrentUser
+                           } else {
+                               comment?.likedByCurrentUser = false
+                           }
+                           
+                           // Return the comment object
+                           return comment
+                       } ?? []
+
+                       // Once we have all the comments with the 'likedByCurrentUser' information, we can update the UI accordingly
+                       self.updateCommentUI()
+                   }
+               }
+       }
 
     // Function to fetch user data
     private func fetchUserData(for userID: String, completion: @escaping (String, String?) -> Void) {
