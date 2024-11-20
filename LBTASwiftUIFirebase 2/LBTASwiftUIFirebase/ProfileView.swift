@@ -27,6 +27,7 @@ struct ProfileView: View {
     //for removing friend
     @State private var showingAlert = false
     @State private var isBlocked: Bool = false
+    @State private var didBlockUser: Bool = false  //if you blocked the user
     @State private var isCheckingBlockedStatus: Bool = true // Track the status check
 
     
@@ -144,18 +145,36 @@ struct ProfileView: View {
                         
                         // Post Counts
                         VStack {
-                            Text("\(userPosts.count)")
-                                .font(.system(size: 20, weight: .bold))
-                            Text("\(userPosts.count == 1 ? "Post" : "Posts")")
-                                .font(.system(size: 16))
+                            
+                            if didBlockUser {
+                                Text("0")
+                                    .font(.system(size: 20, weight: .bold))
+                                Text("Posts")
+                                    .font(.system(size: 16))   
+                            }
+                            else {
+                                Text("\(userPosts.count)")
+                                    .font(.system(size: 20, weight: .bold))
+                                Text("\(userPosts.count == 1 ? "Post" : "Posts")")
+                                    .font(.system(size: 16))
+                            }
                         }.padding(.horizontal, 40)
                         
                         // Friends Counts
                         VStack {
-                            Text("\(friendsList.count)")
-                                .font(.system(size: 20, weight: .bold))
-                            Text("\(friendsList.count == 1 ? "Friend" : "Friends")")
-                                .font(.system(size: 16))
+                            if didBlockUser {
+                                Text("0")
+                                    .font(.system(size: 20, weight: .bold))
+                                Text("Friends")
+                                    .font(.system(size: 16))
+                            }
+                            else{
+                                Text("\(friendsList.count)")
+                                    .font(.system(size: 20, weight: .bold))
+                                Text("\(friendsList.count == 1 ? "Friend" : "Friends")")
+                                    .font(.system(size: 16))
+                            }
+                        
                         }
                         .padding(.horizontal, 10)
                         .onTapGesture {
@@ -210,8 +229,11 @@ struct ProfileView: View {
                     if viewingOtherProfile {
                         HStack{
                             Button(action: {
+                                if (self.didBlockUser) {
+                                    unblockUser (userId: user_uid)
+                                }
                                 //if request tapped -> remove friend request
-                                if (self.isRequestSentToOtherUser)
+                                else if (self.isRequestSentToOtherUser)
                                 {
                                     deleteFriendRequest ()
                                 }
@@ -262,7 +284,11 @@ struct ProfileView: View {
                                     .foregroundColor(.white) // White text color
                                     .padding() // Add padding inside the button
                                     .frame(maxWidth: .infinity) // Make the button expand to full width
-                                    .background((isRequestSentToOtherUser || isFriends) ? Color.gray : Color.customPurple) // Gray if requested or friends, else purple
+                                    .background(
+                                        self.didBlockUser
+                                        ? Color.red // Red if the user is blocked
+                                        : (isRequestSentToOtherUser || isFriends ? Color.gray : Color.customPurple) // Gray if requested or friends, else purple
+                                    )
                                     .cornerRadius(25) // Rounded corners
                                     .shadow(radius: 5) // Optional shadow for depth
                             }
@@ -459,6 +485,7 @@ struct ProfileView: View {
                             buttons: [
                                 .destructive(Text("Block"), action: {
                                     // Call function to block user here
+                                    blockUser (userId: user_uid)
                                 }),
                                 .cancel()
                             ]
@@ -472,6 +499,9 @@ struct ProfileView: View {
                          primaryButton: .destructive(Text("Unfriend")) {
                              // Unfriend action: Add your unfriending logic here
                              removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", profileUser?.uid ?? "")
+                             self.friendshipLabelText = "Add Friend"
+                             self.isFriends = false
+                             self.friendsList.removeLast()
                          },
                          secondaryButton: .cancel {
                              // Cancel action (dismiss the alert)
@@ -528,12 +558,71 @@ struct ProfileView: View {
             }
             
             print("Successfully removed friend!")
+            /*
             self.friendshipLabelText = "Add Friend"
             self.isFriends = false
-            self.friendsList.removeLast()
+            self.friendsList.removeLast()*/
             //delete all notifications associated with friend requests
             //self.deleteFriendRequestNotifications(user1UID: currentUserUID, user2UID: friend.uid)
             // Optionally, reload friends after removal
+        }
+    }
+    
+    func unblockUser(userId: String) {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+
+        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+
+        // Remove the blocked user from the current user's blocks list
+        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
+            if let error = error {
+                print("Error unblocking user: \(error)")
+            } else {
+                print("User unblocked successfully.")
+                //self.blocked_users.removeAll { $0.uid == userId }
+                
+                self.didBlockUser = false
+                self.friendshipLabelText = "Add Friend"
+            }
+        }
+
+        // Remove the current user from the blocked user's 'blockedBy' list
+        blockedUserRef.setData(["blockedByIds": FieldValue.arrayRemove([currentUserId])], merge: true) { error in
+            if let error = error {
+                print("Error removing blockedBy for user: \(error)")
+            }
+        }
+    }
+    
+    func blockUser(userId: String) {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+
+        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+
+        // Add the blocked user to the current user's blocks list
+        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
+            if let error = error {
+                print("Error blocking user: \(error)")
+            } else {
+                print("User blocked successfully.")
+                //clear all possible friendship statuses
+                self.isFriends = false
+                self.didUserSendMeRequest = false
+                self.isRequestSentToOtherUser = false
+                self.didBlockUser = true
+                self.friendshipLabelText = "Unblock"
+                
+                self.removeFriend (currentUserUID: currentUserId, user_uid)
+            }
+        }
+
+        // Add the current user to the blocked user's 'blockedBy' list
+        blockedUserRef.setData(["blockedByIds": FieldValue.arrayUnion([currentUserId])], merge: true) { error in
+            if let error = error {
+                print("Error adding blockedBy for user: \(error)")
+            }
         }
     }
     
@@ -609,6 +698,12 @@ struct ProfileView: View {
                     //completion(isRequestSentToOtherUser, isFriends)
                 }
             }
+            if didBlockUser {
+                friendshipLabelText = "Unblock"
+                print ("Setting friendship label to Unblock")
+                return
+            }
+            
             if !isRequestSentToOtherUser && !isFriends{
                 friendshipLabelText = "Add Friend"
                 print ("Setting friendship label to Add friend")
@@ -694,9 +789,13 @@ struct ProfileView: View {
                 let profileUserBlockedList = profileDocument?.data()?["blockedUserIds"] as? [String] ?? []
 
                 // Check if either user is blocked
-                if currentUserBlockedList.contains(user_uid) || profileUserBlockedList.contains(currentUserId) {
+                if profileUserBlockedList.contains(currentUserId) {
                     self.isBlocked = true
-                } else {
+                }
+                else if currentUserBlockedList.contains(user_uid) {
+                    self.didBlockUser = true
+                }
+                else {
                     self.isBlocked = false
                 }
 
