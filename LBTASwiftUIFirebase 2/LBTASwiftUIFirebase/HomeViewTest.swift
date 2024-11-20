@@ -10,18 +10,36 @@ struct HomeViewTest: View {
     @State private var posts: [Post] = []
     @State private var isLoading = true
     @State private var friendIds: Set<String> = []
-    
+    @State private var navigateToSearchView = false
+
     var body: some View {
         NavigationView {
             VStack {
                 // Header with notification bell
                 HStack {
+                    // Search Icon
+
                     Text("ExploreNow")
                         .font(.title)
                         .fontWeight(.bold)
-                        .padding(.leading)
-                    
+                        .padding(.leading, 15)
+
                     Spacer()
+                    
+                    Button(action: {
+                        navigateToSearchView = true
+                    }) {
+                        Image(systemName: "magnifyingglass")
+                            .resizable()
+                            .frame(width: 24, height: 24)
+                            .foregroundColor(Color.customPurple)
+                    }
+                    .padding(.trailing, 15)
+                     
+                    // Navigation to AllUsersSearchView
+                    NavigationLink(destination: AllUsersSearchView(), isActive: $navigateToSearchView) {
+                                        EmptyView()
+                    }
                     
                     // NavigationLink that wraps the bell icon
                     NavigationLink(destination: NotificationView(userManager: userManager), isActive: $navigateToNotifications) {

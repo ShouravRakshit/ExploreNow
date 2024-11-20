@@ -1334,7 +1334,10 @@ struct ProfileView: View {
         }
         
     func checkBlockedStatus() {
-        let currentUserId = userManager.currentUser?.uid ?? ""
+        guard let currentUserId = userManager.currentUser?.uid else {
+            isCheckingBlockedStatus = false
+            return
+        }
         let userBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
         let profileBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(user_uid)
 
@@ -1342,7 +1345,7 @@ struct ProfileView: View {
         userBlocksRef.getDocument { document, error in
             if let error = error {
                 print("Error fetching current user's blocked list: \(error.localizedDescription)")
-                isCheckingBlockedStatus = false // Stop loading even if there's an error
+                isCheckingBlockedStatus = false
                 return
             }
 
@@ -1351,7 +1354,7 @@ struct ProfileView: View {
             profileBlocksRef.getDocument { profileDocument, error in
                 if let error = error {
                     print("Error fetching profile user's blocked list: \(error.localizedDescription)")
-                    isCheckingBlockedStatus = false // Stop loading even if there's an error
+                    isCheckingBlockedStatus = false
                     return
                 }
 
@@ -1364,10 +1367,11 @@ struct ProfileView: View {
                     self.isBlocked = false
                 }
 
-                isCheckingBlockedStatus = false // Status check complete
+                isCheckingBlockedStatus = false
             }
         }
     }
+
     
         private func fetchUserPosts(uid: String) {
             isLoading = true
