@@ -10,10 +10,16 @@ import Foundation
 class AllUsersSearchViewModel: ObservableObject {
     @Published var users = [User]() // Use your User model
     @Published var filteredUsers = [User]()
-    @Published var searchQuery = ""
-    @Published var blockedUsers: [String] = [] // UIDs of blocked users
-    private var currentUserId: String?
+    @Published var searchQuery = ""{
+        didSet {
+            filterUsers()
+        }
+    }
+    @Published var blockedUsers: [String] = []
     @Published var blockedByUsers: [String] = []
+    private var currentUserId: String?
+
+    private var searchCache: [String: [User]] = [:] // Cache for search queries
     
     init() {
         currentUserId = FirebaseManager.shared.auth.currentUser?.uid
@@ -82,13 +88,24 @@ class AllUsersSearchViewModel: ObservableObject {
     }
 
     func filterUsers() {
-        if searchQuery.isEmpty {
-            filteredUsers = users
-        } else {
-            filteredUsers = users.filter { user in
-                user.name.lowercased().contains(searchQuery.lowercased()) ||
-                user.username.lowercased().contains(searchQuery.lowercased())
+            DispatchQueue.main.async {
+                let query = self.searchQuery.lowercased()
+
+                if query.isEmpty {
+                    self.filteredUsers = []
+                } else if let cachedResults = self.searchCache[query] {
+                    // Use cached results
+                    self.filteredUsers = cachedResults
+                } else {
+                    // Perform filtering and cache the results
+                    let results = self.users.filter { user in
+                        user.name.lowercased().contains(query) ||
+                        user.username.lowercased().contains(query)
+                    }
+                    self.searchCache[query] = results
+                    self.filteredUsers = results
+                }
             }
         }
     }
-}
+
