@@ -470,7 +470,7 @@ class UserManager: ObservableObject {
                 timestamp: timestamp,
                 isRead: false,
                 status: "Comment",
-                type: "CommentLike",
+                type: "Comment",
                 post_id: post.id
             )
             
