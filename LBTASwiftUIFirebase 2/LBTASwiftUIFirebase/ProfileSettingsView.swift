@@ -312,10 +312,11 @@ struct ProfileSettingsView: View {
 
     @State private var selectedRow: String? // Track the selected row
 
-    @State private var showEditView = false
+    @State private var showEditView       = false
     @State private var showChangePassword = false
+    @State private var showBlockedUsers   = false
 
-    @State private var isUploading = false // Loading state
+    @State private var isUploading  = false // Loading state
     @State private var showingAlert = false
 
     var body: some View {
@@ -325,7 +326,7 @@ struct ProfileSettingsView: View {
                 Image(systemName: "chevron.left")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 25, height: 25)
                     .padding()
                     .foregroundColor(Color.customPurple)
                     .onTapGesture {
@@ -334,7 +335,7 @@ struct ProfileSettingsView: View {
                     }
                 Spacer()
                 Text("Settings")
-                    .font(.custom("Sansation-Regular", size: 30))
+                    .font(.custom("Sansation-Regular", size: 25))
                     .foregroundColor(Color.customPurple)
                     .offset(x: -30)
                 Spacer()
@@ -486,21 +487,29 @@ struct ProfileSettingsView: View {
                 Divider()
             }
             
+            Text("Blocked Users >")
+                .padding(.top, 10)
+                .font(.custom("Sansation-Regular", size: 18))
+                .foregroundColor(.customPurple)
+                .onTapGesture {
+                    showBlockedUsers = true
+                }
+            
             ToggleButtonView(userId: userManager.currentUser?.uid ?? "")
 
-            Text("Change Password")
+            Text("Change Password >")
                 .padding(.top, 10)
-                .font(.custom("Sansation-Regular", size: 23))
-                .foregroundColor(.blue)
-                .underline() // Underline the text
+                .font(.custom("Sansation-Regular", size: 18))
+                .foregroundColor(.customPurple)
+                //.underline() // Underline the text
                 .onTapGesture {
                     showChangePassword = true
                 }
             
             Text("Delete Account")
                 .padding(.top, 10)
-                .font(.custom("Sansation-Regular", size: 23))
-                .foregroundColor(.blue)
+                .font(.custom("Sansation-Regular", size: 18))
+                .foregroundColor(.customPurple)
                 .underline() // Underline the text
                 .onTapGesture {
                     showingAlert = true
@@ -538,6 +547,10 @@ struct ProfileSettingsView: View {
         }
         .fullScreenCover(isPresented: $showChangePassword) {
             ChangePasswordView()
+                .environmentObject(userManager)
+        }
+        .fullScreenCover(isPresented: $showBlockedUsers) {
+            BlockedUsersView()
                 .environmentObject(userManager)
         }
         .alert(isPresented: $showingAlert) {

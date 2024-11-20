@@ -50,6 +50,8 @@
 		B01523482CC82ED90012FC49 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523472CC82ED50012FC49 /* EditView.swift */; };
 		B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */; };
 		B01DE7132CC199A000C158DD /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7122CC199A000C158DD /* MainMessagesView.swift */; };
+		B022884E2CEE520C0089FB7A /* BlockedUsersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B022884D2CEE52070089FB7A /* BlockedUsersView.swift */; };
+		B02288502CEE56220089FB7A /* BlockedManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B022884F2CEE561F0089FB7A /* BlockedManager.swift */; };
 		B02392912CBDD511007CC920 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B02392902CBDD511007CC920 /* GoogleService-Info.plist */; };
 		B02A96A92CC0AB81008B6E8B /* Sansation-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */; };
 		B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B02A96AB2CC0ACCF008B6E8B /* SignUpView.swift */; };
@@ -105,6 +107,8 @@
 		B01523472CC82ED50012FC49 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicView.swift; sourceTree = "<group>"; };
 		B01DE7122CC199A000C158DD /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
+		B022884D2CEE52070089FB7A /* BlockedUsersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedUsersView.swift; sourceTree = "<group>"; };
+		B022884F2CEE561F0089FB7A /* BlockedManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockedManager.swift; sourceTree = "<group>"; };
 		B02392902CBDD511007CC920 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Sansation-Regular.ttf"; sourceTree = "<group>"; };
 		B02A96AA2CC0AC21008B6E8B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -169,6 +173,8 @@
 		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
 			isa = PBXGroup;
 			children = (
+				B022884F2CEE561F0089FB7A /* BlockedManager.swift */,
+				B022884D2CEE52070089FB7A /* BlockedUsersView.swift */,
 				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
 				2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */,
 				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
@@ -354,6 +360,7 @@
 			files = (
 				B0F30F2A2CE9863400F4EFE4 /* FriendsView.swift in Sources */,
 				B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */,
+				B022884E2CEE520C0089FB7A /* BlockedUsersView.swift in Sources */,
 				68D3B3982CCA37A200166069 /* AddPhotos.swift in Sources */,
 				B036A85B2CEA764D00820825 /* UserSettingsManager.swift in Sources */,
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
@@ -369,6 +376,7 @@
 				81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */,
 				10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
+				B02288502CEE56220089FB7A /* BlockedManager.swift in Sources */,
 				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				81447E872CB42B86005BE180 /* CreateNewMessageView.swift in Sources */,
 				684A510D2CE1D0D500383B08 /* IndividualPostView.swift in Sources */,
