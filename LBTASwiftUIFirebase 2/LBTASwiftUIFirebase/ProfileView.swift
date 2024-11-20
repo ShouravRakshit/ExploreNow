@@ -21,6 +21,7 @@ struct ProfileView: View {
     @State private var friendsList: [String] = []
     //for navigating to different pages
     @State private var shouldShowLogOutOptions = false
+    @State private var shouldShowMoreOptions = false //block user
     @State private var showProfileSettings = false
     @State private var showFriendsList = false
     //for removing friend
@@ -30,6 +31,22 @@ struct ProfileView: View {
 
     
     var user_uid: String // The UID of the user whose profile is being viewed
+    
+    @State private var activeActionSheet: ActiveSheet? = nil
+
+    enum ActiveSheet: Identifiable {
+        case settings
+        case moreOptions
+
+        var id: String {
+            switch self {
+            case .settings:
+                return "settings"
+            case .moreOptions:
+                return "moreOptions"
+            }
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -67,11 +84,25 @@ struct ProfileView: View {
             
             VStack(alignment: .leading) {
                 
-                if !viewingOtherProfile {
+                //block user option
+                if viewingOtherProfile{
+                    HStack {
+                        Spacer()
+                        Image(systemName: "ellipsis.circle") // 3-dots icon
+                            .font(.title)
+                            .foregroundColor(.primary)
+                            .onTapGesture {
+                                activeActionSheet = .moreOptions
+                            }
+                    }
+                    .padding (.trailing, 10)
+                }
+                
+               else { //viewing your own profile
                     HStack {
                         Spacer()
                         Button(action: {
-                            shouldShowLogOutOptions = true
+                            activeActionSheet = .settings
                         }) {
                             Image(systemName: "gearshape.fill")
                                 .font(.system(size: 25))
@@ -80,6 +111,7 @@ struct ProfileView: View {
                     }
                     .padding (.trailing, 10)
                 }
+                
                 
                 ScrollView {
                     
@@ -141,6 +173,7 @@ struct ProfileView: View {
                             }
                         
                         Spacer()
+
                     }
                     .padding(.horizontal)
                     
@@ -408,16 +441,35 @@ struct ProfileView: View {
                     }
                 }
                 
-                .actionSheet(isPresented: $shouldShowLogOutOptions) {
-                    ActionSheet(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [
-                        .default(Text("Edit Profile"), action: {
-                            showProfileSettings = true
-                        }),
-                        .destructive(Text("Sign Out"), action: {
-                            handleSignOut()
-                        }),
-                        .cancel()
-                    ])
+                .actionSheet(item: $activeActionSheet) { sheet in
+                    switch sheet {
+                    case .settings:
+                        return ActionSheet(
+                            title: Text("Settings"),
+                            message: Text("What do you want to do?"),
+                            buttons: [
+                                .default(Text("Edit Profile"), action: {
+                                    showProfileSettings = true
+                                }),
+                                .destructive(Text("Sign Out"), action: {
+                                    handleSignOut()
+                                }),
+                                .cancel()
+                            ]
+                        )
+                        
+                    case .moreOptions:
+                        return ActionSheet(
+                            title: Text("User Actions"),
+                            message: Text(""),
+                            buttons: [
+                                .destructive(Text("Block"), action: {
+                                    // Call function to block user here
+                                }),
+                                .cancel()
+                            ]
+                        )
+                    }
                 }
                 .alert(isPresented: $showingAlert) {
                      Alert(
