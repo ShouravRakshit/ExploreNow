@@ -497,26 +497,55 @@ struct ProfileSettingsView: View {
             
             ToggleButtonView(userId: userManager.currentUser?.uid ?? "")
 
-            Text("Change Password >")
-                .padding(.top, 10)
-                .font(.custom("Sansation-Regular", size: 18))
-                .foregroundColor(.customPurple)
-                //.underline() // Underline the text
-                .onTapGesture {
-                    showChangePassword = true
-                }
+//            Text("Change Password >")
+//                .padding(.top, 10)
+//                .font(.custom("Sansation-Regular", size: 18))
+//                .foregroundColor(.customPurple)
+//                //.underline() // Underline the text
+//                .onTapGesture {
+//                    showChangePassword = true
+//                }
             
-            Text("Delete Account")
-                .padding(.top, 10)
-                .font(.custom("Sansation-Regular", size: 18))
-                .foregroundColor(.customPurple)
-                .underline() // Underline the text
-                .onTapGesture {
-                    showingAlert = true
+            Button(action: {
+                    showChangePassword = true
+                }) {
+                    Text("Change Password")
+                        .font(.custom("Sansation-Regular", size: 16))
+                        .frame(width: 360, height: 50)
+                        .background(Color.purple)
+                        .foregroundColor(.white)
+                        .cornerRadius(22)
+                        .shadow(radius: 4)
                 }
+                .padding(.top, 5)
+            
+//            Text("Delete Account")
+//                .padding(.top, 10)
+//                .font(.custom("Sansation-Regular", size: 18))
+//                .foregroundColor(.customPurple)
+//                .underline() // Underline the text
+//                .onTapGesture {
+//                    showingAlert = true
+//                }
+            
+            // "Delete Account" Button
+            Button(action: {
+                    showingAlert = true
+                }) {
+                    Text("Delete Account")
+                        .font(.custom("Sansation-Regular", size: 16))
+                        .frame(width: 360, height: 50)
+                        .background(Color.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(22)  // Rounded corners
+                        .shadow(radius: 4) // Add shadow to match the visual style
+                }
+                .padding(.top, 5)
 
-            Spacer() // Pushes content to the top
+                Spacer() // Pushes content to the top
+                Spacer()
         }
+        .padding(.horizontal, 15)
         /*
         .onAppear(){
             settingsManager.fetchUserSettings(userId: userManager.currentUser?.uid ?? "") { isPublic in
