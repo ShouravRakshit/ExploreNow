@@ -304,6 +304,7 @@ import SDWebImageSwiftUI
 struct ProfileSettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var userManager: UserManager
+    @EnvironmentObject var appState: AppState
     let settingsManager = UserSettingsManager()
 
     @State var shouldShowImagePicker = false
@@ -315,6 +316,7 @@ struct ProfileSettingsView: View {
     @State private var showChangePassword = false
 
     @State private var isUploading = false // Loading state
+    @State private var showingAlert = false
 
     var body: some View {
         VStack {
@@ -331,7 +333,7 @@ struct ProfileSettingsView: View {
                         presentationMode.wrappedValue.dismiss()
                     }
                 Spacer()
-                Text("Edit Profile")
+                Text("Settings")
                     .font(.custom("Sansation-Regular", size: 30))
                     .foregroundColor(Color.customPurple)
                     .offset(x: -30)
@@ -369,7 +371,7 @@ struct ProfileSettingsView: View {
                         .clipShape(Circle())
                 }
             }
-            .padding(.top, 30)
+            .padding(.top, 20)
 
             // Button to upload or change profile picture
             if self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) {
@@ -487,12 +489,21 @@ struct ProfileSettingsView: View {
             ToggleButtonView(userId: userManager.currentUser?.uid ?? "")
 
             Text("Change Password")
-                .padding(.top, 25)
+                .padding(.top, 10)
                 .font(.custom("Sansation-Regular", size: 23))
                 .foregroundColor(.blue)
                 .underline() // Underline the text
                 .onTapGesture {
                     showChangePassword = true
+                }
+            
+            Text("Delete Account")
+                .padding(.top, 10)
+                .font(.custom("Sansation-Regular", size: 23))
+                .foregroundColor(.blue)
+                .underline() // Underline the text
+                .onTapGesture {
+                    showingAlert = true
                 }
 
             Spacer() // Pushes content to the top
@@ -529,6 +540,27 @@ struct ProfileSettingsView: View {
             ChangePasswordView()
                 .environmentObject(userManager)
         }
+        .alert(isPresented: $showingAlert) {
+             Alert(
+                 title: Text("Delete Account?"),
+                 message: Text("Are you sure you want to delete your account?"),
+                 primaryButton: .destructive(Text("Delete")) {
+                     deleteUserAccount { result in
+                         switch result {
+                         case .success:
+                             print("Account deleted successfully.")
+                             handleSignOut()
+                         case .failure(let error):
+                             print("Failed to delete account:", error.localizedDescription)
+                         }
+                     }
+                 },
+                 secondaryButton: .cancel {
+                     // Cancel action (dismiss the alert)
+                     print("Delete Account canceled.")
+                 }
+             )
+         }
     }
     
     // Function to upload the image to Firebase Storage
@@ -577,6 +609,60 @@ struct ProfileSettingsView: View {
                 self.userManager.fetchCurrentUser()
             }
     }
+    
+    private func showDeleteAccountConfirmation() {
+        let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
+            deleteUserAccount { result in
+                switch result {
+                case .success:
+                    print("Account deleted successfully.")
+                    handleSignOut()
+                case .failure(let error):
+                    print("Failed to delete account:", error.localizedDescription)
+                }
+            }
+        }))
+
+        DispatchQueue.main.async {
+            if let topController = UIApplication.shared.windows.first?.rootViewController {
+                topController.present(alert, animated: true)
+            }
+        }
+    }
+    private func handleSignOut() {
+        do {
+            try FirebaseManager.shared.auth.signOut()
+            appState.isLoggedIn = false // Update authentication state
+        } catch let signOutError as NSError {
+            print("Error signing out: %@", signOutError.localizedDescription)
+        }
+    }
+    
+    func deleteUserAccount(completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+            completion(.failure(NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "User not found."])))
+            return
+        }
+
+        FirebaseManager.shared.auth.currentUser?.delete { error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+
+            FirebaseManager.shared.firestore.collection("users").document(uid).delete { error in
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                completion(.success(()))
+            }
+        }
+    }
+    
 }
 
 struct ToggleButtonView: View {

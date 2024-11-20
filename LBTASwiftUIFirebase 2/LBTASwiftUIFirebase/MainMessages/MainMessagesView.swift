@@ -354,13 +354,14 @@ struct MainMessagesView: View {
             }
 
             Spacer()
+            /*
             Button(action: {
                 shouldShowLogOutOptions.toggle()
             }) {
                 Image(systemName: "gear")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(Color(.label))
-            }
+            }*/
 
             // Add New Message Button
             Button(action: {

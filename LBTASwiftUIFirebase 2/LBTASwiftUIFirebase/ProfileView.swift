@@ -369,6 +369,7 @@ struct ProfileView: View {
                 .fullScreenCover(isPresented: $showProfileSettings) {
                     ProfileSettingsView()
                         .environmentObject(userManager)
+                        .environmentObject(appState)
                 }
                 .fullScreenCover(isPresented: $showAddPost) {
                     AddPostView()
