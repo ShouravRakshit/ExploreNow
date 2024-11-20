@@ -13,7 +13,8 @@ struct Comment: Identifiable, Decodable {
     let postID: String
     let userID: String
     let text: String
-    let timestamp: Date
+    var timestamp: Date
+    var timestampString: String? 
     var likeCount: Int             // comment liked
     var likedByCurrentUser: Bool   // comment liked by current user
 }

@@ -6,6 +6,16 @@ import SDWebImageSwiftUI
 import MapKit
 import CoreLocation
 
+
+
+extension Comment {
+    func formattedTimestamp() -> String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .full // Options: .full, .short, .abbreviated
+        return formatter.localizedString(for: timestamp, relativeTo: Date())
+    }
+}
+
 struct PostView: View {
     @EnvironmentObject var userManager: UserManager
     @State private var comments: [Comment] = []
@@ -51,6 +61,32 @@ struct PostView: View {
           }
       }
   
+    private func formatCommentTimestamp(_ timestamp: Date) -> String {
+        let currentTime = Date()
+        let timeInterval = currentTime.timeIntervalSince(timestamp)
+        
+        let secondsInMinute: TimeInterval = 60
+        let secondsInHour: TimeInterval = 3600
+        let secondsInDay: TimeInterval = 86400
+        let secondsInWeek: TimeInterval = 604800
+        
+        if timeInterval < secondsInMinute {
+            return "Just now"
+        } else if timeInterval < secondsInHour {
+            let minutes = Int(timeInterval / secondsInMinute)
+            return "\(minutes) min ago"
+        } else if timeInterval < secondsInDay {
+            let hours = Int(timeInterval / secondsInHour)
+            return "\(hours) hr ago"
+        } else if timeInterval < secondsInWeek {
+            let days = Int(timeInterval / secondsInDay)
+            return "\(days) day(s) ago"
+        } else {
+            let weeks = Int(timeInterval / secondsInWeek)
+            return "\(weeks) week(s) ago"
+        }
+        
+    }
 
    
     // Computed property to return "time ago" string (e.g., "5 days ago")
@@ -249,13 +285,19 @@ struct PostView: View {
                                             .clipShape(Circle())
                                     }
                                     
+                                    
+                                    
                                     VStack(alignment: .leading, spacing: 4) {
                                         Text(userData[comment.userID]?.username ?? "Loading...")
                                             .font(.subheadline)
                                             .bold()
                                         Text(comment.text)
                                             .font(.body)
+                                        Text(comment.timestampString ?? "Unknown time")
+                                                   .font(.subheadline)
+                                                   .foregroundColor(.gray)
                                     }
+                                    
                                     
                                     Spacer()
                                     
@@ -340,8 +382,10 @@ struct PostView: View {
                         // Emoji Picker Sheet
                         // Emoji Picker Overlay
                         
+                        
                     }
                     .padding(.leading, 5)
+                    
                 }
                 .padding(.horizontal)
                 
@@ -560,6 +604,14 @@ struct PostView: View {
                            
                            // Fetch the 'likedByCurrentUser' dictionary to see if the current user liked the comment
                            guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return comment }
+                           
+                           // Format the timestamp and update the comment object
+                           if let timestamp = document.data()["timestamp"] as? Timestamp {
+                               let timestampDate = timestamp.dateValue()
+                               comment?.timestampString = formatCommentTimestamp(timestampDate) // Store the formatted timestamp
+                           }
+
+
                            
                            // Fetch the likedByCurrentUser field
                            if let likedByCurrentUser = document.data()["likedByCurrentUser"] as? [String: Bool],
