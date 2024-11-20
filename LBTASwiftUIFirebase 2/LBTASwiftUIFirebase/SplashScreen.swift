@@ -17,11 +17,14 @@ struct SplashScreen: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.customPurple, Color(UIColor(hex: "#483D8B") ?? .purple)]), startPoint: .bottom, endPoint: .top)
+//            LinearGradient(gradient: Gradient(colors: [Color.customPurple, Color(UIColor(hex: "#483D8B") ?? .purple)]), startPoint: .bottom, endPoint: .top)
+//                            .edgesIgnoringSafeArea(.all)
+
+
+            RadialGradient(gradient: Gradient(colors: [Color.customPurple, Color(UIColor(hex: "#4B0082")?.withAlphaComponent(0.8) ?? .purple)]), center: .center, startRadius: 50, endRadius: UIScreen.main.bounds.height)
                             .edgesIgnoringSafeArea(.all)
 
-
-
+            
             Image(systemName: "airplane")
                 .font(.system(size: 100))
                 .foregroundColor(.white)
