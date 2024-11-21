@@ -483,13 +483,19 @@ struct ProfileView: View {
                         return ActionSheet(
                             title: Text("User Actions"),
                             buttons: [
-                                .destructive(Text("Block"), action: {
-                                    // Call function to block user here
-                                    blockUser (userId: user_uid)
+                                .destructive(Text(didBlockUser ? "Unblock" : "Block"), action: {
+                                    if didBlockUser {
+                                        // Call function to unblock user here
+                                        unblockUser(userId: user_uid)
+                                    } else {
+                                        // Call function to block user here
+                                        blockUser(userId: user_uid)
+                                    }
                                 }),
                                 .cancel()
                             ]
                         )
+                        
                     }
                 }
                 .alert(isPresented: $showingAlert) {
