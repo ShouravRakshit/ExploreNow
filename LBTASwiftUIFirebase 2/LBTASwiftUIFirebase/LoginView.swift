@@ -141,7 +141,7 @@ struct LoginView: View {
                 }
                 
                 .background(Color.customPurple)
-                .navigationViewStyle(StackNavigationViewStyle())
+                //.navigationViewStyle(StackNavigationViewStyle())
                 
                 .fullScreenCover(isPresented: $showSignUpView){
                     SignUpView()

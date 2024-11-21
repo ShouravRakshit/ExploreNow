@@ -61,12 +61,13 @@ struct HomeViewTest: View {
                         .onTapGesture {
                             // Trigger navigation to NotificationView
                             navigateToNotifications = true
+                            print ("Navigating to notifications page")
                         }
                     }
                     .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
                     .padding(.trailing)
                 }
-                .padding(.top, 20)
+                .padding(.top, 5)
                 
                 // Loading and empty states
                 if isLoading {
@@ -131,7 +132,7 @@ struct HomeViewTest: View {
             }
            // .navigationBarHidden(true)
         //}
-        .edgesIgnoringSafeArea(.top)
+        //.edgesIgnoringSafeArea(.top)
         .onAppear {
             if userManager.currentUser != nil {
                 checkIfNotifications()
