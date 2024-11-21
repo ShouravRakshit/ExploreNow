@@ -64,30 +64,22 @@ struct FriendsView: View {
             } else {
                 List(friendManager.filteredUsers) { friend in
                     // Row content for each friend
-                    row(for: friend)
-                        .onTapGesture {
-                            selectedUserUID = friend.uid
-                            navigateToProfile = true
-                        }
+                    NavigationLink(
+                        destination: ProfileView(user_uid: friend.uid)
+                    ) {
+                        row(for: friend) // The content of the row
+                    }
                 }
                 .listStyle(PlainListStyle()) // Ensure list style is plain (no separators, no extra padding)
                 .padding (.top, 10)
             }
-            
-            // Conditional NavigationLink
-            if navigateToProfile {
-                NavigationLink(
-                    destination: ProfileView(user_uid: selectedUserUID ?? ""),
-                    isActive: $navigateToProfile,
-                    label: { EmptyView() }
-                )
-                .hidden() // Hide the NavigationLink in the UI
-            }
+
         }
         .onAppear {
             friendManager.fetchFriends(forUserUID: user_uid)  // Fetch friends when the view appears
             
             print ("fetched friends length: \(friendManager.friends)")
+            print ("Viewing other profile: \(viewingOtherProfile)")
         }
         .onChange(of: searchQuery) { newValue in
             filterUsers(query: newValue)

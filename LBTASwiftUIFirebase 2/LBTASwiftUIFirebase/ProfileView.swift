@@ -391,7 +391,7 @@ struct ProfileView: View {
 
                     // NavigationLink is always part of the hierarchy
                     NavigationLink(
-                        destination: FriendsView(user_uid: profileUser?.uid ?? "", viewingOtherProfile: false),
+                        destination: FriendsView(user_uid: profileUser?.uid ?? "", viewingOtherProfile: self.viewingOtherProfile),
                         isActive: $showFriendsList
                     ) {
                         EmptyView() // Keeps it invisible in the UI
