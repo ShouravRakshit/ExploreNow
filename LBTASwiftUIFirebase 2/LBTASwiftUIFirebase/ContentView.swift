@@ -14,17 +14,17 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-           // NavigationView {
+            NavigationStack {
                 if isActive {
                     SplashScreen(isActive: $isActive)
                 } else {
                     Group {
                         if appState.isLoggedIn {
-                            NavigationStack {
+                            //NavigationStack {
                                 // The NavBar and potential MainMessagesView for logged-in users
                                 NavBar()
                                     .environmentObject(userManager)
-                            }
+                           // }
                         } else {
                             // Show the login view if not logged in
                             LoginView()
@@ -33,7 +33,7 @@ struct ContentView: View {
                         }
                     }
                 }
-          //  }
+            }
         }
         .animation(.easeOut(duration: 0.5), value: isActive)
     }

@@ -160,31 +160,32 @@ struct ProfileView: View {
                             }
                         }.padding(.horizontal, 40)
                         
-                        // Friends Counts
-                        VStack {
-                            if didBlockUser {
-                                Text("0")
-                                    .font(.system(size: 20, weight: .bold))
-                                Text("Friends")
-                                    .font(.system(size: 16))
-                            }
-                            else{
-                                Text("\(friendsList.count)")
-                                    .font(.system(size: 20, weight: .bold))
-                                Text("\(friendsList.count == 1 ? "Friend" : "Friends")")
-                                    .font(.system(size: 16))
-                            }
                         
-                        }
-                        .padding(.horizontal, 10)
-                        .onTapGesture {
-                            //show friends list if you're their friend, they're public, or its your own profile
-                            if (isFriends || isPublic) || !viewingOtherProfile
-                                {
-                                print ("Showing friends list")
-                                showFriendsList = true
+                            // Friends Counts
+                            VStack {
+                                if didBlockUser {
+                                    Text("0")
+                                        .font(.system(size: 20, weight: .bold))
+                                    Text("Friends")
+                                        .font(.system(size: 16))
                                 }
+                                else{
+                                    Text("\(friendsList.count)")
+                                        .font(.system(size: 20, weight: .bold))
+                                    Text("\(friendsList.count == 1 ? "Friend" : "Friends")")
+                                        .font(.system(size: 16))
+                                }
+                            
                             }
+                            .padding(.horizontal, 10)
+                            .onTapGesture {
+                                //show friends list if you're their friend, they're public, or its your own profile
+                                if (isFriends || isPublic) || !viewingOtherProfile
+                                    {
+                                    print ("Showing friends list")
+                                    showFriendsList = true
+                                    }
+                                }
                         
                         Spacer()
 
@@ -387,16 +388,15 @@ struct ProfileView: View {
     
                     }
                     Spacer()
-                    
-                    // Conditional NavigationLink
-                    if showFriendsList {
-                        NavigationLink(
-                            destination: FriendsView (user_uid: profileUser?.uid ?? "", viewingOtherProfile: viewingOtherProfile),
-                            isActive: $showFriendsList,
-                            label: { EmptyView() }
-                        )
-                        .hidden() // Hide the NavigationLink in the UI
+
+                    // NavigationLink is always part of the hierarchy
+                    NavigationLink(
+                        destination: FriendsView(user_uid: profileUser?.uid ?? "", viewingOtherProfile: false),
+                        isActive: $showFriendsList
+                    ) {
+                        EmptyView() // Keeps it invisible in the UI
                     }
+                    .hidden()
                 }
                 .navigationBarBackButtonHidden(false)
                 .navigationBarTitleDisplayMode(.inline)
