@@ -6,7 +6,7 @@ import SDWebImageSwiftUI
 import MapKit
 import CoreLocation
 
-
+// extending comment
 
 extension Comment {
     func formattedTimestamp() -> String {
