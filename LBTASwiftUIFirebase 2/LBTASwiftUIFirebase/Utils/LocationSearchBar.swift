@@ -6,92 +6,115 @@ struct LocationSearchBar: View {
     @Binding var selectedLocation: String
     @Binding var latitude: Double
     @Binding var longitude: Double
-
+    @Environment(\.presentationMode) var presentationMode // To dismiss the view
+    
     @StateObject private var searchCompleter = LocationSearchCompleter()
     @StateObject private var locationManager = CustomLocationManager()
     @State private var searchText = ""
     @State private var showResults = false
 
     var body: some View {
-        VStack(alignment: .leading) {
-            // Search Bar
-            HStack {
-                Image(systemName: "mappin.and.ellipse")
-                    .font(.system(size: 20))
-                TextField("Search location...", text: $searchText)
-                    .onChange(of: searchText) { _, newValue in
-                        if newValue.isEmpty {
+        VStack(spacing: 120) {
+            VStack(spacing: 20) {
+                Spacer()
+                Text("Select Your Location")
+                    .font(.largeTitle)
+                    .padding()
+                // Search Bar
+                HStack(spacing: 20) {
+                    Image(systemName: "mappin.and.ellipse")
+                        .font(.system(size: 24))
+                    TextField("Search location...", text: $searchText)
+                        .font(.system(size: 24))
+                        .onChange(of: searchText) { _, newValue in
+                            if newValue.isEmpty {
+                                showResults = false
+                            } else {
+                                showResults = true
+                                searchCompleter.searchTerm = newValue
+                            }
+                        }
+                    
+                    if !searchText.isEmpty {
+                        Button(action: {
+                            searchText = ""
+                            selectedLocation = ""
                             showResults = false
-                        } else {
-                            showResults = true
-                            searchCompleter.searchTerm = newValue
+                        }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.gray)
                         }
                     }
-
-                if !searchText.isEmpty {
-                    Button(action: {
-                        searchText = ""
-                        selectedLocation = ""
-                        showResults = false
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(.gray)
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal)
+                
+                // "Use Current Location" Button
+                Button(action: {
+                    fetchCurrentLocation()
+                }) {
+                    HStack {
+                        Image(systemName: "location.fill")
+                        Text("Use Current Location")
                     }
+                    .foregroundColor(.primary)
                 }
-            }
-            .padding(.vertical, 8)
-            .padding(.horizontal)
-
-            // "Use Current Location" Button
-            Button(action: {
-                fetchCurrentLocation()
-            }) {
-                HStack {
-                    Image(systemName: "location.fill")
-                    Text("Use Current Location")
-                }
-                .foregroundColor(.primary)
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
-
-            // Search Results
-            if showResults {
-                ScrollView {
-                    VStack(alignment: .leading) {
-                        ForEach(searchCompleter.results, id: \.self) { result in
-                            Button(action: {
-                                selectSearchResult(result)
-                            }) {
-                                VStack(alignment: .leading) {
-                                    Text(result.title)
-                                        .foregroundColor(.primary)
-                                    if !result.subtitle.isEmpty {
-                                        Text(result.subtitle)
-                                            .font(.subheadline)
-                                            .foregroundColor(.gray)
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+                
+                // Search Results
+                if showResults {
+                    ScrollView {
+                        VStack(alignment: .leading) {
+                            ForEach(searchCompleter.results, id: \.self) { result in
+                                Button(action: {
+                                    selectSearchResult(result)
+                                }) {
+                                    VStack(alignment: .leading) {
+                                        Text(result.title)
+                                            .foregroundColor(.primary)
+                                        if !result.subtitle.isEmpty {
+                                            Text(result.subtitle)
+                                                .font(.subheadline)
+                                                .foregroundColor(.gray)
+                                        }
                                     }
                                 }
+                                .padding(.vertical, 4)
+                                Divider()
                             }
-                            .padding(.vertical, 4)
-                            Divider()
-                        }
-
-                        if searchCompleter.results.isEmpty {
-                            Text("No results found.")
-                                .foregroundColor(.gray)
-                                .padding(.vertical, 8)
+                            
+                            if searchCompleter.results.isEmpty {
+                                Text("No results found.")
+                                    .foregroundColor(.gray)
+                                    .padding(.vertical, 8)
+                            }
                         }
                     }
+                    .frame(maxHeight: 200)
                 }
-                .frame(maxHeight: 200)
             }
-        }
-        .onChange(of: selectedLocation) { _, newValue in
-            if newValue.isEmpty {
-                searchText = ""
-                showResults = false
+            .onChange(of: selectedLocation) { _, newValue in
+                if newValue.isEmpty {
+                    searchText = ""
+                    showResults = false
+                }
             }
+            
+            Spacer()
+            
+            Button(action: {
+                presentationMode.wrappedValue.dismiss() // Close the pop-up
+            }) {
+                Text("Done")
+                    .font(.title2)
+                    .frame(width: 200)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
+            }
+            Spacer()
         }
     }
 
@@ -239,3 +262,5 @@ extension CLPlacemark {
         return result.isEmpty ? "Address unavailable" : result
     }
 }
+
+

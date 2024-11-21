@@ -18,14 +18,16 @@ struct AddPostView: View {
     @State private var latitude: Double = 0.0
     @State private var longitude: Double = 0.0
     @State private var isLoading = false
+    @State private var isRatingSheetPresented = false
+    @State private var isLocationSheetPresented = false
     @Environment(\.dismiss) var dismiss
     @StateObject private var searchCompleter = LocationSearchCompleter()
     @EnvironmentObject var userManager: UserManager //Current user
     @StateObject private var locationManager = CustomLocationManager()
-
+    
     let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8)
     ]
     
     var body: some View {
@@ -38,7 +40,7 @@ struct AddPostView: View {
                             .resizable()
                             .frame(width: 60, height: 60)
                             .clipShape(Circle())
-
+                        
                         Text(userManager.currentUser?.username ?? "User 1")
                             .font(.custom("Sansation", size: 18))
                             .foregroundColor(.white)
@@ -49,39 +51,135 @@ struct AddPostView: View {
                         Spacer()
                     }
                     .padding(.horizontal)
+            
                     
-                    // Description
-                    TextField("Description of the recently visited place...", text: $descriptionText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    TextEditor(text: $descriptionText)
                         .padding(.horizontal)
-                        .lineLimit(nil) // Allow for multiple lines
+                        .frame(minHeight: 40, maxHeight: 200) // Set limits to prevent excessive growth
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color(red: 140/255, green: 82/255, blue: 255/255)))
+                        .overlay(
+                            // Placeholder text
+                            Group {
+                                if descriptionText.isEmpty {
+                                    Text("Description of the recently visited place...")
+                                        .foregroundColor(.gray)
+                                        .padding(.horizontal, 8) // Match the padding of TextEditor
+                                        .padding(.vertical, 12) // Adjust vertical padding for alignment
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                        )
                     
                     Divider()
                     
-                    // Location Search
-                    LocationSearchBar(selectedLocation: $selectedLocation, latitude: $latitude, longitude: $longitude)
+                    // Add location
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Where did you visit...")
+                            .font(.system(size: 20))
+                                
+                        Button(action: {
+                                    isLocationSheetPresented = true
+                                    // Action to provide location
+                                }) {
+                                    HStack{
+                                        Image(systemName: "mappin.and.ellipse")
+                                            .font(.system(size: 18))
+                                        Text("Location")
+                                            .font(.system(size: 18))
+                                        Spacer()
+                                        Text(selectedLocation.isEmpty ? "" : "\(selectedLocation)")
+                                            .font(.system(size: 18))
+                                            .foregroundColor(.gray)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .font(.headline)
+                                    .foregroundColor(.black)
+                                }
+                                .padding()
+                                .sheet(isPresented: $isLocationSheetPresented) {
+                                    LocationSearchBar(selectedLocation: $selectedLocation, latitude: $latitude, longitude: $longitude)// Pass the binding
+                                }
+                    }
+                    .padding(.horizontal)
                     
                     Divider()
                     
                     // Rating Section
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("Rating")
-                            .font(.headline)
+                        Text("Rate your recent visit...")
+                            .font(.system(size: 20))
                         
-                        HStack(spacing: 8) {
-                            ForEach(1...5, id: \.self) { star in
-                                Image(systemName: star <= rating ? "star.fill" : "star")
-                                    .font(.title2)
-                                    .foregroundColor(star <= rating ? .yellow : .gray)
-                                    .onTapGesture {
-                                        rating = star
-                                    }
+                        Button(action: {
+                            isRatingSheetPresented = true
+                        }) {
+                            HStack{
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 18))
+                                Text("Ratings")
+                                    .font(.system(size: 18))
+                                Spacer() // Added to push the rating text to the right
+                                Text(rating > 0 ? "\(rating) star\(rating > 1 ? "s" : "")" : "No ratings yet")
+                                    .font(.system(size: 18)) // Smaller font for the rating text
+                                    .foregroundColor(.gray) // Optional: Change color
                             }
-                        }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .font(.headline)
+                            .foregroundColor(.black)
+                            }
+                            .padding()
+                            .sheet(isPresented: $isRatingSheetPresented) {
+                                // Present the rating selection view
+                                RatingSelectionView(selectedRating: $rating)
+                            }
                     }
                     .padding(.horizontal)
                     
+                    
                     Divider()
+                    
+//                    // Photos Section
+//                    VStack(alignment: .leading, spacing: 8) {
+//                        Button(action: {
+//                            isImagePickerPresented = true
+//                        }) {
+//                            HStack {
+//                                Image(systemName: "photo")
+//                                    .font(.system(size: 18))
+//                                Text("Add Photos")
+//                                    .font(.system(size: 18))
+//                                Spacer()
+//                            }
+//                            .foregroundColor(.primary)
+//                        }
+//                        .padding(.horizontal)
+//
+//                        if !images.isEmpty {
+//                            LazyVGrid(columns: columns, spacing: 8) {
+//                                ForEach(images, id: \.self) { image in
+//                                    ZStack(alignment: .topTrailing) {
+//                                        Image(uiImage: image)
+//                                            .resizable()
+//                                            .aspectRatio(contentMode: .fill)
+//                                            .frame(height: 150)
+//                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+//
+//                                        Button(action: {
+//                                            if let index = images.firstIndex(of: image) {
+//                                                images.remove(at: index)
+//                                            }
+//                                        }) {
+//                                            Image(systemName: "xmark.circle.fill")
+//                                                .foregroundColor(.red)
+//                                                .background(Color.white)
+//                                                .clipShape(Circle())
+//                                                .padding(4)
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                            .padding(.horizontal)
+//                        }
+//                    }
                     
                     // Photos Section
                     VStack(alignment: .leading, spacing: 8) {
@@ -90,7 +188,9 @@ struct AddPostView: View {
                         }) {
                             HStack {
                                 Image(systemName: "photo")
+                                    .font(.system(size: 18))
                                 Text("Add Photos")
+                                    .font(.system(size: 18))
                                 Spacer()
                             }
                             .foregroundColor(.primary)
@@ -101,11 +201,13 @@ struct AddPostView: View {
                             LazyVGrid(columns: columns, spacing: 8) {
                                 ForEach(images, id: \.self) { image in
                                     ZStack(alignment: .topTrailing) {
+                                        // Define the size explicitly
                                         Image(uiImage: image)
                                             .resizable()
                                             .aspectRatio(contentMode: .fill)
-                                            .frame(height: 150)
+                                            .frame(width: (UIScreen.main.bounds.width - 40) / 2, height: 150)
                                             .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .clipped() // Ensures content doesn't overflow
                                         
                                         Button(action: {
                                             if let index = images.firstIndex(of: image) {
@@ -118,12 +220,15 @@ struct AddPostView: View {
                                                 .clipShape(Circle())
                                                 .padding(4)
                                         }
+                                        .offset(x: -8, y: 8) // Adjust placement to avoid blocking content
                                     }
                                 }
                             }
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16) // Add padding to the grid
                         }
                     }
+
+
                     
                     if !addPostStatusMessage.isEmpty {
                         Text(addPostStatusMessage)
@@ -158,21 +263,21 @@ struct AddPostView: View {
                         .font(.headline)
                 }
                 /*
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.primary)
-                    }
-                }*/
+                 ToolbarItem(placement: .navigationBarLeading) {
+                 Button(action: {
+                 dismiss()
+                 }) {
+                 Image(systemName: "xmark")
+                 .foregroundColor(.primary)
+                 }
+                 }*/
             }
         }
         .sheet(isPresented: $isImagePickerPresented) {
             AddPhotos(images: $images)
         }
     }
-
+    
     private func addPost() {
         // Input validation
         if descriptionText.isEmpty {
@@ -205,7 +310,7 @@ struct AddPostView: View {
             uploadPost(userID: userID, locationRef: locationRef)
         }
     }
-
+    
     private func handleLocation(completion: @escaping (DocumentReference) -> Void) {
         let db = FirebaseManager.shared.firestore
         
@@ -250,7 +355,7 @@ struct AddPostView: View {
                 }
             }
     }
-
+    
     private func uploadPost(userID: String, locationRef: DocumentReference) {
         // Upload images first
         var imageURLs: [String] = []
@@ -327,7 +432,7 @@ struct AddPostView: View {
             }
         }
     }
-
+    
     private func updateLocationAverageRating(locationRef: DocumentReference) {
         let db = FirebaseManager.shared.firestore
         
@@ -363,7 +468,7 @@ struct AddPostView: View {
                 }
             }
     }
-
+    
     private func clearForm() {
         descriptionText = ""
         selectedLocation = ""
@@ -373,4 +478,51 @@ struct AddPostView: View {
         longitude = 0
         addPostStatusMessage = ""
     }
+    
+    
+    // The Rating Selection Sheet
+    struct RatingSelectionView: View {
+        @Binding var selectedRating: Int
+        @Environment(\.presentationMode) var presentationMode // For dismissing the view
+        
+        var body: some View {
+            VStack {
+                Spacer()
+                
+                Text("Select Your Rating")
+                    .font(.largeTitle)
+                    .padding()
+                
+                HStack(spacing: 20) {
+                    ForEach(1..<6) { rating in
+                        Button(action: {
+                            selectedRating = rating // Update the rating
+                        }) {
+                            Image(systemName: rating <= selectedRating ? "star.fill" : "star")
+                                .font(.largeTitle)
+                                .foregroundColor(.yellow)
+                        }
+                    }
+                }
+                .padding()
+                
+                Spacer()
+                
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss() // Close the pop-up
+                }) {
+                    Text("Done")
+                        .font(.title2)
+                        .frame(width: 200)
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                Spacer()
+            }
+        }
+    }
 }
+
+
