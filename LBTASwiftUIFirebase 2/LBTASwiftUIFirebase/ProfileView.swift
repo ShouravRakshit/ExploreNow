@@ -1022,23 +1022,39 @@ struct UserPostCard: View {
     @State private var likedByUserIds: [String] = []  // Track the list of users who liked the post
     @State private var liked: Bool = false  // Track if the current user has liked the post
     
-    // Computed property to return "time ago" string (e.g., "5 days ago")
+    
     private var timeAgo: String {
-        let calendar = Calendar.current
-        let now = Date()
-        let components = calendar.dateComponents([.day, .weekOfYear, .month, .year], from: post.timestamp, to: now)
+            let calendar = Calendar.current
+            let now = Date()
+
+            // Ensure post.timestamp is a Firestore Timestamp and convert it to Date
+            let postDate: Date
+            if let timestamp = post.timestamp as? Timestamp {
+                postDate = timestamp.dateValue() // Convert Firestore Timestamp to Date
+            } else if let date = post.timestamp as? Date {
+                postDate = date // If it's already a Date object
+            } else {
+                postDate = now // Fallback in case timestamp is nil or of an unexpected type
+            }
             
-        if let year = components.year, year > 0 {
-            return "\(year) yr\(year > 1 ? "s" : "") ago"
-        } else if let month = components.month, month > 0 {
-            return "\(month) mo ago"
-        } else if let week = components.weekOfYear, week > 0 {
-            return "\(week) wk\(week > 1 ? "s" : "") ago"
-        } else if let day = components.day, day > 0 {
-            return "\(day)d ago"
-        } else {
-            return "Just now"
-         }
+            // Calculate the time difference in various units
+            let components = calendar.dateComponents([.minute, .hour, .day, .weekOfYear, .month, .year], from: postDate, to: now)
+            
+            if let year = components.year, year > 0 {
+                return "\(year) yr\(year > 1 ? "s" : "") ago"
+            } else if let month = components.month, month > 0 {
+                return "\(month) mo ago"
+            } else if let week = components.weekOfYear, week > 0 {
+                return "\(week) wk\(week > 1 ? "s" : "") ago"
+            } else if let day = components.day, day > 0 {
+                return "\(day)d ago"
+            } else if let hour = components.hour, hour > 0 {
+                return "\(hour) hr\(hour > 1 ? "s" : "") ago"
+            } else if let minute = components.minute, minute > 0 {
+                return "\(minute) min\(minute > 1 ? "s" : "") ago"
+            } else {
+                return "Just now"
+            }
         }
 
     
@@ -1222,19 +1238,62 @@ struct UserPostCard: View {
     }
     
     private func fetchComments() {
-        let db = FirebaseManager.shared.firestore
-        db.collection("comments")
-            .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
-            .order(by: "timestamp", descending: true)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Error fetching comments: \(error)")
-                } else {
-                    // Decode Firestore documents into Comment objects
-                    self.comments = snapshot?.documents.compactMap { document in
-                        Comment(document: document)
-                    } ?? []
+                let db = FirebaseManager.shared.firestore
+                db.collection("comments")
+                    .whereField("pid", isEqualTo: post.id)
+                    .order(by: "timestamp", descending: true)
+                    .getDocuments { snapshot, error in
+                        if let error = error {
+                            print("Error fetching comments: \(error)")
+                        } else {
+                            self.comments = snapshot?.documents.compactMap { document in
+                                Comment(document: document)
+                            } ?? []
+                        }
+                    }
+            }
+        }
+
+    struct CommentsView: View {
+        let post: Post
+        @State private var comments: [Comment] = []
+
+        var body: some View {
+            VStack {
+                Text("Comments")
+                    .font(.headline)
+                    .padding()
+
+                List(comments, id: \.id) { comment in
+                    VStack(alignment: .leading) {
+                        Text(comment.userID) // Display user name
+                            .font(.subheadline)
+                            .foregroundColor(.gray)
+                        Text(comment.text) // Display comment text
+                            .font(.body)
+                    }
+                    .padding()
+                }
+                .onAppear {
+                    fetchComments()
                 }
             }
+            .navigationBarTitle("Comments", displayMode: .inline)
+        }
+        
+        private func fetchComments() {
+            let db = FirebaseManager.shared.firestore
+            db.collection("comments")
+                .whereField("pid", isEqualTo: post.id)
+                .order(by: "timestamp", descending: true)
+                .getDocuments { snapshot, error in
+                    if let error = error {
+                        print("Error fetching comments: \(error)")
+                    } else {
+                        self.comments = snapshot?.documents.compactMap { document in
+                            Comment(document: document)
+                        } ?? []
+                    }
+                }
+        }
     }
-}
