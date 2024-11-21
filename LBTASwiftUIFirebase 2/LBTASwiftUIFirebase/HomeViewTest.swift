@@ -27,23 +27,19 @@ struct HomeViewTest: View {
 
                     Spacer()
                     
-                    Button(action: {
-                        navigateToSearchView = true
-                    }) {
+
+                    // Navigation to AllUsersSearchView
+                    NavigationLink(destination: AllUsersSearchView())
+                    {
                         Image(systemName: "magnifyingglass")
                             .resizable()
                             .frame(width: 24, height: 24)
                             .foregroundColor(Color.customPurple)
                     }
                     .padding(.trailing, 15)
-                     
-                    // Navigation to AllUsersSearchView
-                    NavigationLink(destination: AllUsersSearchView(), isActive: $navigateToSearchView) {
-                                        EmptyView()
-                    }
                     
                     // NavigationLink that wraps the bell icon
-                    NavigationLink(destination: NotificationView(userManager: userManager), isActive: $navigateToNotifications) {
+                    NavigationLink(destination: NotificationView(userManager: userManager)) {
                         ZStack {
                             Image(systemName: "bell.fill")
                                 .resizable()
@@ -58,11 +54,12 @@ struct HomeViewTest: View {
                                     .offset(x: 8, y: -8)
                             }
                         }
+                        /*
                         .onTapGesture {
                             // Trigger navigation to NotificationView
                             navigateToNotifications = true
                             print ("Navigating to notifications page")
-                        }
+                        }*/
                     }
                     .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
                     .padding(.trailing)

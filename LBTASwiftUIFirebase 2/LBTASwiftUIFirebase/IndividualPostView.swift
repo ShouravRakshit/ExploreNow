@@ -406,7 +406,9 @@ struct PostView: View {
             
         }
         .padding(.bottom, 20)
-        
+        .navigationTitle("Post View")
+        .navigationBarBackButtonHidden(false)
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             fetchComments() // Fetch comments when the view appears
         }

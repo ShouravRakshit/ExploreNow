@@ -38,7 +38,7 @@ struct AllUsersSearchView: View {
             }
         }
         .navigationBarTitle("Search Users", displayMode: .inline)
-        .navigationBarBackButtonHidden(false) // Ensure back button is shown
+        //.navigationBarBackButtonHidden(false) // Ensure back button is shown
         /*
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {

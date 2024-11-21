@@ -31,38 +31,41 @@ struct NavBar: View {
     }
     
     var body: some View {
-        TabView {
-            HomeViewTest()
-                .tabItem {
-                    Image(systemName: "house")
-                }
-            
-            MapPinView()
-                .tabItem {
-                    Image(systemName: "mappin.and.ellipse")
-                }
-            
-            AddPostView()
-                .tabItem {
-                    Image(systemName: "plus.circle.fill")
-                }
-                .environmentObject(userManager)
-            
-            MainMessagesView()
-                .tabItem {
-                    Image(systemName: "message")
-                }
-                .environmentObject(userManager)
-            
-            if let user = userManager.currentUser {
-                ProfileView(user_uid: user.uid)
+       // NavigationView {
+            TabView {
+                
+                HomeViewTest()
                     .tabItem {
-                        Image(systemName: "person")
+                        Image(systemName: "house")
+                    }
+                
+                MapPinView()
+                    .tabItem {
+                        Image(systemName: "mappin.and.ellipse")
+                    }
+                
+                AddPostView()
+                    .tabItem {
+                        Image(systemName: "plus.circle.fill")
                     }
                     .environmentObject(userManager)
+                
+                MainMessagesView()
+                    .tabItem {
+                        Image(systemName: "message")
+                    }
+                    .environmentObject(userManager)
+                
+                if let user = userManager.currentUser {
+                    ProfileView(user_uid: user.uid)
+                        .tabItem {
+                            Image(systemName: "person")
+                        }
+                        .environmentObject(userManager)
+                }
             }
-        }
-        .accentColor(.white) // Use your custom purple color
+            .accentColor(.white) // Use your custom purple color
+      //  }
     }
 }
 
