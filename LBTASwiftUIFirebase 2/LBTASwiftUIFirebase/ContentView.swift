@@ -14,19 +14,21 @@ struct ContentView: View {
 
     var body: some View {
         VStack {
-            if isActive {
-                SplashScreen(isActive: $isActive)
-            } else {
-                Group {
-                    if appState.isLoggedIn {
-                        // The NavBar and potential MainMessagesView for logged-in users
-                        NavBar()
-                            .environmentObject(userManager)
-                    } else {
-                        // Show the login view if not logged in
-                        LoginView()
-                            .environmentObject(appState)
-                            .environmentObject(userManager)
+            NavigationView {
+                if isActive {
+                    SplashScreen(isActive: $isActive)
+                } else {
+                    Group {
+                        if appState.isLoggedIn {
+                            // The NavBar and potential MainMessagesView for logged-in users
+                            NavBar()
+                                .environmentObject(userManager)
+                        } else {
+                            // Show the login view if not logged in
+                            LoginView()
+                                .environmentObject(appState)
+                                .environmentObject(userManager)
+                        }
                     }
                 }
             }

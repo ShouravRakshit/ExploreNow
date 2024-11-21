@@ -29,7 +29,7 @@ struct LoginView: View {
     let validDomains = ["gmail.com", "yahoo.com", "hotmail.com", "outlook.com", "live.com"]
     
     var body: some View {
-        NavigationView {
+       // NavigationView {
             VStack {
                 VStack      {
                     Spacer()
@@ -150,7 +150,7 @@ struct LoginView: View {
                     }
                 
             }
-        }
+       // }
     }
     
     

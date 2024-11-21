@@ -13,8 +13,9 @@ struct HomeViewTest: View {
     @State private var navigateToSearchView = false
 
     var body: some View {
-        NavigationView {
+        //NavigationView {
             VStack {
+                Spacer ()
                 // Header with notification bell
                 HStack {
                     // Search Icon
@@ -65,7 +66,7 @@ struct HomeViewTest: View {
                     .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
                     .padding(.trailing)
                 }
-                .padding(.top)
+                .padding(.top, 20)
                 
                 // Loading and empty states
                 if isLoading {
@@ -128,8 +129,8 @@ struct HomeViewTest: View {
                     }
                 }
             }
-            .navigationBarHidden(true)
-        }
+           // .navigationBarHidden(true)
+        //}
         .edgesIgnoringSafeArea(.top)
         .onAppear {
             if userManager.currentUser != nil {

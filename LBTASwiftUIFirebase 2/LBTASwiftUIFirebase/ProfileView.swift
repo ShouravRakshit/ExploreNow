@@ -50,7 +50,7 @@ struct ProfileView: View {
     }
     
     var body: some View {
-        NavigationView {
+      //  NavigationView {
             VStack {
                 if isCheckingBlockedStatus {
                                 // Show a loading indicator while checking the blocked status
@@ -77,7 +77,7 @@ struct ProfileView: View {
                 // Check if the user is blocked
                 checkBlockedStatus()
             }
-        }
+       // }
     }
     
     // Profile content for when the user is not blocked
