@@ -263,6 +263,7 @@ struct NotificationView: View {
             }
         }*/
         .navigationBarTitle("Notifications", displayMode: .inline)
+        .navigationBarBackButtonHidden(false) // Ensure back button is shown
         
     }
     

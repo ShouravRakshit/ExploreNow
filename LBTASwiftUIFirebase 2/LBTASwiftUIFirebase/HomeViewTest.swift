@@ -131,6 +131,7 @@ struct HomeViewTest: View {
                 }
             }
            // .navigationBarHidden(true)
+            .navigationBarTitle("Home") 
         //}
         //.edgesIgnoringSafeArea(.top)
         .onAppear {

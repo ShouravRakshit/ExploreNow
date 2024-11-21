@@ -38,6 +38,8 @@ struct AllUsersSearchView: View {
             }
         }
         .navigationBarTitle("Search Users", displayMode: .inline)
+        .navigationBarBackButtonHidden(false) // Ensure back button is shown
+        /*
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(action: {
@@ -47,7 +49,7 @@ struct AllUsersSearchView: View {
                     Text("Cancel")
                 }
             }
-        }
+        }*/
         .onAppear {
             print("AllUsersSearchView appeared")
             vm.fetchAllUsers()
