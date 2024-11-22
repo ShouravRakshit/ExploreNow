@@ -11,6 +11,7 @@ struct LocationSearchBar: View {
     @StateObject private var locationManager = CustomLocationManager()
     @State private var searchText = ""
     @State private var showResults = false
+    @State private var showLocationButton = true // State to track button visibility
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -43,18 +44,35 @@ struct LocationSearchBar: View {
             .padding(.horizontal)
 
             // "Use Current Location" Button
-            Button(action: {
-                fetchCurrentLocation()
-            }) {
-                HStack {
-                    Image(systemName: "location.fill")
-                    Text("Use Current Location")
-                }
-                .foregroundColor(.primary)
-            }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
+//            Button(action: {
+//                fetchCurrentLocation()
+//            }) {
+//                HStack {
+//                    Image(systemName: "location.fill")
+//                    Text("Use Current Location")
+//                }
+//                .foregroundColor(.primary)
+//            }
+//            .padding(.horizontal)
+//            .padding(.bottom, 8)
 
+            if showLocationButton {
+                // "Use Current Location" Button
+                Button(action: {
+                    fetchCurrentLocation()
+                    showLocationButton = false // Hide the button when clicked
+                }) {
+                    HStack {
+                        Image(systemName: "location.fill")
+                        Text("Use Current Location")
+                    }
+                    .foregroundColor(.primary)
+                }
+                .padding(.horizontal)
+                .padding(.bottom, 8)
+            }
+
+            
             // Search Results
             if showResults {
                 ScrollView {
