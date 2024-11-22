@@ -237,7 +237,7 @@ struct PostView: View {
                 }
             }
             
-            Button(action: { openInMaps() }) {
+            NavigationLink(destination: LocationPostsPage(locationRef: post.locationRef)) {
                 HStack(spacing: 6) {
                     Image(systemName: "mappin.circle.fill")
                         .font(.system(size: 22))
@@ -247,7 +247,7 @@ struct PostView: View {
                 }
                 .foregroundColor(AppTheme.primaryPurple)
             }
-            
+
             Spacer()
             
             HStack(spacing: 4) {
