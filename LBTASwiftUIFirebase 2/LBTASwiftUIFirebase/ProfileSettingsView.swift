@@ -389,22 +389,24 @@ struct ProfileSettingsView: View {
                     .cancel()
                 ])
             }.fullScreenCover(isPresented: $showPixabayPicker) {
-                PixabayImagePickerView { selectedImage in
-                    if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+                PixabayImagePickerView(allowsMultipleSelection: false) { selectedImages in
+                    if let selectedImage = selectedImages.first,
+                       let urlString = selectedImage.largeImageURL,
+                       let url = URL(string: urlString) {
                         downloadImage(from: url) { downloadedImage in
                             if let downloadedImage = downloadedImage {
                                 self.image = downloadedImage
                                 // Call persistImageToStorage() after image is set
                                 persistImageToStorage()
-                                // Dismiss the picker
-                                self.showPixabayPicker = false
                             } else {
-                                // Handle download failure if needed
-                                self.showPixabayPicker = false
+                                print("Image download failed.")
                             }
+                            // Dismiss the picker
+                            self.showPixabayPicker = false
                         }
                     } else {
-                        // Handle invalid URL if needed
+                        print("Invalid image selection.")
+                        // Dismiss the picker
                         self.showPixabayPicker = false
                     }
                 }
@@ -552,42 +554,28 @@ struct ProfileSettingsView: View {
             Spacer()
         }
         .padding(.horizontal, 15)
-        .fullScreenCover(isPresented: $showPixabayPicker) {
-            PixabayImagePickerView { selectedImage in
-                if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
-                    downloadImage(from: url) { downloadedImage in
-                        if let downloadedImage = downloadedImage {
-                            self.image = downloadedImage
-                            // Call persistImageToStorage() after image is set
-                            persistImageToStorage()
-                        } else {
-                            print("Image download failed.")
-                        }
-                        // Dismiss the picker
-                        self.showPixabayPicker = false
-                    }
-                } else {
-                    print("Invalid image URL.")
-                    // Dismiss the picker
-                    self.showPixabayPicker = false
-                }
-            }
-        }
-    
-        // Attach the fullScreenCover modifier to the VStack
-//        {
-//           PixabayImagePickerView { selectedImage in
-//           if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
-//               downloadImage(from: url) { downloadedImage in
-//                   if let downloadedImage = downloadedImage {
-//                       self.image = downloadedImage
-//                       // Optionally persist the image immediately
-//                       // persistImageToStorage()
-//                   }
-//               }
-//           }
-//       }
+//        .fullScreenCover(isPresented: $showPixabayPicker) {
+//            PixabayImagePickerView { selectedImage in
+//                if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+//                    downloadImage(from: url) { downloadedImage in
+//                        if let downloadedImage = downloadedImage {
+//                            self.image = downloadedImage
+//                            // Call persistImageToStorage() after image is set
+//                            persistImageToStorage()
+//                        } else {
+//                            print("Image download failed.")
+//                        }
+//                        // Dismiss the picker
+//                        self.showPixabayPicker = false
+//                    }
+//                } else {
+//                    print("Invalid image URL.")
+//                    // Dismiss the picker
+//                    self.showPixabayPicker = false
+//                }
+//            }
 //        }
+    
         .fullScreenCover(isPresented: $showEditView) {
             if selectedRow == "Name" {
                 EditView(fieldName: "Name")

@@ -14,7 +14,7 @@ struct AddPostView: View {
     @State private var rating: Int = 0
     @State private var selectedLocation: String = ""
     @State private var images: [UIImage] = []
-    @State private var isImagePickerPresented = false
+//    @State private var isImagePickerPresented = false
     @State private var searchText: String = ""
     @State private var addPostStatusMessage: String = ""
     @State private var latitude: Double = 0.0
@@ -188,44 +188,49 @@ struct AddPostView: View {
             }
             .background(AppTheme.background)
         }
-        .sheet(isPresented: $isImagePickerPresented) {
-            AddPhotos(images: $images)
-        }
         .sheet(isPresented: $showPixabayPicker) {
-            PixabayImagePickerView { selectedImage in
-                if let urlString = selectedImage.largeImageURL,
-                   let url = URL(string: urlString) {
-                    downloadImage(from: url) { image in
-                        if let image = image {
-                            self.images.append(image)
+                    PixabayImagePickerView(allowsMultipleSelection: true) { selectedImages in
+                        let group = DispatchGroup()
+                        for selectedImage in selectedImages {
+                            if let urlString = selectedImage.largeImageURL,
+                               let url = URL(string: urlString) {
+                                group.enter()
+                                downloadImage(from: url) { image in
+                                    if let image = image {
+                                        self.images.append(image)
+                                    }
+                                    group.leave()
+                                }
+                            }
+                        }
+                        group.notify(queue: .main) {
+                            print("All images downloaded and added.")
                         }
                     }
                 }
-            }
-        }
         .actionSheet(isPresented: $showImageSourceOptions) {
             ActionSheet(
                 title: Text("Select Image Source"),
                 message: nil,
                 buttons: [
-                    .default(Text("Photo Library")) { isImagePickerPresented = true },
-                    .default(Text("Pixabay")) { showPixabayPicker = true },
+                    .default(Text("Photo Library")) { showPixabayPicker = true },
                     .cancel()
                 ]
             )
         }
+
     }
 
     
     private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
             SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
-                if let image = image, finished {
-                    DispatchQueue.main.async {
+                DispatchQueue.main.async {
+                    if let image = image, finished {
                         completion(image)
+                    } else {
+                        print("Failed to download image: \(error?.localizedDescription ?? "Unknown error")")
+                        completion(nil)
                     }
-                } else {
-                    print("Failed to download image: \(error?.localizedDescription ?? "Unknown error")")
-                    completion(nil)
                 }
             }
         }
