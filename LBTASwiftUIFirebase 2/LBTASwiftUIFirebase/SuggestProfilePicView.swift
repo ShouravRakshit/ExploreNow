@@ -14,9 +14,10 @@ import SDWebImage
 struct SuggestProfilePicView: View
     {
     @State var image: UIImage?
+    @State private var isUploading  = false // Loading state
 
     @State var statusMessage = ""
-    @State var shouldShowImagePicker = false
+//    @State var shouldShowImagePicker = false
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var userManager: UserManager
     @State private var showPixabayPicker = false
@@ -118,10 +119,10 @@ struct SuggestProfilePicView: View
             Spacer() // Pushes content to the top
             }
             
-            .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil)
-                {
-                ImagePicker(image: $image)
-                }
+//            .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: nil)
+//                {
+//                ImagePicker(image: $image)
+//                }
 
         }
     
@@ -137,26 +138,52 @@ struct SuggestProfilePicView: View
                 }
             }
         }
-    
     private func persistImageToStorage() {
+        isUploading = true // Start loading
+
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
+        let uniqueImagePath = "profile_images/\(uid)_\(UUID().uuidString).jpg"
+        let ref = FirebaseManager.shared.storage.reference(withPath: uniqueImagePath)
         guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
+
         ref.putData(imageData, metadata: nil) { metadata, err in
             if let err = err {
-                self.statusMessage = "Failed to push image to Storage: \(err.localizedDescription)"
+                print("Failed to push image to Storage: \(err.localizedDescription)")
+                isUploading = false // Stop loading
                 return
             }
             ref.downloadURL { url, err in
                 if let err = err {
-                    self.statusMessage = "Failed to retrieve downloadURL: \(err.localizedDescription)"
+                    print("Failed to retrieve downloadURL: \(err.localizedDescription)")
+                    isUploading = false // Stop loading
                     return
                 }
                 guard let url = url else { return }
+                print("New profileImageUrl: \(url.absoluteString)")
                 self.storeUserInformation(imageProfileUrl: url)
             }
         }
     }
+
+//    private func persistImageToStorage() {
+//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
+//        let ref = FirebaseManager.shared.storage.reference(withPath: uid)
+//        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
+//        ref.putData(imageData, metadata: nil) { metadata, err in
+//            if let err = err {
+//                self.statusMessage = "Failed to push image to Storage: \(err.localizedDescription)"
+//                return
+//            }
+//            ref.downloadURL { url, err in
+//                if let err = err {
+//                    self.statusMessage = "Failed to retrieve downloadURL: \(err.localizedDescription)"
+//                    return
+//                }
+//                guard let url = url else { return }
+//                self.storeUserInformation(imageProfileUrl: url)
+//            }
+//        }
+//    }
     
     private func storeUserInformation(imageProfileUrl: URL)
         {
