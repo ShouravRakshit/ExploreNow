@@ -6,19 +6,26 @@ struct LocationSearchBar: View {
     @Binding var selectedLocation: String
     @Binding var latitude: Double
     @Binding var longitude: Double
-
+    
     @StateObject private var searchCompleter = LocationSearchCompleter()
     @StateObject private var locationManager = CustomLocationManager()
     @State private var searchText = ""
     @State private var showResults = false
-
+    
+    private let primaryPurple = Color(red: 140/255, green: 82/255, blue: 255/255)
+    private let lightPurple = Color(red: 140/255, green: 82/255, blue: 255/255).opacity(0.1)
+    
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 8) {
             // Search Bar
-            HStack {
-                Image(systemName: "mappin.and.ellipse")
+            HStack(spacing: 12) {
+                Image(systemName: "mappin.circle.fill")
                     .font(.system(size: 20))
+                    .foregroundColor(.primary) // Changed to black/primary color
+                
                 TextField("Search location...", text: $searchText)
+                    .font(.system(size: 16))
+                    .tint(.blue) // Changed to blue for cursor
                     .onChange(of: searchText) { _, newValue in
                         if newValue.isEmpty {
                             showResults = false
@@ -27,7 +34,7 @@ struct LocationSearchBar: View {
                             searchCompleter.searchTerm = newValue
                         }
                     }
-
+                
                 if !searchText.isEmpty {
                     Button(action: {
                         searchText = ""
@@ -36,55 +43,77 @@ struct LocationSearchBar: View {
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.gray)
+                            .font(.system(size: 18))
                     }
                 }
             }
-            .padding(.vertical, 8)
-            .padding(.horizontal)
-
-            // "Use Current Location" Button
-            Button(action: {
-                fetchCurrentLocation()
-            }) {
-                HStack {
-                    Image(systemName: "location.fill")
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+            
+            // Current Location Button - Full width
+            Button(action: { fetchCurrentLocation() }) {
+                HStack(spacing: 8) {
+                    Image(systemName: "location.circle.fill")
+                        .font(.system(size: 16))
                     Text("Use Current Location")
+                        .font(.system(size: 14, weight: .medium))
+                    Spacer() // Added to make the button full width
                 }
-                .foregroundColor(.primary)
+                .foregroundColor(primaryPurple)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .frame(maxWidth: .infinity) // Added to ensure full width
+                .background(lightPurple)
+                .cornerRadius(8)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
-
+            
             // Search Results
             if showResults {
                 ScrollView {
-                    VStack(alignment: .leading) {
+                    VStack(alignment: .leading, spacing: 0) {
                         ForEach(searchCompleter.results, id: \.self) { result in
-                            Button(action: {
-                                selectSearchResult(result)
-                            }) {
-                                VStack(alignment: .leading) {
+                            Button(action: { selectSearchResult(result) }) {
+                                VStack(alignment: .leading, spacing: 4) {
                                     Text(result.title)
+                                        .font(.system(size: 16))
                                         .foregroundColor(.primary)
+                                    
                                     if !result.subtitle.isEmpty {
                                         Text(result.subtitle)
-                                            .font(.subheadline)
+                                            .font(.system(size: 14))
                                             .foregroundColor(.gray)
                                     }
                                 }
+                                .padding(.vertical, 12)
+                                .padding(.horizontal, 12)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .contentShape(Rectangle())
                             }
-                            .padding(.vertical, 4)
+                            .background(Color(.systemBackground))
+                            
                             Divider()
+                                .padding(.horizontal, 12)
                         }
-
+                        
                         if searchCompleter.results.isEmpty {
-                            Text("No results found.")
-                                .foregroundColor(.gray)
-                                .padding(.vertical, 8)
+                            HStack {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(.gray)
+                                Text("No results found")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.gray)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 20)
                         }
                     }
                 }
-                .frame(maxHeight: 200)
+                .frame(maxHeight: 250)
+                .background(Color(.systemBackground))
+                .cornerRadius(12)
+                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
             }
         }
         .onChange(of: selectedLocation) { _, newValue in
