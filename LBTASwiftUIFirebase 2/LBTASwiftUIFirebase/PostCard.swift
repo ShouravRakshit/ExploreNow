@@ -82,6 +82,7 @@ struct PostCard: View {
                 if !post.description.isEmpty {
                     Text(post.description)
                         .font(.body)
+                        .foregroundColor (.black)
                 }
                 
                 HStack {
