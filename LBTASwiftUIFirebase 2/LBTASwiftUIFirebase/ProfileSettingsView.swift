@@ -305,22 +305,18 @@ struct ProfileSettingsView: View {
     @EnvironmentObject var userManager: UserManager
     @EnvironmentObject var appState: AppState
     let settingsManager = UserSettingsManager()
-
-    @State var shouldShowImagePicker = false
+    //    @State var shouldShowImagePicker = false
+    
     @State var image: UIImage?
-
+    @State private var showImageSourceOptions = false
+    @State private var showPixabayPicker = false
     @State private var selectedRow: String? // Track the selected row
-
+    @State private var isUploading  = false // Loading state
     @State private var showEditView       = false
     @State private var showChangePassword = false
     @State private var showBlockedUsers   = false
-
-    @State private var isUploading  = false // Loading state
     @State private var showingAlert = false
     
-    @State private var showImageSourceOptions = false
-    @State private var showPixabayPicker = false
-
     var body: some View {
         VStack {
             //----- TOP ROW --------------------------------------
@@ -376,68 +372,62 @@ struct ProfileSettingsView: View {
             }
             .padding(.top, 20)
             
-            // Button to upload or change profile picture
-//            if self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) {
-//                // If no profile image exists
-//                Text("Upload Profile Picture")
-//                    .padding(.top, 15)
-//                    .font(.custom("Sansation-Regular", size: 21))
-//                    .foregroundColor(.blue)
-//                    .underline() // Underline the text
-//                    .onTapGesture {
-//                        showImageSourceOptions = true
-//                    }
-//                    .padding(.bottom, 50)
-//            } else {
-//                // If a profile image already exists
-//                Text("Change Profile Picture")
-//                    .padding(.top, 15)
-//                    .font(.custom("Sansation-Regular", size: 21))
-//                    .foregroundColor(.blue)
-//                    .underline() // Underline the text
-//                    .onTapGesture {
-//                        showImageSourceOptions = true
-//                    }
-//                    .padding(.bottom, 50)
-//            }.actionSheet(isPresented: $showImageSourceOptions){
-//                ActionSheet(title: Text("Select Image Source"), message:nil, buttons:[
-//                    .default(Text("Photo Library")){
-//                        shouldShowImagePicker = true
-//                    },
-//                    .default(Text("Pixabay")){
-//                        showPixabayPicker = true
-//                    },
-//                    .cancel()
-//                ])
-//            }
             Button(action: {
                 showImageSourceOptions = true
-                }) {
-                    Text(self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) ? "Upload Profile Picture" : "Change Profile Picture")
-                        .padding(.top, 15)
-                        .font(.custom("Sansation-Regular", size: 21))
-                        .foregroundColor(.blue)
-                        .underline()
-                        .padding(.bottom, 50)
+            }) {
+                Text(self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) ? "Upload Profile Picture" : "Change Profile Picture")
+                    .padding(.top, 15)
+                    .font(.custom("Sansation-Regular", size: 21))
+                    .foregroundColor(.blue)
+                    .underline()
+                    .padding(.bottom, 50)
+            }.actionSheet(isPresented: $showImageSourceOptions) {
+                ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
+                    .default(Text("Photo Library")) {
+                        showPixabayPicker = true // Open Pixabay when "Photo Library" is selected
+                    },
+                    .cancel()
+                ])
+            }.fullScreenCover(isPresented: $showPixabayPicker) {
+                PixabayImagePickerView { selectedImage in
+                    if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+                        downloadImage(from: url) { downloadedImage in
+                            if let downloadedImage = downloadedImage {
+                                self.image = downloadedImage
+                                // Call persistImageToStorage() after image is set
+                                persistImageToStorage()
+                                // Dismiss the picker
+                                self.showPixabayPicker = false
+                            } else {
+                                // Handle download failure if needed
+                                self.showPixabayPicker = false
+                            }
+                        }
+                    } else {
+                        // Handle invalid URL if needed
+                        self.showPixabayPicker = false
+                    }
                 }
-                .actionSheet(isPresented: $showImageSourceOptions) {
-                    ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
-                        .default(Text("Photo Library")) {
-                            shouldShowImagePicker = true
-                        },
-                        .default(Text("Pixabay")) {
-                            showPixabayPicker = true
-                        },
-                        .cancel()
-                    ])
-                }
-
+            }
+            
+            //                .actionSheet(isPresented: $showImageSourceOptions) {
+            //                    ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
+            //                        .default(Text("Photo Library")) {
+            //                            shouldShowImagePicker = true
+            //                        },
+            //                        .default(Text("Pixabay")) {
+            //                            showPixabayPicker = true
+            //                        },
+            //                        .cancel()
+            //                    ])
+            //                }
+            
             // Display loading indicator if uploading
             if isUploading {
                 ProgressView("Uploading...")
                     .padding()
             }
-
+            
             // Profile Information Grid
             Grid {
                 Divider()
@@ -461,9 +451,9 @@ struct ProfileSettingsView: View {
                         showEditView = true
                     }
                 }
-
+                
                 Divider()
-
+                
                 GridRow {
                     HStack {
                         Text("Username:")
@@ -484,9 +474,9 @@ struct ProfileSettingsView: View {
                         showEditView = true
                     }
                 }
-
+                
                 Divider()
-
+                
                 GridRow {
                     HStack {
                         Text("Bio:")
@@ -516,7 +506,7 @@ struct ProfileSettingsView: View {
                         showEditView = true
                     }
                 }
-
+                
                 Divider()
             }
             
@@ -529,82 +519,75 @@ struct ProfileSettingsView: View {
                 }
             
             ToggleButtonView(userId: userManager.currentUser?.uid ?? "")
-
-//            Text("Change Password >")
-//                .padding(.top, 10)
-//                .font(.custom("Sansation-Regular", size: 18))
-//                .foregroundColor(.customPurple)
-//                //.underline() // Underline the text
-//                .onTapGesture {
-//                    showChangePassword = true
-//                }
             
             Button(action: {
-                    showChangePassword = true
-                }) {
-                    Text("Change Password")
-                        .font(.custom("Sansation-Regular", size: 16))
-                        .frame(width: 360, height: 50)
-                        .background(Color.purple)
-                        .foregroundColor(.white)
-                        .cornerRadius(22)
-                        .shadow(radius: 4)
-                }
-                .padding(.top, 5)
+                showChangePassword = true
+            }) {
+                Text("Change Password")
+                    .font(.custom("Sansation-Regular", size: 16))
+                    .frame(width: 360, height: 50)
+                    .background(Color.purple)
+                    .foregroundColor(.white)
+                    .cornerRadius(22)
+                    .shadow(radius: 4)
+            }
+            .padding(.top, 5)
             
-//            Text("Delete Account")
-//                .padding(.top, 10)
-//                .font(.custom("Sansation-Regular", size: 18))
-//                .foregroundColor(.customPurple)
-//                .underline() // Underline the text
-//                .onTapGesture {
-//                    showingAlert = true
-//                }
             
             // "Delete Account" Button
             Button(action: {
-                    showingAlert = true
-                }) {
-                    Text("Delete Account")
-                        .font(.custom("Sansation-Regular", size: 16))
-                        .frame(width: 360, height: 50)
-                        .background(Color.red)
-                        .foregroundColor(.white)
-                        .cornerRadius(22)  // Rounded corners
-                        .shadow(radius: 4) // Add shadow to match the visual style
-                }
-                .padding(.top, 5)
-
-                Spacer() // Pushes content to the top
-                Spacer()
+                showingAlert = true
+            }) {
+                Text("Delete Account")
+                    .font(.custom("Sansation-Regular", size: 16))
+                    .frame(width: 360, height: 50)
+                    .background(Color.red)
+                    .foregroundColor(.white)
+                    .cornerRadius(22)  // Rounded corners
+                    .shadow(radius: 4) // Add shadow to match the visual style
+            }
+            .padding(.top, 5)
+            
+            Spacer() // Pushes content to the top
+            Spacer()
         }
         .padding(.horizontal, 15)
-        /*
-        .onAppear(){
-            settingsManager.fetchUserSettings(userId: userManager.currentUser?.uid ?? "") { isPublic in
-                print("Is public account: \(isPublic)")
-                // You can now use the `publicAccount` value
+        .fullScreenCover(isPresented: $showPixabayPicker) {
+            PixabayImagePickerView { selectedImage in
+                if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+                    downloadImage(from: url) { downloadedImage in
+                        if let downloadedImage = downloadedImage {
+                            self.image = downloadedImage
+                            // Call persistImageToStorage() after image is set
+                            persistImageToStorage()
+                        } else {
+                            print("Image download failed.")
+                        }
+                        // Dismiss the picker
+                        self.showPixabayPicker = false
+                    }
+                } else {
+                    print("Invalid image URL.")
+                    // Dismiss the picker
+                    self.showPixabayPicker = false
+                }
             }
         }
-         */
+    
         // Attach the fullScreenCover modifier to the VStack
-        .fullScreenCover(isPresented: $shouldShowImagePicker, onDismiss: {
-            if image != nil {
-                persistImageToStorage()
-            }
-        }) {
-           PixabayImagePickerView { selectedImage in
-           if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
-               downloadImage(from: url) { downloadedImage in
-                   if let downloadedImage = downloadedImage {
-                       self.image = downloadedImage
-                       // Optionally persist the image immediately
-                       // persistImageToStorage()
-                   }
-               }
-           }
-       }
-        }
+//        {
+//           PixabayImagePickerView { selectedImage in
+//           if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+//               downloadImage(from: url) { downloadedImage in
+//                   if let downloadedImage = downloadedImage {
+//                       self.image = downloadedImage
+//                       // Optionally persist the image immediately
+//                       // persistImageToStorage()
+//                   }
+//               }
+//           }
+//       }
+//        }
         .fullScreenCover(isPresented: $showEditView) {
             if selectedRow == "Name" {
                 EditView(fieldName: "Name")
