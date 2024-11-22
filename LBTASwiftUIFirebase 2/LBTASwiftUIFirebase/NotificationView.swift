@@ -177,19 +177,13 @@ struct NotificationView: View {
                                     else
                                     {
                                         if let post = user.post, user.post_url != nil {
-                                            /*
-                                             NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
-                                             WebImage(url: URL(string: user.post_url ?? ""))
-                                             .resizable()
-                                             .scaledToFill()
-                                             .frame(width: 40, height: 40) // Set size
-                                             }
-                                             .buttonStyle(PlainButtonStyle()) */
-                                            
+
                                             WebImage(url: URL(string: user.post_url ?? ""))
                                                 .resizable()
                                                 .scaledToFill()
-                                                .frame(width: 40, height: 40) // Set size
+                                                .frame(width: 60, height: 45)
+                                                .clipped()
+                                                .fixedSize() // Prevents resizing based on parent constraints
                                         }
                                     }
                                 }
