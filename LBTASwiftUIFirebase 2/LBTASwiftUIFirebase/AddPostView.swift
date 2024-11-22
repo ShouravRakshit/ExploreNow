@@ -113,29 +113,34 @@ struct AddPostView: View {
                     }
                         
                         if !images.isEmpty {
-                            LazyVGrid(columns: columns, spacing: 8) {
-                                ForEach(images, id: \.self) { image in
-                                    ZStack(alignment: .topTrailing) {
-                                        Image(uiImage: image)
-                                            .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(height: 150)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        
-                                        Button(action: {
-                                            if let index = images.firstIndex(of: image) {
-                                                images.remove(at: index)
+                            ScrollView (.horizontal)
+                                {
+                                    HStack{
+                                    //LazyVGrid(columns: columns, spacing: 8) {
+                                    ForEach(images, id: \.self) { image in
+                                        ZStack(alignment: .topTrailing) {
+                                            Image(uiImage: image)
+                                                .resizable()
+                                                .aspectRatio(contentMode: .fill)
+                                                .frame(height: 150)
+                                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            
+                                            Button(action: {
+                                                if let index = images.firstIndex(of: image) {
+                                                    images.remove(at: index)
+                                                }
+                                            }) {
+                                                Image(systemName: "xmark.circle.fill")
+                                                    .foregroundColor(.red)
+                                                    .background(Color.white)
+                                                    .clipShape(Circle())
+                                                    .padding(4)
                                             }
-                                        }) {
-                                            Image(systemName: "xmark.circle.fill")
-                                                .foregroundColor(.red)
-                                                .background(Color.white)
-                                                .clipShape(Circle())
-                                                .padding(4)
                                         }
                                     }
                                 }
                             }
+                          //  }
                             .padding(.horizontal)
                         }
                     }
