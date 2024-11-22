@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */; };
+		10431E6D2CF02EA600240AEC /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10431E6C2CF02EA600240AEC /* AppTheme.swift */; };
 		10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */; };
 		10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */; };
 		10B59CC92CEA7B9000306357 /* PostCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B59CC82CEA7B9000306357 /* PostCard.swift */; };
@@ -72,6 +73,7 @@
 
 /* Begin PBXFileReference section */
 		101D815D2CC6A1B70075C2AD /* LocationInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationInfoView.swift; sourceTree = "<group>"; };
+		10431E6C2CF02EA600240AEC /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		10B0F34D2CC4BEFC003FB476 /* ClusterAnnotationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClusterAnnotationView.swift; sourceTree = "<group>"; };
 		10B0F3512CC4F7F3003FB476 /* MapSearchControllerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSearchControllerDelegate.swift; sourceTree = "<group>"; };
 		10B59CC82CEA7B9000306357 /* PostCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCard.swift; sourceTree = "<group>"; };
@@ -252,6 +254,7 @@
 		81447E7A2CB34DFC005BE180 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				10431E6C2CF02EA600240AEC /* AppTheme.swift */,
 				10F6BB512CDB39660033B9A5 /* LocationSearchBar.swift */,
 				81447E7B2CB34E26005BE180 /* FirebaseManager.swift */,
 			);
@@ -396,6 +399,7 @@
 				B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */,
 				2CD3C7E32CEDBD4300D21855 /* UserRow.swift in Sources */,
 				2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */,
+				10431E6D2CF02EA600240AEC /* AppTheme.swift in Sources */,
 				B02A96AC2CC0ACCF008B6E8B /* SignUpView.swift in Sources */,
 				B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,

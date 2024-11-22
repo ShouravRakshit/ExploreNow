@@ -9,6 +9,7 @@ import CoreLocation
 import Combine
 
 struct AddPostView: View {
+    // Keeping all existing state variables
     @State private var descriptionText: String = ""
     @State private var rating: Int = 0
     @State private var selectedLocation: String = ""
@@ -19,193 +20,202 @@ struct AddPostView: View {
     @State private var latitude: Double = 0.0
     @State private var longitude: Double = 0.0
     @State private var isLoading = false
-    @Environment(\.dismiss) var dismiss
-    @StateObject private var searchCompleter = LocationSearchCompleter()
-    @EnvironmentObject var userManager: UserManager //Current user
-    @StateObject private var locationManager = CustomLocationManager()
     @State private var showPixabayPicker = false
     @State private var showImageSourceOptions = false
-
-
-    let columns = [
-        GridItem(.flexible(), spacing: 8),
-        GridItem(.flexible(), spacing: 8)
-    ]
+    
+    @Environment(\.dismiss) var dismiss
+    @StateObject private var searchCompleter = LocationSearchCompleter()
+    @EnvironmentObject var userManager: UserManager
+    @StateObject private var locationManager = CustomLocationManager()
     
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    // Profile section
-                    HStack(alignment: .center) {
-                        WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
-                            .resizable()
-                            .frame(width: 60, height: 60)
-                            .clipShape(Circle())
-
-                        Text(userManager.currentUser?.username ?? "User 1")
-                            .font(.custom("Sansation", size: 18))
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 4)
-                            .background(Color(red: 140/255, green: 82/255, blue: 255/255))
-                            .cornerRadius(12)
-                        Spacer()
-                    }
-                    .padding(.horizontal)
-                    
-                    // Description text box
-                    TextEditor(text: $descriptionText)
-                        .padding(.horizontal)
-                        .frame(minHeight: 40, maxHeight: 200) // Set limits to prevent excessive growth
-                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color(red: 140/255, green: 82/255, blue: 255/255)))
-                        .overlay(
-                            // Placeholder text
-                            Group {
-                                if descriptionText.isEmpty {
-                                    Text("Description of the recently visited place...")
-                                        .foregroundColor(.gray)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 12)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                }
-                            }
-                        )
-                    
-                    Divider()
-                    
-                    // Location Search
-                    LocationSearchBar(selectedLocation: $selectedLocation, latitude: $latitude, longitude: $longitude)
-                    
-                    Divider()
-                    
-                    // Rating Section
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Rating")
-                            .font(.headline)
-                        
-                        HStack(spacing: 8) {
-                            ForEach(1...5, id: \.self) { star in
-                                Image(systemName: star <= rating ? "star.fill" : "star")
-                                    .font(.title2)
-                                    .foregroundColor(star <= rating ? .yellow : .gray)
-                                    .onTapGesture {
-                                        rating = star
-                                    }
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
-                    
-                    Divider()
-                    
-                    // Photos Section
-                    VStack(alignment: .leading, spacing: 8) {
-                        Button(action: {
-                            showImageSourceOptions = true
-                        }) {
-                            HStack {
-                                Image(systemName: "photo")
-                                Text("Add Photos")
-                                Spacer()
-                            }
+                VStack(spacing: 24) {
+                    // Images Section
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Photos")
+                            .font(.system(size: 16, weight: .semibold))
                             .foregroundColor(.primary)
-                        }
-                        .padding(.horizontal)
-                        .actionSheet(isPresented: $showImageSourceOptions) {
-                        ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
-                            .default(Text("Photo Library")) {
-                                isImagePickerPresented = true
-                            },
-                            .default(Text("Pixabay")) {
-                                showPixabayPicker = true
-                            },
-                            .cancel()
-                        ])
-                    }
                         
-
-                        if !images.isEmpty {
-                            LazyVGrid(columns: columns, spacing: 8) {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 12) {
+                                // Add Photo Button
+                                Button(action: { showImageSourceOptions = true }) {
+                                    VStack {
+                                        Image(systemName: "plus.circle.fill")
+                                            .font(.system(size: 24))
+                                        Text("Add Photos")
+                                            .font(.system(size: 12))
+                                    }
+                                    .frame(width: 100, height: 100)
+                                    .background(AppTheme.lightPurple)
+                                    .foregroundColor(AppTheme.primaryPurple)
+                                    .cornerRadius(12)
+                                }
+                                
+                                // Image Previews
                                 ForEach(images, id: \.self) { image in
                                     ZStack(alignment: .topTrailing) {
                                         Image(uiImage: image)
                                             .resizable()
-                                            .aspectRatio(contentMode: .fill)
-                                            .frame(width: (UIScreen.main.bounds.width - 40) / 2, height: 150)
-                                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                                            .clipped()
+                                            .scaledToFill()
+                                            .frame(width: 100, height: 100)
+                                            .clipShape(RoundedRectangle(cornerRadius: 12))
                                         
+                                        // Delete Button
                                         Button(action: {
                                             if let index = images.firstIndex(of: image) {
                                                 images.remove(at: index)
                                             }
                                         }) {
                                             Image(systemName: "xmark.circle.fill")
-                                                .foregroundColor(.red)
-                                                .background(Color.white)
+                                                .foregroundColor(.white)
+                                                .background(Color.black.opacity(0.6))
                                                 .clipShape(Circle())
-                                                .padding(4)
                                         }
-                                        .offset(x: -8, y: 8)
+                                        .padding(4)
                                     }
                                 }
                             }
-                            .padding(.horizontal, 16)
+                            .padding(.horizontal)
                         }
                     }
+                    .padding(.horizontal)
                     
+                    // Description Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Description")
+                            .font(.system(size: 16, weight: .semibold))
+                        
+                        TextField("Share your experience...", text: $descriptionText, axis: .vertical)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(height: 100, alignment: .top)
+                            .padding(8)
+                            .background(AppTheme.background)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(.systemGray4), lineWidth: 1)
+                            )
+                            .lineLimit(5...10)
+                            .tint(.blue)
+                    }
+                    .padding(.horizontal)
+                    
+                    // Location Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Location")
+                            .font(.system(size: 16, weight: .semibold))
+                        
+                        LocationSearchBar(selectedLocation: $selectedLocation,
+                                        latitude: $latitude,
+                                        longitude: $longitude)
+                            .background(AppTheme.background)
+                            .cornerRadius(12)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(.systemGray4), lineWidth: 1)
+                            )
+                    }
+                    .padding(.horizontal)
+                    
+                    // Rating Section
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Rating")
+                            .font(.system(size: 16, weight: .semibold))
+                        
+                        HStack(spacing: 12) {
+                            ForEach(1...5, id: \.self) { star in
+                                Image(systemName: star <= rating ? "star.fill" : "star")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(star <= rating ? .yellow : Color(.systemGray4))
+                                    .onTapGesture {
+                                        withAnimation(.spring()) {
+                                            rating = star
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
+                    
+                    // Status Message
                     if !addPostStatusMessage.isEmpty {
                         Text(addPostStatusMessage)
-                            .foregroundColor(addPostStatusMessage.contains("Error") ? .red : .green)
-                            .padding()
+                            .font(.system(size: 14))
+                            .foregroundColor(addPostStatusMessage.contains("Error") ?
+                                           AppTheme.error : AppTheme.success)
+                            .padding(.vertical, 8)
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                addPostStatusMessage.contains("Error") ?
+                                AppTheme.error.opacity(0.1) : AppTheme.success.opacity(0.1)
+                            )
+                            .cornerRadius(8)
+                            .padding(.horizontal)
                     }
                     
                     // Post Button
-                    Button(action: {
-                        addPost()
-                    }) {
-                        Text("Post")
-                            .font(.custom("Sansation-Regular", size: 20))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                isLoading ? Color.gray : Color(red: 140/255, green: 82/255, blue: 255/255)
-                            )
-                            .cornerRadius(12)
+                    Button(action: { addPost() }) {
+                        HStack {
+                            if isLoading {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .padding(.trailing, 8)
+                            }
+                            Text("Share Post")
+                                .font(.system(size: 16, weight: .semibold))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(isLoading ? Color.gray : AppTheme.primaryPurple)
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                     }
                     .disabled(isLoading)
                     .padding(.horizontal)
-                    .padding(.bottom, 20)
+                    .padding(.top, 8)
                 }
+                .padding(.vertical, 16)
             }
-            .padding (.top, 10)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     Text("New Post")
-                        .font(.headline)
+                        .font(.system(size: 17, weight: .semibold))
                 }
             }
+            .background(AppTheme.background)
         }
         .sheet(isPresented: $isImagePickerPresented) {
             AddPhotos(images: $images)
-        }.sheet(isPresented: $showPixabayPicker){
-            PixabayImagePickerView{ selectedImage in
-                // Handle the selected image
-                if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
-                    downloadImage(from: url){ image in
+        }
+        .sheet(isPresented: $showPixabayPicker) {
+            PixabayImagePickerView { selectedImage in
+                if let urlString = selectedImage.largeImageURL,
+                   let url = URL(string: urlString) {
+                    downloadImage(from: url) { image in
                         if let image = image {
                             self.images.append(image)
                         }
                     }
                 }
-                
             }
         }
+        .actionSheet(isPresented: $showImageSourceOptions) {
+            ActionSheet(
+                title: Text("Select Image Source"),
+                message: nil,
+                buttons: [
+                    .default(Text("Photo Library")) { isImagePickerPresented = true },
+                    .default(Text("Pixabay")) { showPixabayPicker = true },
+                    .cancel()
+                ]
+            )
+        }
     }
-    
+
     
     private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
             SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
@@ -421,4 +431,3 @@ struct AddPostView: View {
         addPostStatusMessage = ""
     }
 }
-

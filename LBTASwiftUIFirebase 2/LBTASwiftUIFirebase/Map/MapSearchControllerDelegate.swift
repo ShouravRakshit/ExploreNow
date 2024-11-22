@@ -43,6 +43,10 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
         self.searchCompleter = MKLocalSearchCompleter()
         super.init()
         
+        searchBar.tintColor = .systemBlue
+        searchBar.searchTextField.tintColor = .systemBlue 
+
+        
         searchCompleter.delegate = self
         searchCompleter.resultTypes = [.pointOfInterest, .address, .query]
         setupSuggestionsTableView()
@@ -54,7 +58,7 @@ class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource,
             suggestionsTableView.translatesAutoresizingMaskIntoConstraints = false
             window.addSubview(suggestionsTableView)
         }
-    }
+    } 
     
     // MARK: - UISearchBarDelegate
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {

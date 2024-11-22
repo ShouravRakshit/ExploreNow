@@ -5,6 +5,12 @@ import Firebase
 import FirebaseFirestore
 import SDWebImageSwiftUI
 
+struct LocationDetails {
+    let mainAddress: String
+    let fullAddress: String
+    let averageRating: Double
+}
+
 struct LocationPostsPage: View {
     let locationRef: DocumentReference
     @State private var locationPosts: [Post] = []
@@ -12,133 +18,192 @@ struct LocationPostsPage: View {
     @State private var isLoading = true
     @State private var headerImageUrl: String? = nil
     @EnvironmentObject var userManager: UserManager
-
-}
-
-struct LocationDetails {
-    let mainAddress: String
-    let fullAddress: String
-    let averageRating: Double
-}
-
-extension LocationPostsPage {
-
+    
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                if isLoading {
-                    ProgressView()
-                } else {
-                    // Header Image with location and rating
-                    ZStack(alignment: .bottom) {
-                        if let imageUrl = headerImageUrl {
-                            WebImage(url: URL(string: imageUrl))
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 250)
-                                .clipped()
-                        } else {
-                            // Fallback image or color when no images are available
-                            Rectangle()
-                                .fill(Color.gray.opacity(0.3))
-                                .frame(height: 250)
-                                .overlay(
-                                    Image(systemName: "photo")
-                                        .foregroundColor(.gray)
-                                        .font(.system(size: 40))
-                                )
+            ScrollView {
+                VStack(spacing: 0) {
+                    if isLoading {
+                        loadingView
+                    } else {
+                        VStack(spacing: 0) {
+                            headerSection
+                            locationInfoSection
+                            postsSection
                         }
-
-                        // Location info overlay
-                        VStack(spacing: 8) {
-                            // Main address (POI)
-                            Text(locationDetails?.mainAddress ?? "Location")
-                                .font(.title)
-                                .fontWeight(.bold)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                            
-                            // Full address
-                            if let fullAddress = locationDetails?.fullAddress {
-                                Text(fullAddress)
-                                    .font(.subheadline)
-                                    .foregroundColor(.white.opacity(0.9))
-                                    .multilineTextAlignment(.center)
-                                    .onTapGesture {
-                                        openInMaps()
-                                    }
-                                    .padding(.horizontal)
-                            }
-                            
-                            // Ratings and car button side by side
-                            HStack(spacing: 16) {
-                                // Rating display
-                                HStack(spacing: 4) {
-                                    Text(String(format: "%.1f", locationDetails?.averageRating ?? 0))
-                                        .font(.headline)
-                                        .foregroundColor(.black)
-                                    Image(systemName: "star.fill")
-                                        .foregroundColor(.yellow)
-                                }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Color.white)
-                                .clipShape(Capsule())
-                                .shadow(radius: 3)
-                                
-                                // Car button
-                                Button(action: {
-                                    openInMapsWithDirections()
-                                }) {
-                                    HStack {
-                                        Image(systemName: "car.fill")
-                                            .foregroundColor(.white)
-                                    }
-                                    .frame(width: 44, height: 44)
-                                    .background(Color.blue)
-                                    .clipShape(Circle())
-                                    .shadow(radius: 3)
-                                }
-                            }
-                            .padding(.horizontal)
-                            .padding(.vertical, 8)
-                        }
-
-
-                        }
-                        .padding(.bottom, 50)
-                        .shadow(radius: 5)
-                    }
-                    
-                    ScrollView {
-                        VStack(spacing: 16) {
-                            if locationPosts.isEmpty {
-                                Text("No posts yet for this location")
-                                    .foregroundColor(.gray)
-                                    .padding()
-                            } else {
-                                ForEach(locationPosts) { post in
-                                    PostCard(post: post)
-                                        .environmentObject(userManager)
-                                        .padding(.horizontal)
-                                }
-                            }
-                        }
-                        .padding(.top)
                     }
                 }
-                
-                Spacer()
             }
             .edgesIgnoringSafeArea(.top)
+            .background(AppTheme.background)
             .onAppear {
                 fetchLocationDetails()
                 fetchLocationPosts()
             }
-        
+        }
         .navigationViewStyle(StackNavigationViewStyle())
     }
     
+    // MARK: - UI Components
+    
+    private var loadingView: some View {
+        VStack(spacing: 16) {
+            ProgressView()
+                .scaleEffect(1.5)
+                .tint(AppTheme.primaryPurple)
+            Text("Loading location details...")
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.secondaryText)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(.top, 100)
+    }
+    
+    private var headerSection: some View {
+        ZStack(alignment: .bottom) {
+            // Header Image
+            Group {
+                if let imageUrl = headerImageUrl {
+                    WebImage(url: URL(string: imageUrl))
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 250)
+                        .clipped()
+                } else {
+                    Rectangle()
+                        .fill(AppTheme.secondaryBackground)
+                        .frame(height: 250)
+                        .overlay(
+                            Image(systemName: "photo")
+                                .font(.system(size: 40))
+                                .foregroundColor(AppTheme.secondaryText)
+                        )
+                }
+            }
+            
+            // Gradient overlay
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    Color.black.opacity(0.5),
+                    Color.black.opacity(0)
+                ]),
+                startPoint: .bottom,
+                endPoint: .top
+            )
+            .frame(height: 150)
+        }
+        .frame(height: 250)
+    }
+    
+    private var locationInfoSection: some View {
+        VStack(spacing: 16) {
+            // Location Name
+            Text(locationDetails?.mainAddress ?? "Location")
+                .font(.system(size: 24, weight: .bold))
+                .foregroundColor(AppTheme.primaryText)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+                .padding(.top, 16)
+            
+            // Address
+            if let fullAddress = locationDetails?.fullAddress {
+                Button(action: { openInMaps() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "mappin.circle.fill")
+                            .font(.system(size: 16))
+                        Text(fullAddress)
+                            .font(.system(size: 14))
+                    }
+                    .foregroundColor(AppTheme.primaryPurple)
+                }
+                .padding(.horizontal)
+            }
+            
+            // Rating and Directions
+            HStack(spacing: 20) {
+                // Rating
+                HStack(spacing: 4) {
+                    Text(String(format: "%.1f", locationDetails?.averageRating ?? 0))
+                        .font(.system(size: 16, weight: .semibold))
+                    Image(systemName: "star.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(.yellow)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(AppTheme.lightPurple)
+                .cornerRadius(12)
+                
+                // Directions Button
+                Button(action: { openInMapsWithDirections() }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "car.fill")
+                        Text("Get Directions")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(AppTheme.primaryPurple)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+            }
+            .padding(.vertical, 8)
+            
+            Divider()
+                .padding(.horizontal)
+        }
+        .background(AppTheme.background)
+    }
+    
+    private var postsSection: some View {
+        VStack(spacing: 16) {
+            // Section Header
+            HStack {
+                Text("Posts")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundColor(AppTheme.primaryText)
+                
+                Spacer()
+                
+                Text("\(locationPosts.count)")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.secondaryText)
+            }
+            .padding(.horizontal)
+            .padding(.top, 16)
+            
+            // Posts List
+            if locationPosts.isEmpty {
+                emptyPostsView
+            } else {
+                LazyVStack(spacing: 16) {
+                    ForEach(locationPosts) { post in
+                        PostCard(post: post)
+                            .environmentObject(userManager)
+                            .padding(.horizontal)
+                    }
+                }
+            }
+        }
+        .padding(.bottom, 20)
+    }
+    
+    private var emptyPostsView: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "photo.stack")
+                .font(.system(size: 40))
+                .foregroundColor(AppTheme.secondaryText)
+            
+            Text("No posts yet for this location")
+                .font(.system(size: 14))
+                .foregroundColor(AppTheme.secondaryText)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 40)
+        .background(AppTheme.background)
+    }
+
     private func fetchLocationDetails() {
         locationRef.getDocument { snapshot, error in
             if let error = error {

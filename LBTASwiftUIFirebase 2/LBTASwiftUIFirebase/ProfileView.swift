@@ -1102,7 +1102,6 @@ struct UserPostCard: View {
                 Text(post.description)
                     .font(.system(size: 14))
                     .padding(.horizontal)
-                    .foregroundColor (.black)
                     .padding(.top, 8)
                 
                 // Display the timestamp

@@ -1,4 +1,3 @@
-import Foundation
 import SwiftUI
 import Firebase
 import FirebaseFirestore
@@ -6,12 +5,11 @@ import SDWebImageSwiftUI
 import MapKit
 import CoreLocation
 
-// extending comment
-
+// MARK: - Comment Extension
 extension Comment {
     func formattedTimestamp() -> String {
         let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .full // Options: .full, .short, .abbreviated
+        formatter.unitsStyle = .full
         return formatter.localizedString(for: timestamp, relativeTo: Date())
     }
 }
@@ -38,29 +36,6 @@ struct PostView: View {
             self._liked = State(initialValue: liked)
         }
     
-      private var emojiPicker: some View {
-          let emojis: [String] = ["😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳"]
-          
-          return VStack {
-              LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
-                  ForEach(emojis, id: \.self) { emoji in
-                      Button(action: {
-                    // Add selected emoji to commentText
-                            commentText += emoji
-                            showEmojiPicker = false  // Hide the picker after selecting an emoji
-                    }) {
-                            Text(emoji)
-                                    .font(.largeTitle)
-                                     }
-                                 }
-                             }
-              .padding()
-              .background(Color.white)
-              .cornerRadius(10)
-              .shadow(radius: 5)
-          }
-      }
-  
     private func formatCommentTimestamp(_ timestamp: Date) -> String {
         let currentTime = Date()
         let timeInterval = currentTime.timeIntervalSince(timestamp)
@@ -123,312 +98,355 @@ struct PostView: View {
            }
        }
 
-
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-           
-            HStack {
+        ScrollView {
+            VStack(spacing: 0) {
+                // Header Section
+                headerSection
                 
-                if let imageUrl = URL(string: post.userProfileImageUrl) {
-                    WebImage(url: imageUrl)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                } else {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .foregroundColor(.gray)
-                        .clipShape(Circle())
-                }
+                // Images Section
+                imageSection
                 
-                NavigationLink(destination: ProfileView(user_uid: post.uid)) {
-                    Text(post.username)
-                        .font(.headline)
-                        .foregroundColor(.customPurple)  // Optional: To make the username look clickable
-                }
+                // Interaction Bar
+                interactionBar
+                    .padding(.vertical, 12)
                 
-                Spacer()
-                // Display the time ago
-                Text(timeAgo)  // Show the "time ago" string
-                    .font(.system(size: 12))
-                    .foregroundColor(.gray)
-                    .padding(.horizontal)
-            }
-            .padding()
-           
-            
-            // Post images
-            if !post.imageUrls.isEmpty {
-                TabView {
-                    ForEach(post.imageUrls.indices, id: \.self) { index in
-                        if let imageUrl = URL(string: post.imageUrls[index]) {
-                            WebImage(url: imageUrl)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(height: 200)
-                                .clipped()
-                                .tag(index)
-                        } else {
-                            Image(systemName: "photo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(height: 200)
-                                .foregroundColor(.gray)
-                                .tag(index)
-                        }
-                    }
-                }
-                .tabViewStyle(PageTabViewStyle())
-                .frame(height: 200)
-                .cornerRadius(12)
-            }
-            
-            /*
-            // Display the time ago
-            Text(timeAgo)  // Show the "time ago" string
-                .font(.system(size: 12))
-                .foregroundColor(.gray)
-                .padding(.horizontal)*/
-            
-            // Location, Rating, Likes
-            HStack {
-                Button(action: {
-                    openInMaps()
-                }) {
-                    HStack {
-                        Image(systemName: "mappin.and.ellipse")
-                            .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
-                        Text("\(post.locationAddress)")
-                            .font(.system(size: 16))
-                            .foregroundColor(.blue) // Make it look clickable
-                            .underline() // Optional: add underline to make it look more like a link
-                    }
-                }
-
-                Spacer()
-                
-                Label {
-                    Text("\(post.rating)")
-                        .font(.system(size: 16))
-                } icon: {
-                    Image(systemName: "star.fill")
-                        .foregroundColor(.yellow)
-                }
-                
-                // Likes are dynamic
-                HStack(spacing: 4) {
-                    // Heart icon that changes based on whether the post is liked
-                    Image(systemName: liked ? "heart.fill" : "heart")  // Filled heart if liked, empty if not
-                        .foregroundColor(liked ? .red : .gray)  // Red if liked, gray if not
-                        .padding(5)
-                        .onTapGesture {
-                          toggleLike()  // Toggle like action
-                        }
-                    
-                    // Display like count
-                    Text("\(likesCount)")
-                        .foregroundColor(.gray)  // Like count in gray
-                }
-            }
-            .font(.subheadline)
-            .foregroundColor(.gray)
-            .padding(.horizontal)
-            .padding(.top, 10)
-            .padding(.bottom, 10)
-            
-         
-            
-            // Description Box
-            VStack(alignment: .leading, spacing: 8) {
+                // Description Section
                 if !post.description.isEmpty {
-                    Text(post.description)
-                        .font(.body)
-                        .foregroundColor(.gray)
-                        .padding()
-                        .frame(width: 350, alignment: .leading)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(Color(red: 140/255, green: 82/255, blue: 255/255))
-                        )
-                }
-            }
-            .padding(.horizontal)
-            
-           
-            
-            // Comments Section
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Comments")
-                        .font(.headline)
-                        .padding(.horizontal)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Spacer()
-                    
-                    Text("\(comments.count)")
-                        .font(.headline)
-                        .foregroundColor(.gray)
-                    
-                    Spacer()
+                    descriptionSection
                 }
                 
-                // Display "No comments yet" if there are no comments
-                if comments.isEmpty {
-                    Text("No comments yet")
-                        .font(.subheadline)
-                        .foregroundColor(.gray)
-                        .padding()
-                } else {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(comments) { comment in
-                                HStack(alignment: .top, spacing: 8) {
-                                    if let profileImageUrl = userData[comment.userID]?.profileImageUrl,
-                                       let url = URL(string: profileImageUrl) {
-                                        WebImage(url: url)
-                                            .resizable()
-                                            .frame(width: 40, height: 40)
-                                            .clipShape(Circle())
-                                    } else {
-                                        Image(systemName: "person.circle.fill")
-                                            .resizable()
-                                            .frame(width: 40, height: 40)
-                                            .clipShape(Circle())
-                                    }
-                                    
-                                    
-                                    
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text(userData[comment.userID]?.username ?? "Loading...")
-                                            .font(.subheadline)
-                                            .bold()
-                                        Text(comment.text)
-                                            .font(.body)
-                                        Text(comment.timestampString ?? "Unknown time")
-                                                   .font(.subheadline)
-                                                   .foregroundColor(.gray)
-                                    }
-                                    
-                                    
-                                    Spacer()
-                                    
-                                    // Like button for each comment
-                                           HStack(spacing: 4) {
-                                               Image(systemName: comment.likedByCurrentUser ? "heart.fill" : "heart")
-                                                   .foregroundColor(comment.likedByCurrentUser ? .red : .gray)
-                                                   .onTapGesture {
-                                                       toggleLikeForComment(comment)  // Toggle like for comment
-                                                   }
-                                               
-                                               Text("\(comment.likeCount)")
-                                                   .foregroundColor(.gray)
-                                           }
-                                           
-                                    
-                                    // Delete button
-                                    if comment.userID == FirebaseManager.shared.auth.currentUser?.uid {
-                                        Button(action: { deleteComment(comment) }) {
-                                            Image(systemName: "trash")
-                                                .foregroundColor(.red)
-                                        }
-                                    }
-                                }
-                                .padding(.horizontal)
-                                .padding(.vertical, 10)
-                                .background(RoundedRectangle(cornerRadius: 10).stroke(Color(red: 140/255, green: 82/255, blue: 255/255)))
-                                .onAppear {
-                                    // Fetch user data if not already cached
-                                    if userData[comment.userID] == nil {
-                                        fetchUserData(for: comment.userID) { username, profileImageUrl in
-                                            userData[comment.userID] = (username, profileImageUrl)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // "Add a comment" Section
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    // Display current user's profile image
-                    if let imageUrl = currentUserProfileImageUrl, let url = URL(string: imageUrl) {
-                        WebImage(url: url)
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .clipShape(Circle())
-                    } else {
-                        Image(systemName: "person.circle.fill") // Placeholder if image URL is not available
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .clipShape(Circle())
-                            .foregroundColor(.gray)
-                    }
-                    
-                    TextField("Add a comment for @\(post.username)...", text: $commentText)
-                        .padding(10)
-                        .background(Color.gray.opacity(0.1))
-                        .cornerRadius(20)
-                   
-                    
-                            .padding(.leading, 5)
-                    
-                    Button(action: {
-                        withAnimation {
-                            showEmojiPicker.toggle()
-                        }
-                        }) {
-                            Image(systemName: "face.smiling")
-                                .font(.system(size: 24))
-                                .foregroundColor(Color(.darkGray))
-                    }
-                                      
-                    
-                    Button(action: addComment) {
-                        Text("Post")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(.blue)
-                        // Emoji Picker Sheet
-                        // Emoji Picker Overlay
-                        
-                        
-                    }
-                    .padding(.leading, 5)
-                    
-                }
-                .padding(.horizontal)
+                Divider()
+                    .padding(.horizontal)
+                    .padding(.vertical, 8)
                 
-                // Conditional rendering of the emoji picker
-                if showEmojiPicker {
-                    emojiPicker  // Display the emoji picker when `showEmojiPicker` is true
-                        .transition(.move(edge: .bottom))  // Add a transition for a smooth animation
-                            }
-                        }
-                
-            
-            
-            .padding(.bottom, 20)
-            .onAppear {
-                fetchCurrentUserProfile() // Fetch profile image on view load
-                fetchLikes() // Fetch likes on view load
+                // Comments Section
+                commentsSection
             }
-            
         }
-        .padding(.bottom, 20)
-        .navigationTitle("Post View")
-        .navigationBarBackButtonHidden(false)
+        .overlay(alignment: .bottom) {
+            commentInputSection
+                .background(AppTheme.background)
+                .shadow(color: Color.black.opacity(0.05), radius: 10, y: -5)
+        }
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            fetchComments() // Fetch comments when the view appears
+            fetchCurrentUserProfile()
+            fetchLikes()
+            fetchComments()
         }
     }
+    
+    // MARK: - UI Components
+    private var profileImage: some View {
+        Group {
+            if let imageUrl = URL(string: post.userProfileImageUrl) {
+                WebImage(url: imageUrl)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 40, height: 40)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(AppTheme.lightPurple, lineWidth: 2))
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .frame(width: 40, height: 40)
+                    .foregroundColor(AppTheme.secondaryText)
+                    .clipShape(Circle())
+                    .overlay(Circle().stroke(AppTheme.lightPurple, lineWidth: 2))
+            }
+        }
+    }
+    
+//    private var currentUserImage: some View {
+//        if let imageUrl = URL(string: currentUserProfileImageUrl ?? "") {
+//            WebImage(url: imageUrl)
+//                .resizable()
+//                .scaledToFill()
+//                .frame(width: 32, height: 32)
+//                .clipShape(Circle())
+//        } else {
+//            Image(systemName: "person.circle.fill")
+//                .resizable()
+//                .frame(width: 32, height: 32)
+//                .foregroundColor(AppTheme.secondaryText)
+//                .clipShape(Circle())
+//        }
+//    }
+
+    
+    private var headerSection: some View {
+        HStack(spacing: 12) {
+            profileImage  // Use the new component
+            
+            VStack(alignment: .leading, spacing: 2) {
+                NavigationLink(destination: ProfileView(user_uid: post.uid)) {
+                    Text(post.username)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(AppTheme.primaryPurple)
+                }
+                
+                Text(timeAgo)
+                    .font(.system(size: 12))
+                    .foregroundColor(AppTheme.secondaryText)
+            }
+            
+            Spacer()
+        }
+        .padding(16)
+        .background(AppTheme.background)
+    }
+
+    private var imageSection: some View {
+        TabView {
+            ForEach(post.imageUrls.indices, id: \.self) { index in
+                Group {
+                    if let imageUrl = URL(string: post.imageUrls[index]) {
+                        WebImage(url: imageUrl)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(maxWidth: CGFloat.infinity)
+                            .frame(height: 400)
+                            .clipped()
+                    } else {
+                        Image(systemName: "photo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(maxWidth: CGFloat.infinity)
+                            .frame(height: 400)
+                            .foregroundColor(AppTheme.secondaryText)
+                    }
+                }
+            }
+        }
+        .tabViewStyle(PageTabViewStyle())
+        .frame(height: 400)
+    }
+
+    private var interactionBar: some View {
+        HStack(spacing: 20) {
+            Button(action: { toggleLike() }) {
+                HStack(spacing: 6) {
+                    Image(systemName: liked ? "heart.fill" : "heart")
+                        .font(.system(size: 22))
+                        .foregroundColor(liked ? .red : AppTheme.secondaryText)
+                    
+                    Text("\(likesCount)")
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.secondaryText)
+                }
+            }
+            
+            NavigationLink(destination: LocationPostsPage(locationRef: post.locationRef)) {
+                HStack(spacing: 6) {
+                    Image(systemName: "mappin.circle.fill")
+                        .font(.system(size: 22))
+                    Text(post.locationAddress)
+                        .font(.system(size: 14))
+                        .lineLimit(1)
+                }
+                .foregroundColor(AppTheme.primaryPurple)
+            }
+
+            Spacer()
+            
+            HStack(spacing: 4) {
+                ForEach(1...5, id: \.self) { index in
+                    Image(systemName: index <= post.rating ? "star.fill" : "star")
+                        .font(.system(size: 14))
+                        .foregroundColor(index <= post.rating ? .yellow : AppTheme.secondaryText)
+                }
+            }
+        }
+        .padding(.horizontal, 16)
+    }
+    
+    private var descriptionSection: some View {
+        Text(post.description)
+            .font(.system(size: 15))
+            .foregroundColor(AppTheme.primaryText)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .background(AppTheme.background)
+    }
+    
+    private var commentsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Comments")
+                    .font(.system(size: 16, weight: .semibold))
+                Spacer()
+                Text("\(comments.count)")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.secondaryText)
+            }
+            .padding(.horizontal, 16)
+            
+            if comments.isEmpty {
+                Text("No comments yet")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppTheme.secondaryText)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+            } else {
+                ForEach(comments) { comment in
+                    CommentRow(comment: comment,
+                             userData: userData[comment.userID],
+                             onDelete: { deleteComment(comment) },
+                             onLike: { toggleLikeForComment(comment) })
+                }
+            }
+        }
+        .padding(.bottom, 60) // Space for input bar
+    }
+    
+    private var commentInputSection: some View {
+        VStack(spacing: 0) {
+            Divider()
+            
+            HStack(spacing: 12) {
+                Group {
+                    if let imageUrl = currentUserProfileImageUrl,
+                       let url = URL(string: imageUrl),
+                       !imageUrl.isEmpty {
+                        WebImage(url: url)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(AppTheme.secondaryText)
+                            .clipShape(Circle())
+                    }
+                }
+                
+                TextField("Add a comment...", text: $commentText)
+                    .textFieldStyle(.plain)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(AppTheme.secondaryBackground)
+                    .cornerRadius(20)
+                
+                Button(action: { showEmojiPicker.toggle() }) {
+                    Image(systemName: "face.smiling")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppTheme.secondaryText)
+                }
+                
+                Button(action: addComment) {
+                    Text("Post")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(AppTheme.primaryPurple)
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            
+            if showEmojiPicker {
+                EmojiPickerView(text: $commentText, showPicker: $showEmojiPicker)
+                    .transition(.move(edge: .bottom))
+            }
+        }
+    }
+
+    // MARK: - Supporting Views
+    private struct CommentRow: View {
+        let comment: Comment
+        let userData: (username: String, profileImageUrl: String?)?
+        let onDelete: () -> Void
+        let onLike: () -> Void
+        
+        var body: some View {
+            HStack(alignment: .top, spacing: 12) {
+                // User Image
+                Group {
+                    if let profileUrl = userData?.profileImageUrl,
+                       let url = URL(string: profileUrl),
+                       !profileUrl.isEmpty {
+                        WebImage(url: url)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(AppTheme.secondaryText)
+                            .clipShape(Circle())
+                    }
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(userData?.username ?? "Unknown User")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(AppTheme.primaryText)
+                    
+                    Text(comment.text)
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.primaryText)
+                    
+                    Text(comment.timestampString ?? "")
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.secondaryText)
+                }
+                
+                Spacer()
+                
+                // Like and Delete buttons
+                HStack(spacing: 12) {
+                    Button(action: onLike) {
+                        HStack(spacing: 4) {
+                            Image(systemName: comment.likedByCurrentUser ? "heart.fill" : "heart")
+                                .foregroundColor(comment.likedByCurrentUser ? .red : AppTheme.secondaryText)
+                            Text("\(comment.likeCount)")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.secondaryText)
+                        }
+                    }
+                    
+                    if comment.userID == FirebaseManager.shared.auth.currentUser?.uid {
+                        Button(action: onDelete) {
+                            Image(systemName: "trash")
+                                .foregroundColor(.red)
+                        }
+                    }
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        }
+    }
+
+
+    private struct EmojiPickerView: View {
+        @Binding var text: String
+        @Binding var showPicker: Bool
+        
+        let emojis = ["😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳"]
+        
+        var body: some View {
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 6), spacing: 12) {
+                ForEach(emojis, id: \.self) { emoji in
+                    Button(action: {
+                        text += emoji
+                        showPicker = false
+                    }) {
+                        Text(emoji)
+                            .font(.system(size: 24))
+                    }
+                }
+            }
+            .padding()
+            .background(AppTheme.background)
+        }
+    }
+
     
     private func openInMaps() {
         // First, get the location reference
@@ -606,72 +624,94 @@ struct PostView: View {
            return UIButton()
        }
 
-       private func fetchComments() {
-           let db = FirebaseManager.shared.firestore
-           db.collection("comments")
-               .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
-               .order(by: "timestamp", descending: true)
-               .getDocuments { snapshot, error in
-                   if let error = error {
-                       print("Error fetching comments: \(error)")
-                   } else {
-                       // Decode Firestore documents into Comment objects
-                       self.comments = snapshot?.documents.compactMap { document in
-                           // Initialize the Comment object
-                           var comment = Comment(document: document)
-                           
-                           // Fetch the 'likedByCurrentUser' dictionary to see if the current user liked the comment
-                           guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return comment }
-                           
-                           // Format the timestamp and update the comment object
-                           if let timestamp = document.data()["timestamp"] as? Timestamp {
-                               let timestampDate = timestamp.dateValue()
-                               comment?.timestampString = formatCommentTimestamp(timestampDate) // Store the formatted timestamp
-                           }
-
-
-                           
-                           // Fetch the likedByCurrentUser field
-                           if let likedByCurrentUser = document.data()["likedByCurrentUser"] as? [String: Bool],
-                              let isLikedByCurrentUser = likedByCurrentUser[currentUserId] {
-                               comment?.likedByCurrentUser = isLikedByCurrentUser
-                           } else {
-                               comment?.likedByCurrentUser = false
-                           }
-                           
-                           // Return the comment object
-                           return comment
-                       } ?? []
-
-                       // Once we have all the comments with the 'likedByCurrentUser' information, we can update the UI accordingly
-                       self.updateCommentUI()
-                   }
-               }
-       }
+    private func fetchComments() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("comments")
+            .whereField("pid", isEqualTo: post.id)
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching comments: \(error)")
+                    return
+                }
+                
+                // Create a temporary array to hold comments while we fetch user data
+                var newComments: [Comment] = []
+                
+                let group = DispatchGroup()
+                
+                for document in snapshot?.documents ?? [] {
+                    group.enter()
+                    
+                    // Initialize the comment
+                    if var comment = Comment(document: document) {
+                        // Format timestamp
+                        if let timestamp = document.data()["timestamp"] as? Timestamp {
+                            let timestampDate = timestamp.dateValue()
+                            comment.timestampString = formatCommentTimestamp(timestampDate)
+                        }
+                        
+                        // Handle liked status
+                        if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid,
+                           let likedByCurrentUser = document.data()["likedByCurrentUser"] as? [String: Bool] {
+                            comment.likedByCurrentUser = likedByCurrentUser[currentUserId] ?? false
+                        }
+                        
+                        // Fetch user data for this comment
+                        fetchUserData(for: comment.userID) { username, profileImageUrl in
+                            // Store user data in the cache
+                            userData[comment.userID] = (username, profileImageUrl)
+                            newComments.append(comment)
+                            group.leave()
+                        }
+                    } else {
+                        group.leave()
+                    }
+                }
+                
+                // When all user data is fetched
+                group.notify(queue: .main) {
+                    comments = newComments.sorted { $0.timestamp > $1.timestamp }
+                    updateCommentUI()
+                }
+            }
+    }
 
     // Function to fetch user data
     private func fetchUserData(for userID: String, completion: @escaping (String, String?) -> Void) {
+        // First check the cache
         if let cachedData = userData[userID] {
             completion(cachedData.username, cachedData.profileImageUrl)
-        } else {
-            let db = FirebaseManager.shared.firestore
-            db.collection("users").document(userID).getDocument { document, error in
-                if let error = error {
-                    print("Error fetching user data: \(error)")
-                    completion("Unknown", nil)
-                } else if let document = document, document.exists,
-                          let data = document.data(),
-                          let username = data["username"] as? String {
-                    let profileImageUrl = data["profileImageUrl"] as? String
-                    userData[userID] = (username, profileImageUrl) // Cache the result
-                    completion(username, profileImageUrl)
-                } else {
-                    completion("Unknown", nil)
-                }
+            return
+        }
+        
+        // If not in cache, fetch from Firestore
+        let db = FirebaseManager.shared.firestore
+        db.collection("users").document(userID).getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error)")
+                completion("Unknown", nil)
+                return
+            }
+            
+            if let document = document,
+               document.exists,
+               let data = document.data() {
+                let username = data["username"] as? String ?? "Unknown"
+                let profileImageUrl = data["profileImageUrl"] as? String
+                
+                // Store in cache
+                userData[userID] = (username, profileImageUrl)
+                
+                // Return the data
+                completion(username, profileImageUrl)
+            } else {
+                print("No user document found for ID: \(userID)")
+                completion("Unknown", nil)
             }
         }
     }
-    
+
     private func deleteComment(_ comment: Comment) {
           let db = FirebaseManager.shared.firestore
           db.collection("comments").document(comment.id).delete { error in

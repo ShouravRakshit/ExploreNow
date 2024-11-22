@@ -5,12 +5,18 @@ import Firebase
 import FirebaseFirestore
 
 class LocationInfoView: UIView {
-    private let locationLabel = UILabel() // Combined name and post count
+    private let locationLabel = UILabel()
     private let ratingLabel = UILabel()
+    private let postCountLabel = UILabel()
     private var loadingIndicator: UIActivityIndicatorView?
     private var currentLocation: Location?
     private weak var userManager: UserManager?
     
+    // MARK: - Custom Colors
+    private let primaryPurple = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 1.0)
+    private let lightPurple = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 0.1)
+    
+    // MARK: - Initialization
     init(frame: CGRect, userManager: UserManager) {
         self.userManager = userManager
         super.init(frame: frame)
@@ -25,68 +31,120 @@ class LocationInfoView: UIView {
         setupGesture()
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
+        // Main Container Setup
         backgroundColor = .white
-        layer.cornerRadius = 12
+        layer.cornerRadius = 16
+        layer.masksToBounds = false
         layer.shadowColor = UIColor.black.cgColor
-        layer.shadowOpacity = 0.2
-        layer.shadowOffset = CGSize(width: 0, height: 1)
-        layer.shadowRadius = 4
+        layer.shadowOpacity = 0.08
+        layer.shadowOffset = CGSize(width: 0, height: 2)
+        layer.shadowRadius = 8
         
-        // Configure labels with improved styling
-        locationLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        // Location Container
+        let locationContainer = UIView()
+        locationContainer.backgroundColor = .clear
+        locationContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Location Icon
+        let locationIcon = UIImageView(image: UIImage(systemName: "mappin.circle.fill"))
+        locationIcon.tintColor = primaryPurple
+        locationIcon.contentMode = .scaleAspectFit
+        locationIcon.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Location Label Setup
+        locationLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         locationLabel.textColor = .black
-        locationLabel.numberOfLines = 0
+        locationLabel.numberOfLines = 2
+        locationLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        // Create rating container with icon
+        // Post Count Label Setup
+        postCountLabel.font = .systemFont(ofSize: 14)
+        postCountLabel.textColor = .gray
+        postCountLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Rating Container
+        let ratingContainer = UIView()
+        ratingContainer.backgroundColor = lightPurple
+        ratingContainer.layer.cornerRadius = 12
+        ratingContainer.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Rating Icon
         let ratingIcon = UIImageView(image: UIImage(systemName: "star.fill"))
-        ratingIcon.tintColor = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 1.0)
-        ratingIcon.translatesAutoresizingMaskIntoConstraints = false
+        ratingIcon.tintColor = .systemYellow
         ratingIcon.contentMode = .scaleAspectFit
+        ratingIcon.translatesAutoresizingMaskIntoConstraints = false
         
-        ratingLabel.font = .systemFont(ofSize: 14)
-        ratingLabel.textColor = .gray
+        // Rating Label Setup
+        ratingLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        ratingLabel.textColor = primaryPurple
+        ratingLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let ratingStack = UIStackView(arrangedSubviews: [ratingIcon, ratingLabel])
-        ratingStack.spacing = 4
-        ratingStack.alignment = .center
+        // Add subviews
+        addSubview(locationContainer)
+        locationContainer.addSubview(locationIcon)
+        locationContainer.addSubview(locationLabel)
+        locationContainer.addSubview(postCountLabel)
         
-        // Main horizontal stack
-        let mainStack = UIStackView(arrangedSubviews: [locationLabel, ratingStack])
-        mainStack.axis = .horizontal
-        mainStack.spacing = 8
-        mainStack.alignment = .center
-        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(ratingContainer)
+        ratingContainer.addSubview(ratingIcon)
+        ratingContainer.addSubview(ratingLabel)
         
-        addSubview(mainStack)
-        
-        // Create and configure loading indicator
+        // Loading Indicator Setup
         loadingIndicator = UIActivityIndicatorView(style: .medium)
         loadingIndicator?.hidesWhenStopped = true
         loadingIndicator?.translatesAutoresizingMaskIntoConstraints = false
         if let loadingIndicator = loadingIndicator {
             addSubview(loadingIndicator)
         }
-
-        // Set up constraints
+        
+        // Setup Constraints
         NSLayoutConstraint.activate([
-            mainStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            mainStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
-            mainStack.topAnchor.constraint(equalTo: topAnchor, constant: 12),
-            mainStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
+            // Location Container
+            locationContainer.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
+            locationContainer.topAnchor.constraint(equalTo: topAnchor, constant: 12),
+            locationContainer.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
             
+            // Location Icon
+            locationIcon.leadingAnchor.constraint(equalTo: locationContainer.leadingAnchor),
+            locationIcon.centerYAnchor.constraint(equalTo: locationContainer.centerYAnchor),
+            locationIcon.widthAnchor.constraint(equalToConstant: 24),
+            locationIcon.heightAnchor.constraint(equalToConstant: 24),
+            
+            // Location Label
+            locationLabel.leadingAnchor.constraint(equalTo: locationIcon.trailingAnchor, constant: 8),
+            locationLabel.topAnchor.constraint(equalTo: locationContainer.topAnchor),
+            
+            // Post Count Label
+            postCountLabel.leadingAnchor.constraint(equalTo: locationIcon.trailingAnchor, constant: 8),
+            postCountLabel.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: 2),
+            postCountLabel.bottomAnchor.constraint(equalTo: locationContainer.bottomAnchor),
+            
+            // Rating Container
+            ratingContainer.leadingAnchor.constraint(greaterThanOrEqualTo: locationLabel.trailingAnchor, constant: 12),
+            ratingContainer.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16),
+            ratingContainer.centerYAnchor.constraint(equalTo: centerYAnchor),
+            ratingContainer.heightAnchor.constraint(equalToConstant: 32),
+            
+            // Rating Icon
+            ratingIcon.leadingAnchor.constraint(equalTo: ratingContainer.leadingAnchor, constant: 12),
+            ratingIcon.centerYAnchor.constraint(equalTo: ratingContainer.centerYAnchor),
             ratingIcon.widthAnchor.constraint(equalToConstant: 16),
             ratingIcon.heightAnchor.constraint(equalToConstant: 16),
             
+            // Rating Label
+            ratingLabel.leadingAnchor.constraint(equalTo: ratingIcon.trailingAnchor, constant: 4),
+            ratingLabel.trailingAnchor.constraint(equalTo: ratingContainer.trailingAnchor, constant: -12),
+            ratingLabel.centerYAnchor.constraint(equalTo: ratingContainer.centerYAnchor),
+            
+            // Loading Indicator
             loadingIndicator!.centerXAnchor.constraint(equalTo: centerXAnchor),
             loadingIndicator!.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
-        
-        // Add purple border
-        layer.borderWidth = 1
-        layer.borderColor = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 1.0).cgColor
     }
     
+    // MARK: - Configuration
     func configure(with location: Location) {
         self.currentLocation = location
         ratingLabel.text = String(format: "%.1f", location.rating)
@@ -96,9 +154,10 @@ class LocationInfoView: UIView {
     }
     
     private func updateLocationLabel(name: String, postCount: Int) {
-        locationLabel.text = "\(name) (\(postCount))"
+        locationLabel.text = name
+        postCountLabel.text = "\(postCount) posts"
     }
-    
+
     private func fetchPostCount(for coordinate: CLLocationCoordinate2D) {
         let db = FirebaseManager.shared.firestore
         db.collection("locations")
