@@ -6,6 +6,7 @@ import FirebaseStorage
 import FirebaseFirestore
 import SDWebImageSwiftUI
 import CoreLocation
+import Combine
 
 struct AddPostView: View {
     @State private var descriptionText: String = ""
@@ -22,6 +23,9 @@ struct AddPostView: View {
     @StateObject private var searchCompleter = LocationSearchCompleter()
     @EnvironmentObject var userManager: UserManager //Current user
     @StateObject private var locationManager = CustomLocationManager()
+    @State private var showPixabayPicker = false
+    @State private var showImageSourceOptions = false
+
 
     let columns = [
         GridItem(.flexible()),
@@ -86,7 +90,7 @@ struct AddPostView: View {
                     // Photos Section
                     VStack(alignment: .leading, spacing: 8) {
                         Button(action: {
-                            isImagePickerPresented = true
+                            showImageSourceOptions = true
                         }) {
                             HStack {
                                 Image(systemName: "photo")
@@ -96,6 +100,17 @@ struct AddPostView: View {
                             .foregroundColor(.primary)
                         }
                         .padding(.horizontal)
+                        .actionSheet(isPresented: $showImageSourceOptions) {
+                        ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
+                            .default(Text("Photo Library")) {
+                                isImagePickerPresented = true
+                            },
+                            .default(Text("Pixabay")) {
+                                showPixabayPicker = true
+                            },
+                            .cancel()
+                        ])
+                    }
                         
                         if !images.isEmpty {
                             LazyVGrid(columns: columns, spacing: 8) {
@@ -157,22 +172,39 @@ struct AddPostView: View {
                     Text("New Post")
                         .font(.headline)
                 }
-                /*
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark")
-                            .foregroundColor(.primary)
-                    }
-                }*/
             }
         }
         .sheet(isPresented: $isImagePickerPresented) {
             AddPhotos(images: $images)
+        }.sheet(isPresented: $showPixabayPicker){
+            PixabayImagePickerView{ selectedImage in
+                // Handle the selected image
+                if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+                    downloadImage(from: url){ image in
+                        if let image = image {
+                            self.images.append(image)
+                        }
+                    }
+                }
+                
+            }
         }
     }
-
+    
+    
+    private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
+            SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
+                if let image = image, finished {
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
+                } else {
+                    print("Failed to download image: \(error?.localizedDescription ?? "Unknown error")")
+                    completion(nil)
+                }
+            }
+        }
+    
     private func addPost() {
         // Input validation
         if descriptionText.isEmpty {

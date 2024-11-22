@@ -300,7 +300,6 @@
 import SwiftUI
 import Firebase
 import SDWebImageSwiftUI
-
 struct ProfileSettingsView: View {
     @Environment(\.presentationMode) var presentationMode
     @EnvironmentObject var userManager: UserManager
@@ -318,6 +317,9 @@ struct ProfileSettingsView: View {
 
     @State private var isUploading  = false // Loading state
     @State private var showingAlert = false
+    
+    @State private var showImageSourceOptions = false
+    @State private var showPixabayPicker = false
 
     var body: some View {
         VStack {
@@ -346,7 +348,7 @@ struct ProfileSettingsView: View {
                 Circle()
                     .stroke(Color.customPurple, lineWidth: 4) // Purple border
                     .frame(width: 188, height: 188) // Slightly larger than the image
-
+                
                 if let selectedImage = self.image {
                     // Display the newly selected image
                     Image(uiImage: selectedImage)
@@ -373,31 +375,62 @@ struct ProfileSettingsView: View {
                 }
             }
             .padding(.top, 20)
-
+            
             // Button to upload or change profile picture
-            if self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) {
-                // If no profile image exists
-                Text("Upload Profile Picture")
-                    .padding(.top, 15)
-                    .font(.custom("Sansation-Regular", size: 21))
-                    .foregroundColor(.blue)
-                    .underline() // Underline the text
-                    .onTapGesture {
-                        shouldShowImagePicker.toggle()
-                    }
-                    .padding(.bottom, 50)
-            } else {
-                // If a profile image already exists
-                Text("Change Profile Picture")
-                    .padding(.top, 15)
-                    .font(.custom("Sansation-Regular", size: 21))
-                    .foregroundColor(.blue)
-                    .underline() // Underline the text
-                    .onTapGesture {
-                        shouldShowImagePicker.toggle()
-                    }
-                    .padding(.bottom, 50)
-            }
+//            if self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) {
+//                // If no profile image exists
+//                Text("Upload Profile Picture")
+//                    .padding(.top, 15)
+//                    .font(.custom("Sansation-Regular", size: 21))
+//                    .foregroundColor(.blue)
+//                    .underline() // Underline the text
+//                    .onTapGesture {
+//                        showImageSourceOptions = true
+//                    }
+//                    .padding(.bottom, 50)
+//            } else {
+//                // If a profile image already exists
+//                Text("Change Profile Picture")
+//                    .padding(.top, 15)
+//                    .font(.custom("Sansation-Regular", size: 21))
+//                    .foregroundColor(.blue)
+//                    .underline() // Underline the text
+//                    .onTapGesture {
+//                        showImageSourceOptions = true
+//                    }
+//                    .padding(.bottom, 50)
+//            }.actionSheet(isPresented: $showImageSourceOptions){
+//                ActionSheet(title: Text("Select Image Source"), message:nil, buttons:[
+//                    .default(Text("Photo Library")){
+//                        shouldShowImagePicker = true
+//                    },
+//                    .default(Text("Pixabay")){
+//                        showPixabayPicker = true
+//                    },
+//                    .cancel()
+//                ])
+//            }
+            Button(action: {
+                showImageSourceOptions = true
+                }) {
+                    Text(self.userManager.currentUser?.profileImageUrl == nil || (self.userManager.currentUser?.profileImageUrl?.isEmpty ?? true) ? "Upload Profile Picture" : "Change Profile Picture")
+                        .padding(.top, 15)
+                        .font(.custom("Sansation-Regular", size: 21))
+                        .foregroundColor(.blue)
+                        .underline()
+                        .padding(.bottom, 50)
+                }
+                .actionSheet(isPresented: $showImageSourceOptions) {
+                    ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
+                        .default(Text("Photo Library")) {
+                            shouldShowImagePicker = true
+                        },
+                        .default(Text("Pixabay")) {
+                            showPixabayPicker = true
+                        },
+                        .cancel()
+                    ])
+                }
 
             // Display loading indicator if uploading
             if isUploading {
@@ -560,7 +593,17 @@ struct ProfileSettingsView: View {
                 persistImageToStorage()
             }
         }) {
-            ImagePicker(image: $image)
+           PixabayImagePickerView { selectedImage in
+           if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+               downloadImage(from: url) { downloadedImage in
+                   if let downloadedImage = downloadedImage {
+                       self.image = downloadedImage
+                       // Optionally persist the image immediately
+                       // persistImageToStorage()
+                   }
+               }
+           }
+       }
         }
         .fullScreenCover(isPresented: $showEditView) {
             if selectedRow == "Name" {
@@ -604,6 +647,20 @@ struct ProfileSettingsView: View {
              )
          }
     }
+    
+    private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) { // Added function
+                SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
+                    if let image = image, finished {
+                        DispatchQueue.main.async {
+                            completion(image)
+                        }
+                    } else {
+                        print("Failed to download image: \(error?.localizedDescription ?? "Unknown error")")
+                        completion(nil)
+                    }
+                }
+    }
+
     
     // Function to upload the image to Firebase Storage
     private func persistImageToStorage() {

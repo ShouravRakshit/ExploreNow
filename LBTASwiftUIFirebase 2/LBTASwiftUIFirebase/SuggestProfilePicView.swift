@@ -9,6 +9,7 @@ import Firebase
 import FirebaseAuth
 import FirebaseStorage
 import FirebaseFirestore
+import SDWebImage
 
 struct SuggestProfilePicView: View
     {
@@ -18,7 +19,8 @@ struct SuggestProfilePicView: View
     @State var shouldShowImagePicker = false
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var userManager: UserManager
-    
+    @State private var showPixabayPicker = false
+
     private var currentUser: User?
         {
         userManager.currentUser
@@ -75,7 +77,18 @@ struct SuggestProfilePicView: View
                 .padding(.top, 10)
                 .underline() // Underline the text
                 .onTapGesture {
-                    shouldShowImagePicker.toggle()
+//                    shouldShowImagePicker.toggle()
+                    showPixabayPicker.toggle()
+
+                }.sheet(isPresented: $showPixabayPicker) {
+                    PixabayImagePickerView { selectedImage in
+                        // Handle the selected image
+                        if let urlString = selectedImage.largeImageURL, let url = URL(string: urlString) {
+                            downloadImage(from: url) { image in
+                                self.image = image
+                            }
+                        }
+                    }
                 }
                 
             Button(action: {
@@ -110,6 +123,19 @@ struct SuggestProfilePicView: View
                 ImagePicker(image: $image)
                 }
 
+        }
+    
+    private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
+            SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
+                if let image = image, finished {
+                    DispatchQueue.main.async {
+                        completion(image)
+                    }
+                } else {
+                    print("Failed to download image: \(error?.localizedDescription ?? "Unknown error")")
+                    completion(nil)
+                }
+            }
         }
     
     private func persistImageToStorage() {
