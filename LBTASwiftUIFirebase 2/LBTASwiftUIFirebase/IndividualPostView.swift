@@ -360,34 +360,30 @@ struct PostView: View {
         let onDelete: () -> Void
         let onLike: () -> Void
         
-        private var commentUserImage: some View {
-            Group {
-                if let userData = userData,
-                   let profileUrl = userData.profileImageUrl,
-                   let url = URL(string: profileUrl),
-                   !profileUrl.isEmpty {
-                    WebImage(url: url)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 32, height: 32)
-                        .clipShape(Circle())
-                } else {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 32, height: 32)
-                        .foregroundColor(AppTheme.secondaryText)
-                        .clipShape(Circle())
-                }
-            }
-        }
-        
         var body: some View {
             HStack(alignment: .top, spacing: 12) {
-                commentUserImage
+                // User Image
+                Group {
+                    if let profileUrl = userData?.profileImageUrl,
+                       let url = URL(string: profileUrl),
+                       !profileUrl.isEmpty {
+                        WebImage(url: url)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .clipShape(Circle())
+                    } else {
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 32, height: 32)
+                            .foregroundColor(AppTheme.secondaryText)
+                            .clipShape(Circle())
+                    }
+                }
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(userData?.username ?? "Loading...")
+                    Text(userData?.username ?? "Unknown User")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(AppTheme.primaryText)
                     
@@ -402,6 +398,7 @@ struct PostView: View {
                 
                 Spacer()
                 
+                // Like and Delete buttons
                 HStack(spacing: 12) {
                     Button(action: onLike) {
                         HStack(spacing: 4) {
@@ -425,6 +422,7 @@ struct PostView: View {
             .padding(.vertical, 8)
         }
     }
+
 
     private struct EmojiPickerView: View {
         @Binding var text: String
@@ -626,72 +624,94 @@ struct PostView: View {
            return UIButton()
        }
 
-       private func fetchComments() {
-           let db = FirebaseManager.shared.firestore
-           db.collection("comments")
-               .whereField("pid", isEqualTo: post.id) // Filter comments by post ID
-               .order(by: "timestamp", descending: true)
-               .getDocuments { snapshot, error in
-                   if let error = error {
-                       print("Error fetching comments: \(error)")
-                   } else {
-                       // Decode Firestore documents into Comment objects
-                       self.comments = snapshot?.documents.compactMap { document in
-                           // Initialize the Comment object
-                           var comment = Comment(document: document)
-                           
-                           // Fetch the 'likedByCurrentUser' dictionary to see if the current user liked the comment
-                           guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return comment }
-                           
-                           // Format the timestamp and update the comment object
-                           if let timestamp = document.data()["timestamp"] as? Timestamp {
-                               let timestampDate = timestamp.dateValue()
-                               comment?.timestampString = formatCommentTimestamp(timestampDate) // Store the formatted timestamp
-                           }
-
-
-                           
-                           // Fetch the likedByCurrentUser field
-                           if let likedByCurrentUser = document.data()["likedByCurrentUser"] as? [String: Bool],
-                              let isLikedByCurrentUser = likedByCurrentUser[currentUserId] {
-                               comment?.likedByCurrentUser = isLikedByCurrentUser
-                           } else {
-                               comment?.likedByCurrentUser = false
-                           }
-                           
-                           // Return the comment object
-                           return comment
-                       } ?? []
-
-                       // Once we have all the comments with the 'likedByCurrentUser' information, we can update the UI accordingly
-                       self.updateCommentUI()
-                   }
-               }
-       }
+    private func fetchComments() {
+        let db = FirebaseManager.shared.firestore
+        db.collection("comments")
+            .whereField("pid", isEqualTo: post.id)
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error fetching comments: \(error)")
+                    return
+                }
+                
+                // Create a temporary array to hold comments while we fetch user data
+                var newComments: [Comment] = []
+                
+                let group = DispatchGroup()
+                
+                for document in snapshot?.documents ?? [] {
+                    group.enter()
+                    
+                    // Initialize the comment
+                    if var comment = Comment(document: document) {
+                        // Format timestamp
+                        if let timestamp = document.data()["timestamp"] as? Timestamp {
+                            let timestampDate = timestamp.dateValue()
+                            comment.timestampString = formatCommentTimestamp(timestampDate)
+                        }
+                        
+                        // Handle liked status
+                        if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid,
+                           let likedByCurrentUser = document.data()["likedByCurrentUser"] as? [String: Bool] {
+                            comment.likedByCurrentUser = likedByCurrentUser[currentUserId] ?? false
+                        }
+                        
+                        // Fetch user data for this comment
+                        fetchUserData(for: comment.userID) { username, profileImageUrl in
+                            // Store user data in the cache
+                            userData[comment.userID] = (username, profileImageUrl)
+                            newComments.append(comment)
+                            group.leave()
+                        }
+                    } else {
+                        group.leave()
+                    }
+                }
+                
+                // When all user data is fetched
+                group.notify(queue: .main) {
+                    comments = newComments.sorted { $0.timestamp > $1.timestamp }
+                    updateCommentUI()
+                }
+            }
+    }
 
     // Function to fetch user data
     private func fetchUserData(for userID: String, completion: @escaping (String, String?) -> Void) {
+        // First check the cache
         if let cachedData = userData[userID] {
             completion(cachedData.username, cachedData.profileImageUrl)
-        } else {
-            let db = FirebaseManager.shared.firestore
-            db.collection("users").document(userID).getDocument { document, error in
-                if let error = error {
-                    print("Error fetching user data: \(error)")
-                    completion("Unknown", nil)
-                } else if let document = document, document.exists,
-                          let data = document.data(),
-                          let username = data["username"] as? String {
-                    let profileImageUrl = data["profileImageUrl"] as? String
-                    userData[userID] = (username, profileImageUrl) // Cache the result
-                    completion(username, profileImageUrl)
-                } else {
-                    completion("Unknown", nil)
-                }
+            return
+        }
+        
+        // If not in cache, fetch from Firestore
+        let db = FirebaseManager.shared.firestore
+        db.collection("users").document(userID).getDocument { document, error in
+            if let error = error {
+                print("Error fetching user data: \(error)")
+                completion("Unknown", nil)
+                return
+            }
+            
+            if let document = document,
+               document.exists,
+               let data = document.data() {
+                let username = data["username"] as? String ?? "Unknown"
+                let profileImageUrl = data["profileImageUrl"] as? String
+                
+                // Store in cache
+                userData[userID] = (username, profileImageUrl)
+                
+                // Return the data
+                completion(username, profileImageUrl)
+            } else {
+                print("No user document found for ID: \(userID)")
+                completion("Unknown", nil)
             }
         }
     }
-    
+
     private func deleteComment(_ comment: Comment) {
           let db = FirebaseManager.shared.firestore
           db.collection("comments").document(comment.id).delete { error in
