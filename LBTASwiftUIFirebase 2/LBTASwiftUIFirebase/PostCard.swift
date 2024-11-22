@@ -16,43 +16,64 @@ struct PostCard: View {
     @State private var currentImageIndex = 0
     @State private var comments: [Comment] = []
     @State private var commentCount: Int = 0
-    @State private var likesCount: Int = 0  // Track the like count
-    @State private var likedByUserIds: [String] = []  // Track the list of users who liked the post
-    @State private var liked: Bool = false  // Track if the current user has liked the post
-
+    @State private var likesCount: Int = 0
+    @State private var likedByUserIds: [String] = []
+    @State private var liked: Bool = false
+    
     var body: some View {
-        NavigationLink(destination: PostView(post: post, likesCount: likesCount, liked:liked)) {
-            VStack(alignment: .leading, spacing: 8) {
-                // User info header
-                HStack {
+        NavigationLink(destination: PostView(post: post, likesCount: likesCount, liked: liked)) {
+            VStack(alignment: .leading, spacing: 0) {
+                // Header Section
+                HStack(spacing: 12) {
+                    // Profile Image
                     if let imageUrl = URL(string: post.userProfileImageUrl) {
                         WebImage(url: imageUrl)
                             .resizable()
                             .scaledToFill()
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
+                            .overlay(
+                                Circle()
+                                    .stroke(AppTheme.lightPurple, lineWidth: 2)
+                            )
                     } else {
                         Image(systemName: "person.circle.fill")
                             .resizable()
                             .frame(width: 40, height: 40)
-                            .foregroundColor(.gray)
+                            .foregroundColor(AppTheme.secondaryText)
                             .clipShape(Circle())
                     }
                     
-                    NavigationLink(destination: ProfileView(user_uid: post.uid)) {
-                        Text(post.username)
-                            .font(.headline)
-                            .foregroundColor(.customPurple)  // Optional: To make the username look clickable
+                    VStack(alignment: .leading, spacing: 2) {
+                        // Username
+                        NavigationLink(destination: ProfileView(user_uid: post.uid)) {
+                            Text(post.username)
+                                .font(.system(size: 16, weight: .semibold))
+                                .foregroundColor(AppTheme.primaryPurple)
+                        }
+                        
+                        // Location
+                        HStack(spacing: 4) {
+                            Image(systemName: "mappin.circle.fill")
+                                .font(.system(size: 12))
+                            Text(post.locationAddress)
+                                .font(.system(size: 12))
+                                .lineLimit(1)
+                        }
+                        .foregroundColor(AppTheme.secondaryText)
                     }
                     
                     Spacer()
                     
+                    // Timestamp
                     Text(formatDate(post.timestamp))
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                        .font(.system(size: 12))
+                        .foregroundColor(AppTheme.secondaryText)
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
                 
-                // Post images
+                // Images Section
                 if !post.imageUrls.isEmpty {
                     TabView(selection: $currentImageIndex) {
                         ForEach(post.imageUrls.indices, id: \.self) { index in
@@ -60,6 +81,7 @@ struct PostCard: View {
                                 WebImage(url: imageUrl)
                                     .resizable()
                                     .scaledToFill()
+                                    .frame(maxWidth: .infinity)
                                     .frame(height: 300)
                                     .clipped()
                                     .tag(index)
@@ -68,82 +90,76 @@ struct PostCard: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(height: 300)
-                                    .foregroundColor(.gray)
+                                    .foregroundColor(AppTheme.secondaryText)
                                     .tag(index)
                             }
                         }
                     }
                     .tabViewStyle(PageTabViewStyle())
                     .frame(height: 300)
-                    .cornerRadius(12)
                 }
                 
-                // Post description
+                // Interaction Bar
+                HStack(spacing: 20) {
+                    // Like Button
+                    Button(action: { toggleLike() }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: liked ? "heart.fill" : "heart")
+                                .font(.system(size: 20))
+                                .foregroundColor(liked ? .red : AppTheme.secondaryText)
+                            
+                            Text("\(likesCount)")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.secondaryText)
+                        }
+                    }
+                    
+                    // Comment Button
+                    HStack(spacing: 6) {
+                        Image(systemName: "bubble.right")
+                            .font(.system(size: 20))
+                            .foregroundColor(AppTheme.primaryPurple)
+                        Text("\(comments.count)")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppTheme.secondaryText)
+                    }
+                    
+                    Spacer()
+                    
+                    // Rating
+                    HStack(spacing: 4) {
+                        ForEach(1...5, id: \.self) { index in
+                            Image(systemName: index <= post.rating ? "star.fill" : "star")
+                                .font(.system(size: 12))
+                                .foregroundColor(index <= post.rating ? .yellow : AppTheme.secondaryText)
+                        }
+                    }
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+                
+                // Description
                 if !post.description.isEmpty {
                     Text(post.description)
-                        .font(.body)
+                        .font(.system(size: 14))
+                        .foregroundColor(AppTheme.primaryText)
+                        .padding(.horizontal, 16)
+                        .padding(.bottom, 16)
+                        .lineLimit(3)
                 }
-                
-                HStack {
-                    Button(action: {
-                        toggleLike()
-                    }) {
-                        HStack(spacing: 4) {
-                            // Heart icon that changes based on whether the post is liked
-                            Image(systemName: liked ? "heart.fill" : "heart")  // Filled heart if liked, empty if not
-                                .foregroundColor(liked ? .red : .gray)  // Red if liked, gray if not
-                                .padding(5)
-                            
-                            // Display like count
-                            Text("\(likesCount)")
-                                .foregroundColor(.gray)  // Like count in gray
-                        }
-
-                    }
-                    
-                    Spacer()
-                        .frame(width: 20)
-                    
-                    Button(action: {
-                        // Comment action
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "bubble.right.fill")
-                                .foregroundColor(.customPurple)
-                            Text("\(comments.count)")  // Use the updated comments count
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // Location and rating
-                    HStack(spacing: 4) {
-                        Image(systemName: "mappin.circle.fill")
-                            .foregroundColor(.customPurple)
-                        Text(post.locationAddress)
-                            .font(.subheadline)
-                            .lineLimit(1)
-                        
-                        Image(systemName: "star.fill")
-                            .foregroundColor(.customPurple)
-                        Text("\(post.rating)")
-                            .font(.subheadline)
-                    }
-                    .foregroundColor(.gray)
-                }
-                .font(.subheadline)
             }
-            .padding()
-            .background(Color.white)
-            .cornerRadius(15)
-            .shadow(radius: 5)
-            .onAppear {
-                // Fetch likes count when post card appears
-                fetchLikes()
-                // Fetch comments when the post card appears
-                fetchComments()
-            }
+            .background(AppTheme.background)
+            .cornerRadius(16)
+            .shadow(color: Color.black.opacity(0.05), radius: 8, x: 0, y: 2)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color(.systemGray6), lineWidth: 1)
+            )
+        }
+        .buttonStyle(PlainButtonStyle())
+        .onAppear {
+            fetchLikes()
+            fetchComments()
         }
     }
 

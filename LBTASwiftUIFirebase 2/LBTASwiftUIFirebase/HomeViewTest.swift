@@ -11,131 +11,144 @@ struct HomeViewTest: View {
     @State private var isLoading = true
     @State private var friendIds: Set<String> = []
     @State private var navigateToSearchView = false
-
+    
     var body: some View {
-        //NavigationView {
-            VStack {
-                Spacer ()
-                // Header with notification bell
-                HStack {
-                    // Search Icon
-
-                    Text("ExploreNow")
-                        .font(.title)
-                        .fontWeight(.bold)
-                        .padding(.leading, 15)
-
-                    Spacer()
-                    
-
-                    // Navigation to AllUsersSearchView
-                    NavigationLink(destination: AllUsersSearchView())
-                    {
-                        Image(systemName: "magnifyingglass")
-                            .resizable()
-                            .frame(width: 24, height: 24)
-                            .foregroundColor(Color.customPurple)
-                    }
-                    .padding(.trailing, 15)
-                    
-                    // NavigationLink that wraps the bell icon
-                    NavigationLink(destination: NotificationView(userManager: userManager)) {
-                        ZStack {
-                            Image(systemName: "bell.fill")
-                                .resizable()
-                                .frame(width: 24, height: 24)
-                                .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255))
-                            
-                            // Show unread notification indicator if there are unread notifications
-                            if userManager.hasUnreadNotifications {
-                                Circle()
-                                    .fill(Color.red)
-                                    .frame(width: 10, height: 10)
-                                    .offset(x: 8, y: -8)
-                            }
-                        }
-                        /*
-                        .onTapGesture {
-                            // Trigger navigation to NotificationView
-                            navigateToNotifications = true
-                            print ("Navigating to notifications page")
-                        }*/
-                    }
-                    .buttonStyle(PlainButtonStyle()) // Ensure the link doesn't look like a standard button
-                    .padding(.trailing)
-                }
-                .padding(.top, 5)
+        VStack(spacing: 0) {
+            // Custom Navigation Bar
+            HStack(spacing: 16) {
+                Text("ExploreNow")
+                    .font(.system(size: 28, weight: .bold))
+                    .foregroundColor(AppTheme.primaryText)
                 
-                // Loading and empty states
-                if isLoading {
-                    Spacer()
-                    VStack(spacing: 20) {
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .tint(Color.customPurple)
-                            .padding()
+                Spacer()
+                
+                // Search Button
+                NavigationLink(destination: AllUsersSearchView()) {
+                    Image(systemName: "magnifyingglass")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppTheme.primaryPurple)
+                        .frame(width: 40, height: 40)
+                        .background(AppTheme.lightPurple)
+                        .clipShape(Circle())
+                }
+                
+                // Notifications Button
+                NavigationLink(destination: NotificationView(userManager: userManager)) {
+                    ZStack(alignment: .topTrailing) {
+                        Image(systemName: "bell.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(AppTheme.primaryPurple)
+                            .frame(width: 40, height: 40)
+                            .background(AppTheme.lightPurple)
+                            .clipShape(Circle())
                         
-                        Text("Loading your feed...")
-                            .foregroundColor(.gray)
-                            .font(.subheadline)
-                        
-                        // Optional: Add a subtle animation
-                        HStack(spacing: 4) {
-                            ForEach(0..<3) { index in
-                                Circle()
-                                    .fill(Color.customPurple)
-                                    .frame(width: 8, height: 8)
-                                    .opacity(0.3)
-                                    .animation(Animation.easeInOut(duration: 0.5).repeatForever().delay(0.2 * Double(index)))
-                            }
+                        if userManager.hasUnreadNotifications {
+                            Circle()
+                                .fill(AppTheme.error)
+                                .frame(width: 12, height: 12)
+                                .offset(x: 2, y: -2)
                         }
-                    }
-                    Spacer()
-                } else if friendIds.isEmpty {
-                    Spacer()
-                    VStack(spacing: 20) {
-                        Image(systemName: "person.2")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray)
-                        Text("Add friends to see their posts")
-                            .foregroundColor(.gray)
-                    }
-                    .padding()
-                    Spacer()
-                } else if posts.isEmpty {
-                    Spacer()
-                    VStack(spacing: 20) {
-                        Image(systemName: "photo.stack")
-                            .font(.system(size: 50))
-                            .foregroundColor(.gray)
-                        Text("No posts from friends yet")
-                            .foregroundColor(.gray)
-                    }
-                    .padding()
-                    Spacer()
-                } else {
-                    // Posts feed
-                    ScrollView {
-                        LazyVStack(spacing: 16) {
-                            ForEach(posts) { post in
-                                PostCard(post: post)
-                                    .environmentObject(userManager)
-                                    .padding(.horizontal)
-                            }
-                        }
-                        .padding(.top)
                     }
                 }
             }
-           // .navigationBarHidden(true)
-            .navigationBarTitle("Home") 
-        //}
-        //.edgesIgnoringSafeArea(.top)
+            .padding(.horizontal)
+            .padding(.vertical, 12)
+            .background(AppTheme.background)
+            
+            // Main Content
+            if isLoading {
+                // Loading State
+                VStack(spacing: 20) {
+                    Spacer()
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .tint(AppTheme.primaryPurple)
+                    
+                    Text("Loading your feed...")
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.secondaryText)
+                    
+                    // Loading Animation Dots
+                    HStack(spacing: 6) {
+                        ForEach(0..<3) { index in
+                            Circle()
+                                .fill(AppTheme.primaryPurple)
+                                .frame(width: 8, height: 8)
+                                .opacity(0.3)
+                                .animation(
+                                    Animation.easeInOut(duration: 0.5)
+                                        .repeatForever()
+                                        .delay(0.2 * Double(index)),
+                                    value: isLoading
+                                )
+                        }
+                    }
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(AppTheme.background)
+                
+            } else if friendIds.isEmpty {
+                // Empty Friends State
+                EmptyStateView(
+                    icon: "person.2",
+                    message: "Add friends to see their posts",
+                    backgroundColor: AppTheme.background
+                )
+                
+            } else if posts.isEmpty {
+                // Empty Posts State
+                EmptyStateView(
+                    icon: "photo.stack",
+                    message: "No posts from friends yet",
+                    backgroundColor: AppTheme.background
+                )
+                
+            } else {
+                // Posts Feed
+                ScrollView {
+                    LazyVStack(spacing: 20) {
+                        ForEach(posts) { post in
+                            PostCard(post: post)
+                                .environmentObject(userManager)
+                                .padding(.horizontal)
+                        }
+                    }
+                    .padding(.top, 12)
+                    .padding(.bottom, 20)
+                }
+                .background(AppTheme.background)
+            }
+        }
         .onAppear {
             if userManager.currentUser != nil {
                 checkIfNotifications()
             }
             fetchAllPosts()
+        }
+    }
+    
+    // Helper View for Empty States
+    private struct EmptyStateView: View {
+        let icon: String
+        let message: String
+        let backgroundColor: Color
+        
+        var body: some View {
+            VStack(spacing: 20) {
+                Spacer()
+                Image(systemName: icon)
+                    .font(.system(size: 50))
+                    .foregroundColor(AppTheme.secondaryText)
+                
+                Text(message)
+                    .font(.system(size: 16))
+                    .foregroundColor(AppTheme.secondaryText)
+                    .multilineTextAlignment(.center)
+                Spacer()
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(backgroundColor)
         }
     }
 

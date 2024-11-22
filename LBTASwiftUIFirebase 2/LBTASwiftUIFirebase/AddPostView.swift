@@ -28,10 +28,6 @@ struct AddPostView: View {
     @EnvironmentObject var userManager: UserManager
     @StateObject private var locationManager = CustomLocationManager()
     
-    // Custom colors
-    private let primaryPurple = Color(red: 140/255, green: 82/255, blue: 255/255)
-    private let lightPurple = Color(red: 140/255, green: 82/255, blue: 255/255).opacity(0.1)
-    
     var body: some View {
         NavigationView {
             ScrollView {
@@ -53,8 +49,8 @@ struct AddPostView: View {
                                             .font(.system(size: 12))
                                     }
                                     .frame(width: 100, height: 100)
-                                    .background(lightPurple)
-                                    .foregroundColor(primaryPurple)
+                                    .background(AppTheme.lightPurple)
+                                    .foregroundColor(AppTheme.primaryPurple)
                                     .cornerRadius(12)
                                 }
                                 
@@ -87,7 +83,7 @@ struct AddPostView: View {
                     }
                     .padding(.horizontal)
                     
-                    // Description Section - Fixed cursor visibility
+                    // Description Section
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Description")
                             .font(.system(size: 16, weight: .semibold))
@@ -96,7 +92,7 @@ struct AddPostView: View {
                             .textFieldStyle(.roundedBorder)
                             .frame(height: 100, alignment: .top)
                             .padding(8)
-                            .background(Color(.systemBackground))
+                            .background(AppTheme.background)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
@@ -106,7 +102,7 @@ struct AddPostView: View {
                             .tint(.blue)
                     }
                     .padding(.horizontal)
-
+                    
                     // Location Section
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Location")
@@ -115,7 +111,7 @@ struct AddPostView: View {
                         LocationSearchBar(selectedLocation: $selectedLocation,
                                         latitude: $latitude,
                                         longitude: $longitude)
-                            .background(Color(.systemBackground))
+                            .background(AppTheme.background)
                             .cornerRadius(12)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
@@ -148,12 +144,13 @@ struct AddPostView: View {
                     if !addPostStatusMessage.isEmpty {
                         Text(addPostStatusMessage)
                             .font(.system(size: 14))
-                            .foregroundColor(addPostStatusMessage.contains("Error") ? .red : .green)
+                            .foregroundColor(addPostStatusMessage.contains("Error") ?
+                                           AppTheme.error : AppTheme.success)
                             .padding(.vertical, 8)
                             .frame(maxWidth: .infinity)
                             .background(
                                 addPostStatusMessage.contains("Error") ?
-                                Color.red.opacity(0.1) : Color.green.opacity(0.1)
+                                AppTheme.error.opacity(0.1) : AppTheme.success.opacity(0.1)
                             )
                             .cornerRadius(8)
                             .padding(.horizontal)
@@ -172,7 +169,7 @@ struct AddPostView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 16)
-                        .background(isLoading ? Color.gray : primaryPurple)
+                        .background(isLoading ? Color.gray : AppTheme.primaryPurple)
                         .foregroundColor(.white)
                         .cornerRadius(12)
                     }
@@ -189,7 +186,7 @@ struct AddPostView: View {
                         .font(.system(size: 17, weight: .semibold))
                 }
             }
-            .background(Color(.systemBackground))
+            .background(AppTheme.background)
         }
         .sheet(isPresented: $isImagePickerPresented) {
             AddPhotos(images: $images)
