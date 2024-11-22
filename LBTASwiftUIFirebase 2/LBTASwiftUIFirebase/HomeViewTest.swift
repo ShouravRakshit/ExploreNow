@@ -11,7 +11,8 @@ struct HomeViewTest: View {
     @State private var isLoading = true
     @State private var friendIds: Set<String> = []
     @State private var navigateToSearchView = false
-    
+    @State private var blockedUserIds: Set<String> = []
+
     var body: some View {
         VStack(spacing: 0) {
             // Custom Navigation Bar
@@ -123,8 +124,10 @@ struct HomeViewTest: View {
         .onAppear {
             if userManager.currentUser != nil {
                 checkIfNotifications()
+                setupBlockedUsersListener()
+                fetchAllPosts()
+
             }
-            fetchAllPosts()
         }
     }
     
@@ -211,7 +214,6 @@ struct HomeViewTest: View {
             }
         }
     }
-
     
     private func fetchAllPosts() {
         print("DEBUG: Starting fetchAllPosts")
@@ -237,135 +239,199 @@ struct HomeViewTest: View {
             
             print("DEBUG: Starting to fetch posts for \(friendIdsArray.count) friends")
             
+            // First fetch blocked users
             FirebaseManager.shared.firestore
-                .collection("user_posts")
-                .whereField("uid", in: friendIdsArray)
-                .order(by: "timestamp", descending: true)
-                .addSnapshotListener { querySnapshot, error in
-                    if let error = error {
-                        print("DEBUG: Error fetching posts: \(error)")
+                .collection("blocks")
+                .document(currentUserId)
+                .addSnapshotListener { blockSnapshot, blockError in
+                    if let blockError = blockError {
+                        print("DEBUG: Error fetching blocks: \(blockError)")
                         return
                     }
                     
-                    print("DEBUG: Received snapshot with \(querySnapshot?.documentChanges.count ?? 0) changes")
-
-                    // Create a Set to track processed post IDs
-                    var processedPostIds = Set<String>()
+                    // Get current blocked users
+                    let blockedUserIds = Set((blockSnapshot?.data()?["blockedUserIds"] as? [String]) ?? [])
                     
-                    querySnapshot?.documentChanges.forEach { change in
-                        switch change.type {
-                        case .added:
-                            let postId = change.document.documentID
-                            print("DEBUG: Processing post: \(postId)")
-                            
-                            // Skip if we've already processed this post
-                            if processedPostIds.contains(postId) {
-                                print("DEBUG: Skipping already processed post: \(postId)")
+                    // Now fetch posts with real-time updates
+                    FirebaseManager.shared.firestore
+                        .collection("user_posts")
+                        .whereField("uid", in: friendIdsArray)
+                        .order(by: "timestamp", descending: true)
+                        .addSnapshotListener { querySnapshot, error in
+                            if let error = error {
+                                print("DEBUG: Error fetching posts: \(error)")
                                 return
                             }
-                            processedPostIds.insert(postId)
                             
-                            let data = change.document.data()
-                            print("DEBUG: Post author ID: \(data["uid"] as? String ?? "unknown")")
-
-                            // Get the location reference
-                            guard let locationRef = data["locationRef"] as? DocumentReference else { return }
+                            print("DEBUG: Received snapshot with \(querySnapshot?.documentChanges.count ?? 0) changes")
                             
-                            // Fetch location details
-                            locationRef.getDocument { locationSnapshot, locationError in
-                                if let locationData = locationSnapshot?.data(),
-                                   let address = locationData["address"] as? String {
+                            // Create a Set to track processed post IDs
+                            var processedPostIds = Set<String>()
+                            
+                            querySnapshot?.documentChanges.forEach { change in
+                                switch change.type {
+                                case .added:
+                                    let postId = change.document.documentID
+                                    print("DEBUG: Processing post: \(postId)")
                                     
-                                    // Fetch user details
-                                    if let uid = data["uid"] as? String {
-                                        FirebaseManager.shared.firestore
-                                            .collection("users")
-                                            .document(uid)
-                                            .getDocument { userSnapshot, userError in
-                                                if let userData = userSnapshot?.data() {
-                                                    let post = Post(
-                                                        id: postId,
-                                                        description: data["description"] as? String ?? "",
-                                                        rating: data["rating"] as? Int ?? 0,
-                                                        locationRef: locationRef,
-                                                        locationAddress: address,
-                                                        imageUrls: data["images"] as? [String] ?? [],
-                                                        timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
-                                                        uid: uid,
-                                                        username: userData["username"] as? String ?? "User",
-                                                        userProfileImageUrl: userData["profileImageUrl"] as? String ?? ""
-                                                    )
-                                                    
-                                                    DispatchQueue.main.async {
-                                                        // Remove any existing post with the same ID before adding
-                                                        posts.removeAll { $0.id == post.id }
-                                                        posts.append(post)
-                                                        posts.sort { $0.timestamp > $1.timestamp }
-                                                    }
-                                                }
-                                            }
+                                    // Skip if we've already processed this post
+                                    if processedPostIds.contains(postId) {
+                                        print("DEBUG: Skipping already processed post: \(postId)")
+                                        return
                                     }
-                                }
-                            }
-                            
-                        case .modified:
-                            print("DEBUG: Post modified: \(change.document.documentID)")
-                            // Handle modified posts
-                            let postId = change.document.documentID
-                            let data = change.document.data()
-                            
-                            // Similar to added case, but update existing post
-                            guard let locationRef = data["locationRef"] as? DocumentReference else { return }
-                            
-                            locationRef.getDocument { locationSnapshot, locationError in
-                                if let locationData = locationSnapshot?.data(),
-                                   let address = locationData["address"] as? String {
+                                    processedPostIds.insert(postId)
                                     
-                                    if let uid = data["uid"] as? String {
-                                        FirebaseManager.shared.firestore
-                                            .collection("users")
-                                            .document(uid)
-                                            .getDocument { userSnapshot, userError in
-                                                if let userData = userSnapshot?.data() {
-                                                    let updatedPost = Post(
-                                                        id: postId,
-                                                        description: data["description"] as? String ?? "",
-                                                        rating: data["rating"] as? Int ?? 0,
-                                                        locationRef: locationRef,
-                                                        locationAddress: address,
-                                                        imageUrls: data["images"] as? [String] ?? [],
-                                                        timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
-                                                        uid: uid,
-                                                        username: userData["username"] as? String ?? "User",
-                                                        userProfileImageUrl: userData["profileImageUrl"] as? String ?? ""
-                                                    )
-                                                    
-                                                    DispatchQueue.main.async {
-                                                        if let index = posts.firstIndex(where: { $0.id == postId }) {
-                                                            posts[index] = updatedPost
+                                    let data = change.document.data()
+                                    print("DEBUG: Post author ID: \(data["uid"] as? String ?? "unknown")")
+                                    
+                                    // Skip if post is from blocked user
+                                    guard let postUserId = data["uid"] as? String,
+                                          !blockedUserIds.contains(postUserId) else {
+                                        print("DEBUG: Skipping post from blocked user")
+                                        return
+                                    }
+                                    
+                                    // Get the location reference
+                                    guard let locationRef = data["locationRef"] as? DocumentReference else { return }
+                                    
+                                    // Fetch location details
+                                    locationRef.getDocument { locationSnapshot, locationError in
+                                        if let locationData = locationSnapshot?.data(),
+                                           let address = locationData["address"] as? String {
+                                            
+                                            // Fetch user details
+                                            if let uid = data["uid"] as? String {
+                                                FirebaseManager.shared.firestore
+                                                    .collection("users")
+                                                    .document(uid)
+                                                    .getDocument { userSnapshot, userError in
+                                                        if let userData = userSnapshot?.data() {
+                                                            let post = Post(
+                                                                id: postId,
+                                                                description: data["description"] as? String ?? "",
+                                                                rating: data["rating"] as? Int ?? 0,
+                                                                locationRef: locationRef,
+                                                                locationAddress: address,
+                                                                imageUrls: data["images"] as? [String] ?? [],
+                                                                timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
+                                                                uid: uid,
+                                                                username: userData["username"] as? String ?? "User",
+                                                                userProfileImageUrl: userData["profileImageUrl"] as? String ?? ""
+                                                            )
+                                                            
+                                                            DispatchQueue.main.async {
+                                                                if !blockedUserIds.contains(post.uid) {
+                                                                    // Remove any existing post with the same ID before adding
+                                                                    self.posts.removeAll { $0.id == post.id }
+                                                                    self.posts.append(post)
+                                                                    self.posts.sort { $0.timestamp > $1.timestamp }
+                                                                }
+                                                            }
                                                         }
                                                     }
-                                                }
                                             }
+                                        }
+                                    }
+                                    
+                                case .modified:
+                                    print("DEBUG: Post modified: \(change.document.documentID)")
+                                    let postId = change.document.documentID
+                                    let data = change.document.data()
+                                    
+                                    // Check if post is from blocked user
+                                    if let uid = data["uid"] as? String {
+                                        if blockedUserIds.contains(uid) {
+                                            // Remove post if user was blocked
+                                            DispatchQueue.main.async {
+                                                self.posts.removeAll { $0.uid == uid }
+                                            }
+                                            return
+                                        }
+                                        
+                                        // Continue with post modification if user is not blocked
+                                        guard let locationRef = data["locationRef"] as? DocumentReference else { return }
+                                        
+                                        locationRef.getDocument { locationSnapshot, locationError in
+                                            if let locationData = locationSnapshot?.data(),
+                                               let address = locationData["address"] as? String {
+                                                
+                                                FirebaseManager.shared.firestore
+                                                    .collection("users")
+                                                    .document(uid)
+                                                    .getDocument { userSnapshot, userError in
+                                                        if let userData = userSnapshot?.data() {
+                                                            let updatedPost = Post(
+                                                                id: postId,
+                                                                description: data["description"] as? String ?? "",
+                                                                rating: data["rating"] as? Int ?? 0,
+                                                                locationRef: locationRef,
+                                                                locationAddress: address,
+                                                                imageUrls: data["images"] as? [String] ?? [],
+                                                                timestamp: (data["timestamp"] as? Timestamp)?.dateValue() ?? Date(),
+                                                                uid: uid,
+                                                                username: userData["username"] as? String ?? "User",
+                                                                userProfileImageUrl: userData["profileImageUrl"] as? String ?? ""
+                                                            )
+                                                            
+                                                            DispatchQueue.main.async {
+                                                                if let index = self.posts.firstIndex(where: { $0.id == postId }) {
+                                                                    self.posts[index] = updatedPost
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                            }
+                                        }
+                                    }
+                                case .removed:
+                                    print("DEBUG: Post removed: \(change.document.documentID)")
+                                    let postId = change.document.documentID
+                                    DispatchQueue.main.async {
+                                        self.posts.removeAll { $0.id == postId }
                                     }
                                 }
                             }
                             
-                        case .removed:
-                            print("DEBUG: Post removed: \(change.document.documentID)")
-                            // Remove deleted posts
-                            let postId = change.document.documentID
+                            // Also remove any existing posts from blocked users
                             DispatchQueue.main.async {
-                                posts.removeAll { $0.id == postId }
+                                self.posts.removeAll { blockedUserIds.contains($0.uid) }
+                                print("DEBUG: Total posts in feed after block filter: \(self.posts.count)")
+                                self.isLoading = false
                             }
                         }
-                    }
-                    
-                    print("DEBUG: Total posts in feed: \(self.posts.count)")
-                    self.isLoading = false
                 }
         }
     }
+
+
+
+    
+    private func setupBlockedUsersListener() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        FirebaseManager.shared.firestore
+            .collection("blocks")
+            .document(currentUserId)
+            .addSnapshotListener { documentSnapshot, error in
+                if let error = error {
+                    print("Error listening for blocks: \(error)")
+                    return
+                }
+                
+                if let document = documentSnapshot, document.exists {
+                    let blockedUsers = document.data()?["blockedUserIds"] as? [String] ?? []
+                    self.blockedUserIds = Set(blockedUsers)
+                    
+                    // Filter out posts from blocked users
+                    self.posts = self.posts.filter { post in
+                        !self.blockedUserIds.contains(post.uid)
+                    }
+                } else {
+                    self.blockedUserIds = []
+                }
+            }
+    }
+
 
     private func checkIfNotifications() {
         userManager.fetchNotifications {result in
