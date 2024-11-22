@@ -28,14 +28,14 @@ struct AddPostView: View {
 
 
     let columns = [
-        GridItem(.flexible()),
-        GridItem(.flexible())
+        GridItem(.flexible(), spacing: 8),
+        GridItem(.flexible(), spacing: 8)
     ]
     
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 16) {
                     // Profile section
                     HStack(alignment: .center) {
                         WebImage(url: URL(string: userManager.currentUser?.profileImageUrl ?? ""))
@@ -54,11 +54,23 @@ struct AddPostView: View {
                     }
                     .padding(.horizontal)
                     
-                    // Description
-                    TextField("Description of the recently visited place...", text: $descriptionText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    // Description text box
+                    TextEditor(text: $descriptionText)
                         .padding(.horizontal)
-                        .lineLimit(nil) // Allow for multiple lines
+                        .frame(minHeight: 40, maxHeight: 200) // Set limits to prevent excessive growth
+                        .background(RoundedRectangle(cornerRadius: 8).stroke(Color(red: 140/255, green: 82/255, blue: 255/255)))
+                        .overlay(
+                            // Placeholder text
+                            Group {
+                                if descriptionText.isEmpty {
+                                    Text("Description of the recently visited place...")
+                                        .foregroundColor(.gray)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 12)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                        )
                     
                     Divider()
                     
@@ -112,36 +124,34 @@ struct AddPostView: View {
                         ])
                     }
                         
+
                         if !images.isEmpty {
-                            ScrollView (.horizontal)
-                                {
-                                    HStack{
-                                    //LazyVGrid(columns: columns, spacing: 8) {
-                                    ForEach(images, id: \.self) { image in
-                                        ZStack(alignment: .topTrailing) {
-                                            Image(uiImage: image)
-                                                .resizable()
-                                                .aspectRatio(contentMode: .fill)
-                                                .frame(height: 150)
-                                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                            
-                                            Button(action: {
-                                                if let index = images.firstIndex(of: image) {
-                                                    images.remove(at: index)
-                                                }
-                                            }) {
-                                                Image(systemName: "xmark.circle.fill")
-                                                    .foregroundColor(.red)
-                                                    .background(Color.white)
-                                                    .clipShape(Circle())
-                                                    .padding(4)
+                            LazyVGrid(columns: columns, spacing: 8) {
+                                ForEach(images, id: \.self) { image in
+                                    ZStack(alignment: .topTrailing) {
+                                        Image(uiImage: image)
+                                            .resizable()
+                                            .aspectRatio(contentMode: .fill)
+                                            .frame(width: (UIScreen.main.bounds.width - 40) / 2, height: 150)
+                                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                                            .clipped()
+                                        
+                                        Button(action: {
+                                            if let index = images.firstIndex(of: image) {
+                                                images.remove(at: index)
                                             }
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundColor(.red)
+                                                .background(Color.white)
+                                                .clipShape(Circle())
+                                                .padding(4)
                                         }
+                                        .offset(x: -8, y: 8)
                                     }
                                 }
                             }
-                          //  }
-                            .padding(.horizontal)
+                            .padding(.horizontal, 16)
                         }
                     }
                     
@@ -411,3 +421,4 @@ struct AddPostView: View {
         addPostStatusMessage = ""
     }
 }
+
