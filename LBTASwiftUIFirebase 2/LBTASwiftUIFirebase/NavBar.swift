@@ -5,69 +5,97 @@
 //  Created by Alisha Lalani on 2024-10-21.
 //
 import SwiftUI
-//import UIKit
 
 struct NavBar: View {
     @State var user: User?
     @EnvironmentObject var userManager: UserManager
-
+    
+    private let customPurple = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 1.0)
+    
     init() {
-        // Set consistent appearance for all tabs
         let tabBarAppearance = UITabBarAppearance()
         tabBarAppearance.configureWithOpaqueBackground()
-        let customPurpleUIColor = UIColor(red: 140/255, green: 82/255, blue: 255/255, alpha: 1.0)
-
-        tabBarAppearance.backgroundColor = customPurpleUIColor
+        tabBarAppearance.backgroundColor = .white
+        tabBarAppearance.shadowColor = nil
         
-        // Update selected and unselected item colors
-        tabBarAppearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.gray)
-        tabBarAppearance.stackedLayoutAppearance.normal.iconColor = UIColor.white
+        let itemAppearance = UITabBarItemAppearance()
         
-        // Set the appearance for both standard and scrolling
+        // Selected state
+        itemAppearance.selected.iconColor = customPurple
+        
+        // Normal state
+        itemAppearance.normal.iconColor = .systemGray
+        
+        // Apply appearances
+        tabBarAppearance.stackedLayoutAppearance = itemAppearance
+        tabBarAppearance.inlineLayoutAppearance = itemAppearance
+        tabBarAppearance.compactInlineLayoutAppearance = itemAppearance
+        
         UITabBar.appearance().standardAppearance = tabBarAppearance
         if #available(iOS 15.0, *) {
             UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         }
+        
+        UITabBar.appearance().tintColor = customPurple
     }
     
     var body: some View {
-       // NavigationView {
-            TabView {
-                
-                HomeViewTest()
-                    .tabItem {
-                        Image(systemName: "house")
-                    }
-                
-                MapPinView()
-                    .tabItem {
-                        Image(systemName: "mappin.and.ellipse")
-                    }
-                
-                AddPostView()
-                    .tabItem {
-                        Image(systemName: "plus.circle.fill")
-                    }
-                    .environmentObject(userManager)
-                
-                MainMessagesView()
-                    .tabItem {
-                        Image(systemName: "message")
-                    }
-                    .environmentObject(userManager)
-                
-                if let user = userManager.currentUser {
-                    ProfileView(user_uid: user.uid)
-                        .tabItem {
-                            Image(systemName: "person")
-                        }
-                        .environmentObject(userManager)
+        TabView {
+            HomeViewTest()
+                .tabItem {
+                    Image(systemName: "house")
                 }
+                .toolbarBackground(.white, for: .tabBar)
+
+            MapPinView()
+                .tabItem {
+                    Image(systemName: "map")
+                }
+            
+            AddPostView()
+                .tabItem {
+                    Image(systemName: "plus.circle")
+                }
+                .environmentObject(userManager)
+            
+            MainMessagesView()
+                .tabItem {
+                    Image(systemName: "message")
+                }
+                .environmentObject(userManager)
+            
+            if let user = userManager.currentUser {
+                ProfileView(user_uid: user.uid)
+                    .tabItem {
+                        Image(systemName: "person")
+                    }
+                    .environmentObject(userManager)
             }
-            .accentColor(.white) // Use your custom purple color
-      //  }
+        }
+        .accentColor(Color(customPurple))
+        .overlay(
+            Rectangle()
+                .frame(height: 0.5)
+                .foregroundColor(Color(UIColor.systemGray5))
+                .offset(y: -49)
+            , alignment: .bottom
+        )
     }
 }
+
+
+struct SelectedTabBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Color(red: 140/255, green: 82/255, blue: 255/255))
+                    .padding(.horizontal, -8)
+                    .padding(.vertical, -4)
+            )
+    }
+}
+
 
 struct NavBar_Previews: PreviewProvider
     {
@@ -80,19 +108,15 @@ struct NavBar_Previews: PreviewProvider
 struct MapPinView: View {
     var body: some View {
         MapViewControllerWrapper()
-                  .edgesIgnoringSafeArea(.all)
+            .edgesIgnoringSafeArea(.all)
     }
 }
-
 
 struct MapViewControllerWrapper: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> MapController {
-        return MapController() // Initialize the view controller
+        return MapController()
     }
-
+    
     func updateUIViewController(_ uiViewController: MapController, context: Context) {
-        // Update the view controller if needed
     }
 }
-
-
