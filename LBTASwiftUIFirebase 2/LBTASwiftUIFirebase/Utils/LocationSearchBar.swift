@@ -34,6 +34,7 @@ struct LocationSearchBar: View {
                         searchText = ""
                         selectedLocation = ""
                         showResults = false
+                        showLocationButton = true
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.gray)
@@ -44,18 +45,6 @@ struct LocationSearchBar: View {
             .padding(.horizontal)
 
             // "Use Current Location" Button
-//            Button(action: {
-//                fetchCurrentLocation()
-//            }) {
-//                HStack {
-//                    Image(systemName: "location.fill")
-//                    Text("Use Current Location")
-//                }
-//                .foregroundColor(.primary)
-//            }
-//            .padding(.horizontal)
-//            .padding(.bottom, 8)
-
             if showLocationButton {
                 // "Use Current Location" Button
                 Button(action: {
