@@ -63,11 +63,14 @@ struct FriendsView: View {
                     .padding()
             } else {
                 List(friendManager.filteredUsers) { friend in
-                    // Row content for each friend
-                    NavigationLink(
-                        destination: ProfileView(user_uid: friend.uid)
-                    ) {
+                    ZStack {
+                        NavigationLink(destination: ProfileView(user_uid: friend.uid)) {
+                            EmptyView() // Makes the NavigationLink invisible
+                        }
+                        .opacity(0) // Hide the NavigationLink but maintain its tap functionality
+                        
                         row(for: friend) // The content of the row
+                            .contentShape(Rectangle()) // Makes the row tappable
                     }
                 }
                 .listStyle(PlainListStyle()) // Ensure list style is plain (no separators, no extra padding)
