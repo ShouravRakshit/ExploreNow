@@ -5,4 +5,5 @@ A Travel App with your friends.
 
 1. **Clone the repository:**
    ```bash
+   
    git clone https://github.com/ShouravRakshit/ExploreNow.git
