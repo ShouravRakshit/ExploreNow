@@ -18,7 +18,7 @@ git clone https://github.com/ShouravRakshit/ExploreNow.git
 cd ExploreNow
 ```
 
-3. Add API Keys
+### **3. Add API Keys**
 Copy the Template:
 
 Duplicate the Secrets.template.plist file to create a new Secrets.plist file.
