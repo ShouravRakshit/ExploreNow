@@ -7,3 +7,10 @@ A Travel App with your friends.
    ```bash
    
    git clone https://github.com/ShouravRakshit/ExploreNow.git
+
+2. **Navigate to the project directory:**
+   ```bash
+   cd ExploreNow
+
+
+
