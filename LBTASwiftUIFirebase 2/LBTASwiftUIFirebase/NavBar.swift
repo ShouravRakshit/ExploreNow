@@ -35,7 +35,7 @@ struct NavBar: View {
         if #available(iOS 15.0, *) {
             UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
         }
-        
+        UITabBar.appearance().backgroundColor = .white
         UITabBar.appearance().tintColor = customPurple
     }
     
@@ -46,30 +46,39 @@ struct NavBar: View {
                     Image(systemName: "house")
                 }
                 .toolbarBackground(.white, for: .tabBar)
-
+                .toolbarBackground(.visible, for: .tabBar)
+            
             MapPinView()
                 .tabItem {
                     Image(systemName: "map")
                 }
-            
+                .toolbarBackground(.white, for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+
             AddPostView()
                 .tabItem {
                     Image(systemName: "plus.circle")
                 }
                 .environmentObject(userManager)
-            
+                .toolbarBackground(.white, for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+
             MainMessagesView()
                 .tabItem {
                     Image(systemName: "message")
                 }
                 .environmentObject(userManager)
-            
+                .toolbarBackground(.white, for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+
             if let user = userManager.currentUser {
                 ProfileView(user_uid: user.uid)
                     .tabItem {
                         Image(systemName: "person")
                     }
                     .environmentObject(userManager)
+                    .toolbarBackground(.white, for: .tabBar)
+                    .toolbarBackground(.visible, for: .tabBar)
             }
         }
         .accentColor(Color(customPurple))

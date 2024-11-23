@@ -138,22 +138,29 @@ struct HomeViewTest: View {
         let backgroundColor: Color
         
         var body: some View {
-            VStack(spacing: 20) {
-                Spacer()
-                Image(systemName: icon)
-                    .font(.system(size: 50))
-                    .foregroundColor(AppTheme.secondaryText)
-                
-                Text(message)
-                    .font(.system(size: 16))
-                    .foregroundColor(AppTheme.secondaryText)
-                    .multilineTextAlignment(.center)
-                Spacer()
+            ScrollView { // Wrap in ScrollView to maintain consistent layout
+                VStack(spacing: 20) {
+                    Spacer()
+                        .frame(height: 100) // Add some top spacing
+                    
+                    Image(systemName: icon)
+                        .font(.system(size: 50))
+                        .foregroundColor(AppTheme.secondaryText)
+                    
+                    Text(message)
+                        .font(.system(size: 16))
+                        .foregroundColor(AppTheme.secondaryText)
+                        .multilineTextAlignment(.center)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity)
+                .frame(minHeight: UIScreen.main.bounds.height - 200) // Adjust height to account for nav bar and tab bar
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(backgroundColor)
         }
     }
+
 
 
     private func fetchFriends(completion: @escaping () -> Void) {
