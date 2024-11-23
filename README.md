@@ -42,7 +42,6 @@ With the Secrets.plist file selected in the Project Navigator, click on the View
 
 From the dropdown menu, select Inspectors and then Show File Inspector.
 
-Replace with your actual image URL or path.
 
 d. Configure Target Membership
 In the File Inspector pane, locate the section labeled Target Membership.
@@ -50,8 +49,6 @@ In the File Inspector pane, locate the section labeled Target Membership.
 You will see a list of project targets with checkboxes next to them.
 
 Ensure that the checkbox for your target (e.g., LBTASwiftUIFirebase) is checked under Any Supported Platform and specifically for iOS.
-
-Replace with your actual image URL or path.
 
 This ensures that the Secrets.plist file is included in the build when you compile the app for any iOS device.
 
@@ -71,5 +68,3 @@ This project is licensed under the MIT License.
 
 Contact
 For any questions or feedback, please contact Shourav Rakshit.
-
-
