@@ -19,7 +19,10 @@ struct PostCard: View {
     @State private var likesCount: Int = 0
     @State private var likedByUserIds: [String] = []
     @State private var liked: Bool = false
-    
+    @State private var isCurrentUserPost: Bool = false
+    @State private var showDeleteConfirmation = false
+
+
     var body: some View {
         NavigationLink(destination: PostView(post: post, likesCount: likesCount, liked: liked)) {
             VStack(alignment: .leading, spacing: 0) {
@@ -69,6 +72,26 @@ struct PostCard: View {
                     Text(formatDate(post.timestamp))
                         .font(.system(size: 12))
                         .foregroundColor(AppTheme.secondaryText)
+                    
+                    if isCurrentUserPost {
+                        Button(action: {
+                            showDeleteConfirmation = true
+                        }) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 18))
+                                .foregroundColor(.red)
+                        }
+//                        .alert(isPresented: $showDeleteConfirmation) {
+//                            Alert(
+//                                title: Text("Delete Post"),
+//                                message: Text("Are you sure you want to delete this post?"),
+//                                primaryButton: .destructive(Text("Delete")) {
+//                                    deletePost()
+//                                },
+//                                secondaryButton: .cancel()
+//                            )
+//                        }
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
@@ -160,6 +183,22 @@ struct PostCard: View {
         .onAppear {
             fetchLikes()
             fetchComments()
+            isCurrentUserPost = post.uid == userManager.currentUser?.id
+        }
+    }
+    
+    func deletePost() {
+        let postId = post.id
+        
+        let db = Firestore.firestore()
+        db.collection("user_posts").document(postId).delete { error in
+            if let error = error {
+                print("Error deleting post: \(error.localizedDescription)")
+            } else {
+                print("Post successfully deleted")
+                updateLocationRating(locationRef: post.locationRef)
+                showDeleteConfirmation = false
+            }
         }
     }
 
@@ -265,5 +304,43 @@ struct PostCard: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
+    }
+    
+    private func updateLocationRating(locationRef: DocumentReference) {
+        let db = FirebaseManager.shared.firestore
+        
+        // Get all remaining posts for this location
+        db.collection("user_posts")
+            .whereField("locationRef", isEqualTo: locationRef)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Error getting posts for rating update: \(error.localizedDescription)")
+                    return
+                }
+                
+                // Calculate new average
+                var totalRating = 0
+                var count = 0
+                
+                snapshot?.documents.forEach { doc in
+                    if let rating = doc.data()["rating"] as? Int {
+                        totalRating += rating
+                        count += 1
+                    }
+                }
+                
+                if count > 0 {
+                    let newAverageRating = Double(totalRating) / Double(count)
+                    // Update location with new average rating
+                    locationRef.updateData([
+                        "average_rating": newAverageRating
+                    ])
+                } else {
+                    // Either delete the location or set rating to 0
+                    locationRef.updateData([
+                        "average_rating": 0
+                    ])
+                }
+            }
     }
 }
