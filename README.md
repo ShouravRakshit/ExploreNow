@@ -27,7 +27,7 @@ Update API Keys:
 
 Open Secrets.plist and replace Your_API_Key_Here with your actual API keys.
 
-4. Configure Secrets.plist in Xcode
+### **4. Configure Secrets.plist in Xcode**
 To properly configure the Secrets.plist file within your Xcode project, follow these detailed steps:
 
 a. Open the Project in Xcode
