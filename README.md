@@ -60,11 +60,11 @@ After checking the appropriate boxes in the Target Membership, save your changes
 
 ### **f. Ensure there are no build errors related to the configuration of this file**
 
-Contributing
+### **Contributing
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-License
+### **License
 This project is licensed under the MIT License.
 
-Contact
-For any questions or feedback, please contact Shourav Rakshit.
+### **Contact
+For any questions or feedback, please contact Shourav Rakshit Ivan.
