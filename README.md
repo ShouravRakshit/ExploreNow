@@ -1,16 +1,18 @@
-# ExploreNow
-ExploreNow is a travel app designed to help you explore new places with your friends.
+# **ExploreNow**
 
-Setup
+**ExploreNow** is a travel app designed to help you explore new places with your friends.
+
+---
+
+## **Setup**
+
 Follow these steps to set up the project locally:
 
-1. Clone the Repository
-bash
-Copy code
+### **1. Clone the Repository**
+```bash
 git clone https://github.com/ShouravRakshit/ExploreNow.git
+
 2. Navigate to the Project Directory
-bash
-Copy code
 cd ExploreNow
 3. Add API Keys
 Copy the Template:
