@@ -23,3 +23,6 @@ LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/xcuserdata/ivan.xcuserdatad/
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
+**/Secrets.plist
+LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
+LBTASwiftUIFirebase 2/LBTASwiftUIFirebase/Secrets.plist

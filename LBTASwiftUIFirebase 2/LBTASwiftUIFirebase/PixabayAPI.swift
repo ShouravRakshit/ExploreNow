@@ -5,17 +5,29 @@
 //  Created by Ivan on 2024-11-21.
 //
 
+// 47197466-e97591543dd5d0d29999d6d75
+
 import Foundation
 import Combine
 
 class PixabayAPI {
     static let shared = PixabayAPI()
-    private let apiKey = "47197466-e97591543dd5d0d29999d6d75" // Replace with your API key
+        
+        private let apiKey: String = {
+            guard let path = Bundle.main.path(forResource: "Secrets", ofType: "plist"),
+                  let dict = NSDictionary(contentsOfFile: path) as? [String: Any],
+                  let key = dict["PIXABAY_API_KEY"] as? String
+            else {
+                fatalError("Couldn't find API Key in Secrets.plist")
+            }
+            return key
+        }()
 
     private init() {}
 
     func searchImages(query: String) -> AnyPublisher<[PixabayImage], Error> {
         let urlString = "https://pixabay.com/api/?key=\(apiKey)&q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&image_type=photo"
+
         
         guard let url = URL(string: urlString) else {
             return Fail(error: URLError(.badURL))
@@ -23,7 +35,10 @@ class PixabayAPI {
         }
 
         return URLSession.shared.dataTaskPublisher(for: url)
-            .map { $0.data }
+            .map { data, response in
+                print("URL String: \(urlString)")
+                    return data
+            }
             .decode(type: PixabayResponse.self, decoder: JSONDecoder())
             .map { $0.hits }
             .receive(on: DispatchQueue.main)
