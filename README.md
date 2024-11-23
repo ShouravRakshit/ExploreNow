@@ -51,7 +51,7 @@ In the File Inspector pane, locate the section labeled Target Membership.
 
 You will see a list of project targets with checkboxes next to them.
 
-Ensure that the checkbox for your target (e.g., LBTASwiftUIFirebase) is checked under Any Supported Platform and specifically for iOS.
+Ensure that the checkbox for your target project folder is checked under Any Supported Platform and specifically for iOS.
 
 This ensures that the Secrets.plist file is included in the build when you compile the app for any iOS device.
 
