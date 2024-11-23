@@ -63,10 +63,10 @@ After checking the appropriate boxes in the Target Membership, save your changes
 ### **Contributing**
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
-### **Feedback**
-If you have any feedback, please reach out to us at shouravrakshit.ivan@ucalgary.ca
-
 Authors
 Shourav Rakshit Ivan
 License
 MIT
+
+### **Feedback**
+If you have any feedback, please reach out to us at shouravrakshit.ivan@ucalgary.ca
