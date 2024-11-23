@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ChatUser: Identifiable {
+struct ChatUser: Identifiable, Equatable {
     var id: String { uid }
 
     let uid: String

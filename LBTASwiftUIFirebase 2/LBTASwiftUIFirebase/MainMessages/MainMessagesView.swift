@@ -203,6 +203,7 @@ struct MainMessagesView: View {
                 CreateNewMessageView { user in
                     self.selectedChatUser = user
                     self.shouldNavigateToChatLogView = true
+                    print ("")
                 }
             }
         }

@@ -41,10 +41,11 @@ class ChatLogViewModel: ObservableObject {
     @EnvironmentObject var userManager: UserManager
     @Published var blockedByUsers: [String] = []
 
-    let chatUser: ChatUser?
+    var chatUser: ChatUser?
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
+        
         fetchBlockedUsers()
         fetchMessages()
         fetchBlockedByUsers()
@@ -80,8 +81,17 @@ class ChatLogViewModel: ObservableObject {
                 }
         }
     
+    // Method to set or update the chat user
+    func setChatUser(_ newUser: ChatUser?) {
+        self.chatUser = newUser // Set the new user
+        fetchMessages() // Fetch messages for the new user
+        fetchBlockedUsers() // Re-fetch blocked users for the new chatUser
+        fetchBlockedByUsers() // Re-fetch blocked by users
+    }
     
-    private func fetchMessages() {
+    
+  func fetchMessages() {
+      print ("fetching messages for: \(chatUser?.name)")
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         guard let toId = chatUser?.uid else { return }
 
@@ -104,9 +114,11 @@ class ChatLogViewModel: ObservableObject {
 
                     // Allow fetching all messages, even if the user is blocked
                     self.chatMessages.append(.init(documentId: docId, data: data))
+                    
                 }
             }
     }
+
 
     private func sendMessageBatch(fromId: String, toId: String, messageData: [String: Any]) {
         let firestore = FirebaseManager.shared.firestore
@@ -406,17 +418,18 @@ class ChatLogViewModel: ObservableObject {
 }
 
 struct ChatLogView: View {
-    let chatUser: ChatUser?
+    var chatUser: ChatUser?
     
     @EnvironmentObject var userManager: UserManager
-    @ObservedObject var vm: ChatLogViewModel
+    @StateObject var vm: ChatLogViewModel
     @State private var showEmojiPicker = false
     @State private var selectedEmoji: String = ""
     @State private var isNavigating = false // Tracks the state of navigation
     
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
-        self.vm = ChatLogViewModel(chatUser: chatUser)
+        //self.vm = ChatLogViewModel(chatUser: chatUser)
+        _vm = StateObject(wrappedValue: ChatLogViewModel(chatUser: chatUser)) // Use StateObject to persist the ViewModel
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithDefaultBackground()
@@ -494,6 +507,15 @@ struct ChatLogView: View {
             }
 
         )
+        .onChange(of: chatUser) { newUser in
+            // Safely unwrap the chatUser before accessing its properties
+            if let user = newUser {
+                print("User changed, reloading messages for \(user.name)")
+                vm.setChatUser (user)
+            } else {
+                print("No user selected, cannot reload messages")
+            }
+        }
 
     }
     
