@@ -348,7 +348,8 @@ struct PostView: View {
             
             if showEmojiPicker {
                 EmojiPickerView(text: $commentText, showPicker: $showEmojiPicker)
-                    .transition(.move(edge: .bottom))
+                    .transition(.identity) // No animation
+
             }
         }
     }
