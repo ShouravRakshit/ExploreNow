@@ -12,5 +12,3 @@ A Travel App with your friends.
    ```bash
    cd ExploreNow
 
-
-
