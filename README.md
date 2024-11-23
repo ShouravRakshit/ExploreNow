@@ -13,9 +13,8 @@ Follow these steps to set up the project locally:
 git clone https://github.com/ShouravRakshit/ExploreNow.git
 
 2. Navigate to the Project Directory
-bash
-Copy code
 cd ExploreNow
+
 3. Add API Keys
 Copy the Template:
 
