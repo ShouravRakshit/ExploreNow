@@ -67,4 +67,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 This project is licensed under the MIT License.
 
 ### **Contact**
-For any questions or feedback, please contact Shourav Rakshit Ivan.
+For any questions or feedback, please contact shouravrakshit.ivan@ucalgary.ca, .
