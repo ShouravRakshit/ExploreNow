@@ -26,3 +26,9 @@ LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 **/Secrets.plist
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase/Secrets.plist
+LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
+# Ignore specific Xcode project file
+**/LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
+
+# Ignore Secrets files
+**/Secrets.plist
