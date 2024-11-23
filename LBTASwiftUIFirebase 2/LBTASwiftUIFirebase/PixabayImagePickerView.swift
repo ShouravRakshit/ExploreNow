@@ -13,10 +13,12 @@ struct PixabayImagePickerView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var searchQuery: String = ""
     @State private var images: [PixabayImage] = []
+    @State private var selectedImages: [PixabayImage] = []
     @State private var cancellable: AnyCancellable?
     @State private var isLoading: Bool = false
 
-    var onImageSelected: (PixabayImage) -> Void
+    var allowsMultipleSelection: Bool 
+    var onImagesSelected: ([PixabayImage]) -> Void
 
     var body: some View {
         NavigationView {
@@ -35,16 +37,31 @@ struct PixabayImagePickerView: View {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) {
                             ForEach(images) { image in
                                 Button(action: {
-                                    onImageSelected(image)
-                                    presentationMode.wrappedValue.dismiss()
+                                    imageTapped(image)
                                 }) {
-                                    if let urlString = image.previewURL, let url = URL(string: urlString) {
-                                        WebImage(url: url)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 100, height: 100)
-                                            .clipped()
-                                            .cornerRadius(8)
+                                    ZStack {
+                                        if let urlString = image.previewURL, let url = URL(string: urlString) {
+                                            WebImage(url: url)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 100, height: 100)
+                                                .clipped()
+                                                .cornerRadius(8)
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 8)
+                                                        .stroke(selectedImages.contains(where: { $0.id == image.id }) ? Color.blue : Color.clear, lineWidth: 4)
+                                                )
+                                                .opacity(selectedImages.contains(where: { $0.id == image.id }) ? 0.7 : 1.0)
+                                                .overlay(
+                                                    selectedImages.contains(where: { $0.id == image.id }) ?
+                                                        Image(systemName: "checkmark.circle.fill")
+                                                            .foregroundColor(.blue)
+                                                            .font(.system(size: 24))
+                                                            .padding(4)
+                                                        : nil,
+                                                    alignment: .topTrailing
+                                                )
+                                        }
                                     }
                                 }
                             }
@@ -53,10 +70,18 @@ struct PixabayImagePickerView: View {
                     }
                 }
             }
-            .navigationBarTitle("Select Image", displayMode: .inline)
-            .navigationBarItems(leading: Button("Cancel") {
-                presentationMode.wrappedValue.dismiss()
-            })
+            .navigationBarTitle("Select Images", displayMode: .inline)
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                },
+                trailing: allowsMultipleSelection ? Button("Add") {
+                    onImagesSelected(selectedImages)
+                    presentationMode.wrappedValue.dismiss()
+                }
+                .disabled(selectedImages.isEmpty)
+                : nil
+            )
         }
         .onAppear {
             fetchImages(query: "popular")
@@ -80,6 +105,7 @@ struct PixabayImagePickerView: View {
     private func fetchImages(query: String) {
         isLoading = true
         images = []
+        selectedImages = [] // Reset selection when new search occurs
         cancellable = PixabayAPI.shared.searchImages(query: query)
             .sink(receiveCompletion: { completion in
                 isLoading = false
@@ -89,5 +115,23 @@ struct PixabayImagePickerView: View {
             }, receiveValue: { images in
                 self.images = images
             })
+    }
+
+    private func imageTapped(_ image: PixabayImage) {
+        if allowsMultipleSelection {
+            toggleSelection(for: image)
+        } else {
+            // Single selection mode
+            onImagesSelected([image])
+            presentationMode.wrappedValue.dismiss()
+        }
+    }
+
+    private func toggleSelection(for image: PixabayImage) {
+        if let index = selectedImages.firstIndex(where: { $0.id == image.id }) {
+            selectedImages.remove(at: index)
+        } else {
+            selectedImages.append(image)
+        }
     }
 }
