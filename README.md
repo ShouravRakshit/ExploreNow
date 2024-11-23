@@ -65,6 +65,14 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 Authors
 Shourav Rakshit Ivan
+Alisha Lalani
+Saadman Rahman
+Manvi Juneja 
+Zaid Nissar
+Qusai Dahodwalla 
+Alina Mansuri
+Shree Patel
+Vidhi Soni
 License
 MIT
 
