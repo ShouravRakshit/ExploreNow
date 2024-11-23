@@ -182,8 +182,9 @@ struct NotificationView: View {
 
                                 WebImage(url: URL(string: user.post_url ?? ""))
                                     .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 40, height: 40) // Set size
+                                    .scaledToFit() // Ensures the image fits within the frame without distortion
+                                    .frame(width: 40, height: 40) // Sets the frame size
+                                    .clipped() // Crops anything outside the frame
                                 }
                                 }
                             }

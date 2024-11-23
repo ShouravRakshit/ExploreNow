@@ -29,6 +29,9 @@ struct ProfileView: View {
     @State private var isBlocked: Bool = false
     @State private var didBlockUser: Bool = false  //if you blocked the user
     @State private var isCheckingBlockedStatus: Bool = true // Track the status check
+    //for deleting post
+    @State private var showDeleteConfirmation = false
+    @State private var selectedPost: Post? = nil // To track which post is being deleted
 
     
     var user_uid: String // The UID of the user whose profile is being viewed
@@ -376,7 +379,10 @@ struct ProfileView: View {
                     else if (isFriends || isPublic) || !viewingOtherProfile {
                             LazyVStack {
                                 ForEach(userPosts) { post in
-                                    PostCard(post: post)
+                                    PostCard(post: post, onDelete: { selectedPost in
+                                        self.selectedPost = selectedPost
+                                        self.showDeleteConfirmation = true
+                                    })
                                         .environmentObject(userManager)
                                         .padding(.horizontal)
                                 }
@@ -493,6 +499,7 @@ struct ProfileView: View {
                                 .cancel()
                             ]
                         )
+
                         
                     }
                 }
@@ -513,8 +520,43 @@ struct ProfileView: View {
                          }
                      )
                  }
+                .alert(isPresented: $showDeleteConfirmation) {
+                    Alert(
+                        title: Text("Delete Post"),
+                        message: Text("Are you sure you want to delete this post?"),
+                        primaryButton: .destructive(Text("Delete")) {
+                            if let post = selectedPost {
+                                deletePost_db { success in
+                                    if success {
+                                        userPosts.removeAll { $0.id == post.id }
+                                    }
+                                }
+                            }
+                        },
+                        secondaryButton: .cancel()
+                    )
+                }
             
         }
+    
+    
+    func deletePost_db(completion: @escaping (Bool) -> Void) {
+        guard let postId = selectedPost?.id else {
+            completion(false)
+            return
+        }
+        
+        let db = Firestore.firestore()
+        db.collection("user_posts").document(postId).delete { error in
+            if let error = error {
+                print("Error deleting post: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                print("Post successfully deleted")
+                completion(true)
+            }
+        }
+    }
         
     // Remove a friend from both users' friend lists
     func removeFriend(currentUserUID: String, _ friend_uid: String) {
@@ -571,6 +613,8 @@ struct ProfileView: View {
             // Optionally, reload friends after removal
         }
     }
+    
+
     
     func unblockUser(userId: String) {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }

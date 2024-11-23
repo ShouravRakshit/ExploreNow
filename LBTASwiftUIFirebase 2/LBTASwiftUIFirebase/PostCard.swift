@@ -21,6 +21,8 @@ struct PostCard: View {
     @State private var liked: Bool = false
     @State private var isCurrentUserPost: Bool = false
     @State private var showDeleteConfirmation = false
+    
+    var onDelete: ((Post) -> Void)?
 
 
     var body: some View {
@@ -76,21 +78,25 @@ struct PostCard: View {
                     if isCurrentUserPost {
                         Button(action: {
                             showDeleteConfirmation = true
+                            print("Show delete confirmation: \(showDeleteConfirmation)")
+                            // Call the delete callback
+                            onDelete?(post)
+                            //deletePost()
                         }) {
                             Image(systemName: "trash")
                                 .font(.system(size: 18))
                                 .foregroundColor(.red)
                         }
-//                        .alert(isPresented: $showDeleteConfirmation) {
-//                            Alert(
-//                                title: Text("Delete Post"),
-//                                message: Text("Are you sure you want to delete this post?"),
-//                                primaryButton: .destructive(Text("Delete")) {
-//                                    deletePost()
-//                                },
-//                                secondaryButton: .cancel()
-//                            )
-//                        }
+                        .alert(isPresented: $showDeleteConfirmation) {
+                            Alert(
+                                title: Text("Delete Post"),
+                                message: Text("Are you sure you want to delete this post?"),
+                                primaryButton: .destructive(Text("Delete")) {
+                                    deletePost()
+                                },
+                                secondaryButton: .cancel()
+                            )
+                        }
                     }
                 }
                 .padding(.horizontal, 16)
