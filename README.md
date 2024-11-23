@@ -64,14 +64,14 @@ After checking the appropriate boxes in the Target Membership, save your changes
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
 
 Authors
-Shourav Rakshit Ivan
-Alisha Lalani
-Saadman Rahman
-Manvi Juneja 
-Zaid Nissar
-Qusai Dahodwalla 
-Alina Mansuri
-Shree Patel
+Shourav Rakshit Ivan,
+Alisha Lalani,
+Saadman Rahman,
+Alina Mansuri,
+Manvi Juneja,
+Zaid Nissar,
+Qusai Dahodwalla, 
+Shree Patel,
 Vidhi Soni
 License
 MIT
