@@ -12,8 +12,9 @@ Follow these steps to set up the project locally:
 ```bash
 git clone https://github.com/ShouravRakshit/ExploreNow.git
 ```
+### **2. Navigate to the Project Directory**
+
 ```bash
-2. Navigate to the Project Directory
 cd ExploreNow
 ```
 
