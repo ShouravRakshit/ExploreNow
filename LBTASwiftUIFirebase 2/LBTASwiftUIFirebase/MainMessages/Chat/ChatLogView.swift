@@ -435,16 +435,16 @@ struct ChatLogView: View {
         appearance.configureWithDefaultBackground()
         appearance.buttonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
         appearance.backButtonAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.systemBlue]
-
+        
         appearance.setBackIndicatorImage(UIImage(systemName: "chevron.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal),
-                                       transitionMaskImage: UIImage(systemName: "chevron.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))
+                                         transitionMaskImage: UIImage(systemName: "chevron.left")?.withTintColor(.systemBlue, renderingMode: .alwaysOriginal))
         
         UINavigationBar.appearance().tintColor = .systemBlue // This sets the back button color
         UINavigationBar.appearance().standardAppearance = appearance
         UINavigationBar.appearance().compactAppearance = appearance
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
-
+    
     var body: some View {
         VStack {
             messagesView
@@ -475,29 +475,29 @@ struct ChatLogView: View {
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(false)
-//        .navigationBarTitle("", displayMode: .inline) // Optional, customize
+        //        .navigationBarTitle("", displayMode: .inline) // Optional, customize
         .toolbar {
             ToolbarItem(placement: .principal) {
-//                HStack {
-                    //Spacer() // To center the content
-                    if let name = chatUser?.name {
-                        Button(action: {
-//                            // Set the navigation state to true when the email is tapped
-                            self.isNavigating = true
-                        }) {
-                            Text(name) // Make the email clickable
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(.customPurple)
-                                .frame(maxWidth: .infinity, alignment: .center) // Ensure the username takes all available width and is centered
-                        }
-                        
-
+                //                HStack {
+                //Spacer() // To center the content
+                if let name = chatUser?.name {
+                    Button(action: {
+                        //                            // Set the navigation state to true when the email is tapped
+                        self.isNavigating = true
+                    }) {
+                        Text(name) // Make the email clickable
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.customPurple)
+                            .frame(maxWidth: .infinity, alignment: .center) // Ensure the username takes all available width and is centered
                     }
-                    //Spacer() // To center the content
-//                }
+                    
+                    
+                }
+                //Spacer() // To center the content
+                //                }
             }
         }
-//         Use a NavigationLink triggered programmatically by `isNavigating`
+        //         Use a NavigationLink triggered programmatically by `isNavigating`
         .background(
             NavigationLink(
                 destination: ProfileView(user_uid: chatUser?.uid ?? ""),
@@ -505,7 +505,7 @@ struct ChatLogView: View {
             ) {
                 EmptyView() // NavigationLink content is invisible; it only triggers navigation
             }
-
+            
         )
         .onChange(of: chatUser) { newUser in
             // Safely unwrap the chatUser before accessing its properties
@@ -516,7 +516,7 @@ struct ChatLogView: View {
                 print("No user selected, cannot reload messages")
             }
         }
-
+        
     }
     
     private var messagesView: some View {
@@ -564,7 +564,7 @@ struct ChatLogView: View {
             }
         }
     }
-
+    
     
     private func scrollToBottom(scrollViewProxy: ScrollViewProxy) {
         DispatchQueue.main.async {
@@ -574,7 +574,7 @@ struct ChatLogView: View {
         }
     }
     
-
+    
     private var chatBottomBar: some View {
         HStack {
             if vm.blockedUsers.contains(chatUser?.uid ?? "") {
@@ -601,7 +601,7 @@ struct ChatLogView: View {
                         .font(.system(size: 24))
                         .foregroundColor(Color(.darkGray))
                 }
-
+                
                 ZStack(alignment: .leading) {
                     if vm.chatText.isEmpty {
                         Text("Type your message...")
@@ -612,7 +612,7 @@ struct ChatLogView: View {
                         .frame(height: 40)
                         .opacity(vm.chatText.isEmpty ? 0.5 : 1)
                 }
-
+                
                 Button {
                     vm.handleSend()
                 } label: {
@@ -628,24 +628,48 @@ struct ChatLogView: View {
         .padding(.horizontal)
         .padding(.vertical, 8)
     }
-
     
     private var emojiPicker: some View {
-        let emojis: [String] = ["😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳"]
+        let emojis: [String] = [
+            // Smileys & Emotions
+            "😀", "😂", "😍", "😎", "😢", "😡", "🥳", "🤔", "🤗", "🤩", "🙄", "😳", "😇", "😉", "😋", "😜", "🤪",
+            "🥰", "😱", "😴", "🤤", "😭", "😅", "🤓", "😞", "😩", "😤",
+            
+            // Animals & Nature
+            "🐶", "🐱", "🐭", "🐰", "🦊", "🐻", "🐼", "🐸", "🐷", "🐵", "🐦", "🐧", "🦉", "🐳", "🦄", "🐝", "🐢", "🐬", "🐙",
+            
+            // Food & Drink
+            "🍎", "🍌", "🍓", "🍉", "🍒", "🍔", "🍕", "🍩", "🍿", "🍪", "🌮", "🥗", "🍣", "🍱", "🥤", "☕", "🍇", "🥪", "🥞",
+            
+            // Activities & Objects
+            "⚽", "🏀", "🏈", "🎾", "🏓", "🥋", "🎤", "🎮", "🎹", "🎨", "🧵", "🎬", "🎧", "🎯", "🎷", "🎻", "🏆", "🎟️", "🎲",
+            
+            // Travel & Places
+            "🚗", "✈️", "🚀", "🚂", "🚤", "🛳️", "🏠", "🏔️", "🗽", "🏝️", "🏙️", "🏨", "⛺", "🗿",
+            
+            // Symbols
+            "❤️", "💔", "🔥", "⭐", "🌈", "☀️", "⚡", "❄️", "💧", "🌍", "✨", "🎉", "🛑", "✔️", "➕", "➖", "♻️", "🔔", "🔒", "🔑",
+            
+            // Flags
+            "🇺🇸", "🇬🇧", "🇨🇦", "🇮🇳", "🇦🇺", "🇫🇷", "🇩🇪", "🇯🇵", "🇧🇷", "🇰🇷", "🇨🇳", "🇮🇹"
+        ]
         
         return VStack {
-            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
-                ForEach(emojis, id: \.self) { emoji in
-                    Button(action: {
-                        selectedEmoji = emoji
-                        showEmojiPicker = false
-                    }) {
-                        Text(emoji)
-                            .font(.largeTitle)
+            ScrollView {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                    ForEach(emojis, id: \.self) { emoji in
+                        Button(action: {
+                            vm.chatText += emoji
+                            showEmojiPicker = false // Close picker after selection
+                        }) {
+                            Text(emoji)
+                                .font(.largeTitle)
+                        }
                     }
                 }
+                .padding()
             }
-            .padding()
+            .frame(maxHeight: 300) // Limit the height of the picker for better UI
             .background(Color.white)
             .cornerRadius(10)
             .shadow(radius: 5)
