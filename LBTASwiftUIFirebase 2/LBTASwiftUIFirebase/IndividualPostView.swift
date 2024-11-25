@@ -49,19 +49,19 @@ struct PostView: View {
             return "Just now"
         } else if timeInterval < secondsInHour {
             let minutes = Int(timeInterval / secondsInMinute)
-            return "\(minutes) min ago"
+            return "\(minutes) min"
         } else if timeInterval < secondsInDay {
             let hours = Int(timeInterval / secondsInHour)
             return "\(hours) hr ago"
         } else if timeInterval < secondsInWeek {
             let days = Int(timeInterval / secondsInDay)
-            return "\(days) day(s) ago"
+            return "\(days) d ago"
         } else {
             let weeks = Int(timeInterval / secondsInWeek)
-            return "\(weeks) week(s) ago"
+            return "\(weeks) wk ago"
         }
-        
     }
+
 
    
     private var timeAgo: String {
@@ -348,7 +348,8 @@ struct PostView: View {
             
             if showEmojiPicker {
                 EmojiPickerView(text: $commentText, showPicker: $showEmojiPicker)
-                    .transition(.move(edge: .bottom))
+                    .transition(.identity) // No animation
+
             }
         }
     }
