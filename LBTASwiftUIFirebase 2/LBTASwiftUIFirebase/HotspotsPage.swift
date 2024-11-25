@@ -5,137 +5,179 @@
 //  Created by Manvi Juneja on 2024-11-24.
 //
 
-import Foundation
 import SwiftUI
+import Foundation
 
-
-
-struct Hotspots: View {
-    @State private var place: String = ""
-    @State private var offset: CGFloat = 0
-    
-    @State private var displayedSuggestions: [(String, String)] = []
-    @State private var currentPage: Int = 0
-    @State private var isLoading: Bool = false
-
-    
-    let suggestions = [
-        ("Jasper", "Jasper, Canada"), ("Banff", "Banff, Canada"), ("Korea", "Seoul, Korea"), ("Paris", "Paris, France"), ("Drumheller", "Drumheller, Canada"), ("Canmore", "Canmore, Canada"), ("Toronto", "Toronto, Canada"), ("Calgary", "Calgary, Canada"), ("Japan", "Kyoto, Japan"), ("Italy", "Venice, Italy")
-    ]
-    
-    let gridItems = [GridItem(.flexible()), GridItem(.flexible())]
-    
-    
-    func loadMoreSuggestions() {
-        guard !isLoading else { return } // Prevent loading if already fetching
-        
-        isLoading = true
-        
-        // Simulate delay for loading more items (replace with network call)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            let startIndex = currentPage * 6
-            let endIndex = min((currentPage + 1) * 6, suggestions.count)
-            
-            if startIndex < suggestions.count {
-                let newSuggestions = Array(suggestions[startIndex..<endIndex])
-                displayedSuggestions.append(contentsOf: newSuggestions)
-                currentPage += 1
-            }
-            
-            isLoading = false
-        }
-    }
-
-        
-    var body: some View {
-        ScrollView{
-            VStack(alignment: .leading, spacing: 2) {
-                Text("TRENDING")
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(Color(hex: "8C52FF"))
-                    //.padding(.top, -60)
-                    .padding(.leading, 2)
-                
-                
-                // Suggested locations view
-                VStack{
-                    LazyVGrid(columns: gridItems, spacing: 0) {
-                        ForEach(displayedSuggestions, id: \.0) { image in
-                            NavigationLink(destination: SuggestionPage(suggestionName: image.1)) {
-                                ZStack(alignment: .bottomLeading) {
-                                    // Displaying image
-                                    Image(image.0)
-                                        .resizable()
-                                        .aspectRatio(contentMode: .fill)
-                                        .frame(width: 174, height: 142)
-                                        .clipped()
-                                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                                        .overlay(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.1)))
-                                        .padding(.bottom, 18)
-                                    
-                                    //Displaying Text
-                                    Text(image.1)
-                                        .font(.system(size: 25, weight: .bold))
-                                        .foregroundColor(.white)
-                                        .multilineTextAlignment(.leading)
-                                        .padding(.horizontal, 10)
-                                        .frame(width: 163, alignment: .leading)
-                                        .padding(.bottom, 20)
-                                }
-                            
-                            }
-                            .buttonStyle(PlainButtonStyle())
-                            .onAppear {
-                                if let lastItem = displayedSuggestions.last, image == lastItem {
-                                    loadMoreSuggestions()
-                                }
-                            }
-                        }
-                    }
-                }
-                .padding(.horizontal, -5)
-                .padding(.top, 1)
-                .onAppear{
-                    loadMoreSuggestions()
-                }
-            }
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .topLeading)
-            
-        }
-        
-    }
+// Pixabay Response Model
+struct PixabayResponse1: Decodable {
+    let hits: [PixabayImage1]
 }
 
+struct PixabayImage1: Decodable {
+    let webformatURL: String
+}
 
-// The purple color used
+// Color Extension for Hex Values
 extension Color {
     init(hex: String) {
         let scanner = Scanner(string: hex)
         scanner.currentIndex = hex.startIndex
         var rgbValue: UInt64 = 0
         scanner.scanHexInt64(&rgbValue)
-        
+
         let red = Double((rgbValue & 0xFF0000) >> 16) / 255.0
         let green = Double((rgbValue & 0x00FF00) >> 8) / 255.0
         let blue = Double(rgbValue & 0x0000FF) / 255.0
-        
+
         self.init(red: red, green: green, blue: blue)
     }
 }
 
+struct Hotspots: View {
+    @State private var displayedSuggestions: [(String, String)] = []
+    @State private var currentPage: Int = 0
+    @State private var images: [String: String] = [:] // Store images for each place
+    @State private var selectedCity: String? = nil // Store the selected city dynamically
 
-// Displays lcoation suggestion posts
-struct SuggestionPage: View {
-    let suggestionName: String
-    
+    let suggestions = [
+        ("Jasper", "Jasper, Canada"),
+        ("Banff", "Banff, Canada"),
+        ("Korea", "Seoul, Korea"),
+        ("Paris", "Paris, France"),
+        ("Drumheller", "Drumheller, Canada"),
+        ("Canmore", "Canmore, Canada"),
+        ("Toronto", "Toronto, Canada"),
+        ("Calgary", "Calgary, Canada"),
+        ("Japan", "Kyoto, Japan"),
+        ("Italy", "Venice, Italy")
+    ]
+
     var body: some View {
-        VStack {
-            Text("Welcome to \(suggestionName)")
-                .font(.largeTitle)
+        NavigationView {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("TRENDING")
+                        .font(.system(size: 30, weight: .bold))
+                        .foregroundColor(Color(hex: "8C52FF"))
+
+                    // Using VStack to stack images vertically
+                    ForEach(0..<suggestions.count, id: \.self) { index in
+                        NavigationLink(destination: SuggestionPage(city: suggestions[index].0, selectedCity: $selectedCity)) {
+                            VStack {
+                                if let imageURL = images[suggestions[index].0], let url = URL(string: imageURL) {
+                                    AsyncImage(url: url) { image in
+                                        image.resizable().scaledToFill()
+                                    } placeholder: {
+                                        Color.gray.opacity(0.2)
+                                    }
+                                    .frame(height: 200) // Set consistent height for each image
+                                    .cornerRadius(8)
+                                    .padding(.bottom, 8)
+                                } else {
+                                    Color.gray.opacity(0.2)
+                                        .frame(height: 200)
+                                        .cornerRadius(8)
+                                        .padding(.bottom, 8)
+                                }
+
+                                Text(suggestions[index].1)
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .padding(8)
+                                    .background(Color.black.opacity(0.6))
+                                    .cornerRadius(8)
+                                    .padding([.leading, .bottom], 10)
+                            }
+                        }
+                    }
+                    .onAppear {
+                        fetchImagesForSuggestions()
+                    }
+                }
                 .padding()
-            
+            }
+            .navigationTitle("Hotspots")
         }
-        .navigationTitle(suggestionName)
+    }
+
+    func fetchImagesForSuggestions() {
+        let apiKey = "47197466-e97591543dd5d0d29999d6d75"
+        for suggestion in suggestions {
+            let query = suggestion.0.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? suggestion.0
+            let urlString = "https://pixabay.com/api/?key=\(apiKey)&q=\(query)&image_type=photo"
+
+            guard let url = URL(string: urlString) else { continue }
+
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let data = data {
+                    do {
+                        let decodedResponse = try JSONDecoder().decode(PixabayResponse1.self, from: data)
+                        DispatchQueue.main.async {
+                            if let firstImage = decodedResponse.hits.first {
+                                images[suggestion.0] = firstImage.webformatURL
+                            }
+                        }
+                    } catch {
+                        print("Error decoding response for \(suggestion.0): \(error)")
+                    }
+                }
+            }.resume()
+        }
     }
 }
+
+struct SuggestionPage: View {
+    let city: String
+    @Binding var selectedCity: String? // Binding to update selected city in Hotspots view
+    @State private var detailedImages: [PixabayImage1] = []
+
+    var body: some View {
+        VStack {
+            Text("Welcome to \(selectedCity ?? city)") // Use binding city or fallback to provided city
+                .font(.largeTitle)
+                .padding()
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    ForEach(detailedImages, id: \.webformatURL) { image in
+                        AsyncImage(url: URL(string: image.webformatURL)) { img in
+                            img.resizable()
+                                .scaledToFill()
+                                .frame(height: 200)
+                                .clipped()
+                        } placeholder: {
+                            Color.gray.opacity(0.2)
+                        }
+                        .cornerRadius(8)
+                    }
+                }
+            }
+            .onAppear {
+                fetchDetailedImages(for: city) // Fetch images based on the selected city
+            }
+        }
+        .padding()
+    }
+
+    func fetchDetailedImages(for query: String) {
+        let apiKey = "47197466-e97591543dd5d0d29999d6d75"
+        let urlString = "https://pixabay.com/api/?key=\(apiKey)&q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&image_type=photo"
+
+        guard let url = URL(string: urlString) else { return }
+
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                do {
+                    let decodedResponse = try JSONDecoder().decode(PixabayResponse1.self, from: data)
+                    DispatchQueue.main.async {
+                        detailedImages = decodedResponse.hits
+                        selectedCity = query // Update selectedCity when images are loaded
+                    }
+                } catch {
+                    print("Error decoding detailed images: \(error)")
+                }
+            }
+        }.resume()
+    }
+}
+
