@@ -184,38 +184,34 @@ class LocationInfoView: UIView {
     }
     
     private func getPointOfInterest(for coordinate: CLLocationCoordinate2D) {
-        let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-        let geocoder = CLGeocoder()
-        
-        geocoder.reverseGeocodeLocation(location) { [weak self] placemarks, error in
-            guard let self = self else { return }
-            
-            DispatchQueue.main.async {
-                if let error = error {
-                    print("Reverse geocoding error: \(error.localizedDescription)")
-                    self.locationLabel.text = "Location not found"
-                    return
-                }
+        // Fetch location document to get the address
+        let db = FirebaseManager.shared.firestore
+        db.collection("locations")
+            .whereField("location_coordinates", isEqualTo: [coordinate.latitude, coordinate.longitude])
+            .getDocuments { [weak self] snapshot, error in
+                guard let self = self else { return }
                 
-                if let placemark = placemarks?.first {
-                    if let name = placemark.name {
-                        self.locationLabel.text = name
-                        // Trigger post count fetch after setting the name
-                        self.fetchPostCount(for: coordinate)
-                    } else if let thoroughfare = placemark.thoroughfare {
-                        let locationName = placemark.subThoroughfare.map { "\($0) \(thoroughfare)" } ?? thoroughfare
+                DispatchQueue.main.async {
+                    if let error = error {
+                        print("Error fetching location: \(error.localizedDescription)")
+                        self.locationLabel.text = "Location not found"
+                        return
+                    }
+                    
+                    if let locationDoc = snapshot?.documents.first,
+                       let address = locationDoc.data()["address"] as? String {
+                        // Take the address up to the first comma
+                        let locationName = address.components(separatedBy: ",")[0].trimmingCharacters(in: .whitespaces)
                         self.locationLabel.text = locationName
                         // Trigger post count fetch after setting the name
                         self.fetchPostCount(for: coordinate)
                     } else {
                         self.locationLabel.text = "Unknown location"
                     }
-                } else {
-                    self.locationLabel.text = "No location found"
                 }
             }
-        }
     }
+
 
     private func setupGesture() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
