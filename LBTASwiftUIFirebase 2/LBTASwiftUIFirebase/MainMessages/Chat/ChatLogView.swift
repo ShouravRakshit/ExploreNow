@@ -553,6 +553,7 @@ struct ChatLogView: View {
                             }
                         }
                     }
+                    //T
                     .padding(.horizontal)
                     .padding(.top, 8)
                     .onChange(of: vm.chatMessages.count) { _ in
