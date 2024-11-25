@@ -135,7 +135,7 @@ struct ProfileView: View {
                                 .shadow(radius: 5)
                         } else {
                             // Placeholder Image
-                            Image(systemName: "person.fill")
+                            Image(systemName: "person.circle.fill")
                                 .resizable()
                                 .scaledToFill()
                                 .frame(width: 80, height: 80)
@@ -144,6 +144,7 @@ struct ProfileView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 40).stroke(Color.customPurple, lineWidth: 1))
                                 .padding(.horizontal, 1)
                                 .shadow(radius: 5)
+                            
                         }
                         
                         // Post Counts

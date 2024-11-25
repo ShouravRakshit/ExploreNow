@@ -66,11 +66,16 @@ struct NotificationView: View {
                                         WebImage(url: URL(string: user.profileImageUrl))
                                             .resizable()
                                             .scaledToFill()
-                                            .clipShape(Circle()) // Clip to circle shape
-                                            .frame(width: 40, height: 40) // Set size
+                                            .frame(width: 40, height: 40)
+                                            .clipped()
+                                            .cornerRadius(20)
+                                            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.customPurple, lineWidth: 0.5))
+                                            .padding(.horizontal, 1)
+                                            .shadow(radius: 1)
                                         }
                                     else
                                         {
+                                        /*
                                         Image(systemName: "person.fill")
                                             .font(.system(size: 40))
                                             .padding()
@@ -78,7 +83,17 @@ struct NotificationView: View {
                                             .foregroundColor(Color(.label))
                                             .frame(width: 40, height: 40) // Set size for placeholder
                                             .background(Color.gray.opacity(0.2)) // Optional background
-                                            .clipShape(Circle()) // Clip to circle shape
+                                            .clipShape(Circle()) // Clip to circle shape*/
+                                        
+                                        Image(systemName: "person.circle.fill")
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(width: 40, height: 40)
+                                            .clipped()
+                                            .cornerRadius(20)
+                                            .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.customPurple, lineWidth: 0.5))
+                                            .padding(.horizontal, 1)
+                                            .shadow(radius: 1)
                                         }
                                 }
 
