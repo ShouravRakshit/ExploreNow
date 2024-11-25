@@ -116,13 +116,10 @@ struct FriendsView: View {
                let url = URL(string: profileImageUrl) {
                 AsyncImage(url: url) { image in
                     image
+                        .resizable()
                         .scaledToFill()
                         .frame(width: 50, height: 50)
-                        .clipped()
-                        .cornerRadius(25)
-                        .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color.customPurple, lineWidth: 0.5))
-                        .padding(.horizontal, 1)
-                        .shadow(radius: 1)
+                        .clipShape(Circle())
                 } placeholder: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
@@ -130,13 +127,9 @@ struct FriendsView: View {
                 }
             } else {
                 Image(systemName: "person.circle.fill")
-                    .scaledToFill()
+                    .resizable()
+                    .scaledToFit()
                     .frame(width: 50, height: 50)
-                    .clipped()
-                    .cornerRadius(25)
-                    .overlay(RoundedRectangle(cornerRadius: 25).stroke(Color.customPurple, lineWidth: 0.5))
-                    .padding(.horizontal, 1)
-                    .shadow(radius: 1)
             }
             
             // Text content: Username and Name

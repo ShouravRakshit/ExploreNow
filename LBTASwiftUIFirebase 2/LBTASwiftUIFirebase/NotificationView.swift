@@ -56,11 +56,12 @@ struct NotificationView: View {
                                 
                                 ZStack
                                 {
+                                    /*
                                     // Circular border
                                     Circle()
                                         .stroke(Color.black, lineWidth: 4) // Black border
                                         .frame(width: 41, height: 41) // Slightly larger than the image
-                                    
+                                    */
                                     if !user.profileImageUrl.isEmpty
                                         {
                                         WebImage(url: URL(string: user.profileImageUrl))
