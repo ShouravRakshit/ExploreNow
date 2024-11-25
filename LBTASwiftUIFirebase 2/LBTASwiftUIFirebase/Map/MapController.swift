@@ -7,6 +7,7 @@
 
 import MapKit
 import UIKit
+import SwiftUI
 
 class LocationManager {
     static let shared = LocationManager()
@@ -290,7 +291,14 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
 
     @objc private func hotspotButtonTapped() {
         print("Hotspot button tapped!")
-        // Add your hotspot functionality here
+        // Create the Hotspots SwiftUI view
+        let hotspotsView = Hotspots()
+            
+        // Wrap the SwiftUI view in a UIHostingController
+        let hostingController = UIHostingController(rootView: hotspotsView)
+            
+        // Push the UIHostingController onto the navigation stack
+        self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
     private func adjustHotspotButtonPosition(show: Bool) {

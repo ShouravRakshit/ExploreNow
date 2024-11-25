@@ -11,6 +11,7 @@ struct LocationSearchBar: View {
     @StateObject private var locationManager = CustomLocationManager()
     @State private var searchText = ""
     @State private var showResults = false
+    @State private var showLocationButton = true // State to track button visibility
     
     private let primaryPurple = Color(red: 140/255, green: 82/255, blue: 255/255)
     private let lightPurple = Color(red: 140/255, green: 82/255, blue: 255/255).opacity(0.1)
@@ -40,6 +41,7 @@ struct LocationSearchBar: View {
                         searchText = ""
                         selectedLocation = ""
                         showResults = false
+                        showLocationButton = true
                     }) {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundColor(.gray)
@@ -52,21 +54,26 @@ struct LocationSearchBar: View {
             .background(Color(.systemGray6))
             .cornerRadius(12)
             
-            // Current Location Button - Full width
-            Button(action: { fetchCurrentLocation() }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "location.circle.fill")
-                        .font(.system(size: 16))
-                    Text("Use Current Location")
-                        .font(.system(size: 14, weight: .medium))
-                    Spacer() // Added to make the button full width
+            if showLocationButton {
+                // Current Location Button - Full width
+                Button(action: {
+                    fetchCurrentLocation()
+                    showLocationButton = false
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "location.circle.fill")
+                            .font(.system(size: 16))
+                        Text("Use Current Location")
+                            .font(.system(size: 14, weight: .medium))
+                        Spacer() // Added to make the button full width
+                    }
+                    .foregroundColor(primaryPurple)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity) // Added to ensure full width
+                    .background(lightPurple)
+                    .cornerRadius(8)
                 }
-                .foregroundColor(primaryPurple)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .frame(maxWidth: .infinity) // Added to ensure full width
-                .background(lightPurple)
-                .cornerRadius(8)
             }
             
             // Search Results
