@@ -2,8 +2,9 @@
 //  HotspotsPage.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by Manvi Juneja on 2024-11-24.
+//  Created by Manvi Juneja and Shree Patel on 2024-11-24.
 //
+//  To further expand this implementation, the locations present on the Hotspots page can be collected using an algorithm that grabs the most popular locations from the database. Additioanlly, when a location is clicked, the location page view for that location can be displayed (similar to how it is displayed in the Explore page), so that the user can view all posts present in that location.
 
 import SwiftUI
 import Foundation
@@ -39,6 +40,7 @@ struct Hotspots: View {
     @State private var images: [String: String] = [:] // Store images for each place
     @State private var selectedCity: String? = nil // Store the selected city dynamically
 
+    // List of trending locations
     let suggestions = [
         ("Jasper", "Jasper, Canada"),
         ("Banff", "Banff, Canada"),
@@ -55,6 +57,7 @@ struct Hotspots: View {
     var body: some View {
         NavigationView {
             ScrollView {
+                // Displaying the heading for the page
                 VStack(alignment: .leading, spacing: 16) {
                     Text("TRENDING")
                         .font(.system(size: 30, weight: .bold))
@@ -79,7 +82,7 @@ struct Hotspots: View {
                                         .cornerRadius(8)
                                         .padding(.bottom, 8)
                                 }
-
+                                // Displaying the name of the location
                                 Text(suggestions[index].1)
                                     .font(.headline)
                                     .foregroundColor(.white)
