@@ -384,6 +384,7 @@ struct PostView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 4) {
+                    
                     Text(userData?.username ?? "Unknown User")
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(AppTheme.primaryText)

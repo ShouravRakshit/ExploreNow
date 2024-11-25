@@ -338,14 +338,20 @@ struct ProfileSettingsView: View {
                     .offset(x: -30)
                 Spacer()
             }
+            .padding(.top, 20)
             //------------------------------------------------
             ZStack {
                 // Circular border
                 Circle()
                     .stroke(Color.customPurple, lineWidth: 4) // Purple border
                     .frame(width: 188, height: 188) // Slightly larger than the image
-                
-                if let selectedImage = self.image {
+                if isUploading {
+                    // Show loading spinner
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .customPurple))
+                        .frame(width: 180, height: 180)
+                }
+                else if let selectedImage = self.image {
                     // Display the newly selected image
                     Image(uiImage: selectedImage)
                         .resizable()
@@ -370,7 +376,7 @@ struct ProfileSettingsView: View {
                         .clipShape(Circle())
                 }
             }
-            .padding(.top, 20)
+            .padding(.top, 10)
             
             Button(action: {
                 showImageSourceOptions = true
@@ -380,7 +386,7 @@ struct ProfileSettingsView: View {
                     .font(.custom("Sansation-Regular", size: 21))
                     .foregroundColor(.blue)
                     .underline()
-                    .padding(.bottom, 50)
+                    .padding(.bottom, 20)
             }.actionSheet(isPresented: $showImageSourceOptions) {
                 ActionSheet(title: Text("Select Image Source"), message: nil, buttons: [
                     .default(Text("Photo Library")) {
@@ -424,11 +430,12 @@ struct ProfileSettingsView: View {
             //                    ])
             //                }
             
+            /*
             // Display loading indicator if uploading
             if isUploading {
                 ProgressView("Uploading...")
-                    .padding()
-            }
+                    .padding(.top, 2)
+            }*/
             
             // Profile Information Grid
             Grid {
@@ -511,11 +518,12 @@ struct ProfileSettingsView: View {
                 
                 Divider()
             }
+            .padding (.top, 5)
             
             Text("Blocked Users >")
                 .padding(.top, 10)
                 .font(.custom("Sansation-Regular", size: 18))
-                .foregroundColor(.customPurple)
+                .foregroundColor(.red)
                 .onTapGesture {
                     showBlockedUsers = true
                 }
