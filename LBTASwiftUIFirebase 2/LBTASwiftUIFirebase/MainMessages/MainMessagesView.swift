@@ -183,7 +183,7 @@ struct MainMessagesView: View {
             VStack {
                 customNavBar
                 
-//                searchBar
+                searchBar
 
                 messagesView
 
@@ -355,14 +355,6 @@ struct MainMessagesView: View {
             }
 
             Spacer()
-            /*
-            Button(action: {
-                shouldShowLogOutOptions.toggle()
-            }) {
-                Image(systemName: "gear")
-                    .font(.system(size: 24, weight: .bold))
-                    .foregroundColor(Color(.label))
-            }*/
 
             // Add New Message Button
             Button(action: {
@@ -374,67 +366,8 @@ struct MainMessagesView: View {
             }
         }
         .padding()
-        .actionSheet(isPresented: $shouldShowLogOutOptions) {
-            ActionSheet(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [
-                .default(Text("Change Password"), action: {
-                    shouldShowChangePasswordConfirmation.toggle()
-                }),
-                .destructive(Text("Sign Out"), action: {
-                    handleSignOut()
-                }),
-                .destructive(Text("Delete Account"), action: {
-                    showDeleteAccountConfirmation()
-                }),
-                .cancel()
-            ])
-        }
-        .alert(isPresented: $shouldShowChangePasswordConfirmation) {
-            
-            Alert(
-                
-                title: Text("Change Password"),
-                message: Text("A password reset link will be sent to your email."),
-                primaryButton: .default(Text("OK"), action: {
-                    if let email = userManager.currentUser?.email {
-                        vm.changePassword(email: email) { result in
-                            switch result {
-                            case .success:
-                                print("Password reset email sent.")
-                            case .failure(let error):
-                                print("Failed to send password reset email:", error.localizedDescription)
-                            }
-                        }
-                    }
-                }),
-                secondaryButton: .cancel()
-            )
-        }
         
     }
-    
-    private func showDeleteAccountConfirmation() {
-        let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            vm.deleteUserAccount { result in
-                switch result {
-                case .success:
-                    print("Account deleted successfully.")
-                    handleSignOut()
-                case .failure(let error):
-                    print("Failed to delete account:", error.localizedDescription)
-                }
-            }
-        }))
-
-        DispatchQueue.main.async {
-            if let topController = UIApplication.shared.windows.first?.rootViewController {
-                topController.present(alert, animated: true)
-            }
-        }
-    }
-    
     
     
     func updateRecentMessagesWithNames() {

@@ -5,7 +5,6 @@
 //  Created by Ivan on 2024-11-21.
 //
 
-// 47197466-e97591543dd5d0d29999d6d75
 
 import Foundation
 import Combine
