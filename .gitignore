@@ -2,6 +2,7 @@
 */xcuserdata/*
 *.xcuserstate
 *.xcshareddata
+*.xcodeproj
 
 # Xcode files
 *.xcuserdata
