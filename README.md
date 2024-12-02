@@ -40,7 +40,7 @@ Navigate to the location of your project and double-click on the .xcodeproj or .
 ### **7. Locate Secrets.plist File**
 In the Project Navigator on the left side of Xcode, find the Secrets.plist file.
 
-This file is typically located in the main project directory or under a specific group for resources.
+This file is located in the main project directory.
 
 ### **8. View the File Inspector**
 With the Secrets.plist file selected in the Project Navigator, click on the View menu at the top of Xcode.
