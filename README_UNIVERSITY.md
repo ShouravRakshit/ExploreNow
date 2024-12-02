@@ -5,7 +5,7 @@
 ---
 
 # **Setup Instructions**
-This version is pre-configured for grading. No additional setup is required. Simply open the project in Xcode and build it.
+No additional setup is required. Simply open the project in Xcode and build it.
 
 # **Open the Project:**
 Navigate to the project directory and double-click the .xcodeproj or .xcworkspace file.
