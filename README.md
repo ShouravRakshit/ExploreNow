@@ -21,13 +21,9 @@ cd ExploreNow
 Sign up for a free account on [Pixabay](https://pixabay.com/). Once registered, navigate to the [Pixabay API Documentation](https://pixabay.com/api/docs/) to generate your API key. This key will be required for accessing Pixabay's API features.
 
 ### **4. Add API Keys**
-Copy the Template:
+Copy the Template: Duplicate the Secrets.template.plist file to create a new Secrets.plist file.
 
-Duplicate the Secrets.template.plist file to create a new Secrets.plist file.
-
-Update API Keys:
-
-Open Secrets.plist and replace Your_API_Key_Here with your actual API keys.
+Update API Keys: Open Secrets.plist and replace Your_API_Key_Here with your actual API keys.
 
 ### **5. Configure Secrets.plist in Xcode**
 To properly configure the Secrets.plist file within your Xcode project, follow these detailed steps:
