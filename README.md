@@ -17,8 +17,10 @@ git clone https://github.com/ShouravRakshit/ExploreNow.git
 ```bash
 cd ExploreNow
 ```
+### **3. Get API Keys**
+Sign up for a free account on [Pixabay](https://pixabay.com/). Once registered, navigate to the [Pixabay API Documentation](https://pixabay.com/api/docs/) to generate your API key. This key will be required for accessing Pixabay's API features.
 
-### **3. Add API Keys**
+### **4. Add API Keys**
 Copy the Template:
 
 Duplicate the Secrets.template.plist file to create a new Secrets.plist file.
@@ -27,26 +29,26 @@ Update API Keys:
 
 Open Secrets.plist and replace Your_API_Key_Here with your actual API keys.
 
-### **4. Configure Secrets.plist in Xcode**
+### **5. Configure Secrets.plist in Xcode**
 To properly configure the Secrets.plist file within your Xcode project, follow these detailed steps:
 
-### **5. Open the Project in Xcode**
+### **6. Open the Project in Xcode**
 Start by opening your project in Xcode.
 
 Navigate to the location of your project and double-click on the .xcodeproj or .xcworkspace file to open it.
 
-### **6. Locate Secrets.plist File**
+### **7. Locate Secrets.plist File**
 In the Project Navigator on the left side of Xcode, find the Secrets.plist file.
 
 This file is typically located in the main project directory or under a specific group for resources.
 
-### **7. View the File Inspector**
+### **8. View the File Inspector**
 With the Secrets.plist file selected in the Project Navigator, click on the View menu at the top of Xcode.
 
 From the dropdown menu, select Inspectors and then Show File Inspector.
 
 
-### **8. Configure Target Membership**
+### **9. Configure Target Membership**
 In the File Inspector pane, locate the section labeled Target Membership.
 
 You will see a list of project targets with checkboxes next to them.
@@ -55,10 +57,10 @@ Ensure that the checkbox for your target project folder is checked under Any Sup
 
 This ensures that the Secrets.plist file is included in the build when you compile the app for any iOS device.
 
-### **9. Save Changes**
+### **10. Save Changes**
 After checking the appropriate boxes in the Target Membership, save your changes in Xcode by pressing Cmd + S.
 
-### **10. Ensure there are no build errors related to the configuration of this file**
+### **11. Ensure there are no build errors related to the configuration of this file**
 
 ### **Contributing**
 Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
