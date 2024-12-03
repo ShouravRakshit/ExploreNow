@@ -57,7 +57,7 @@
 		8148DC992CFFB1A400D490A6 /* CreateNewMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC982CFFB1A400D490A6 /* CreateNewMessageView.swift */; };
 		8148DCA12CFFB70100D490A6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCA02CFFB70100D490A6 /* LoginView.swift */; };
 		8148DCA32CFFB72F00D490A6 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCA22CFFB72F00D490A6 /* LoginViewModel.swift */; };
-		8148DCB12CFFC52800D490A6 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCB02CFFC52800D490A6 /* SignUpView.swift */; };
+		8148DCBF2CFFCD6200D490A6 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */; };
 		B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523452CC814060012FC49 /* ProfileSettingsView.swift */; };
 		B01523482CC82ED90012FC49 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523472CC82ED50012FC49 /* EditView.swift */; };
 		B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */; };
@@ -126,7 +126,7 @@
 		8148DC982CFFB1A400D490A6 /* CreateNewMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewMessageView.swift; sourceTree = "<group>"; };
 		8148DCA02CFFB70100D490A6 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		8148DCA22CFFB72F00D490A6 /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
-		8148DCB02CFFC52800D490A6 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		B01523452CC814060012FC49 /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		B01523472CC82ED50012FC49 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicView.swift; sourceTree = "<group>"; };
@@ -204,14 +204,11 @@
 				B022884F2CEE561F0089FB7A /* BlockedManager.swift */,
 				684BEE1E2CF449EB00579766 /* HotspotsPage.swift */,
 				B022884D2CEE52070089FB7A /* BlockedUsersView.swift */,
-				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
 				2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */,
 				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
 				10B59CC82CEA7B9000306357 /* PostCard.swift */,
 				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
-				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				B0F30F292CE9863100F4EFE4 /* FriendsView.swift */,
-				2C1967AC2CE0404E00765C63 /* SplashScreen.swift */,
 				B09365872CDC951E00126005 /* NotificationManager.swift */,
 				B09365852CDC231900126005 /* NotificationView.swift */,
 				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
@@ -221,6 +218,7 @@
 				2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
+				8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */,
 				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
 				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
@@ -241,7 +239,6 @@
 				B01523452CC814060012FC49 /* ProfileSettingsView.swift */,
 				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
 				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
-				8148DCB02CFFC52800D490A6 /* SignUpView.swift */,
 			);
 			path = LBTASwiftUIFirebase;
 			sourceTree = "<group>";
@@ -304,6 +301,8 @@
 		8148DC862CFFADB500D490A6 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				2C1967AC2CE0404E00765C63 /* SplashScreen.swift */,
+				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
 				8148DC8C2CFFAE6700D490A6 /* ChatLogView.swift */,
 				8148DC8E2CFFAE9500D490A6 /* MessageView.swift */,
 				8148DC922CFFAF8200D490A6 /* SearchUserView.swift */,
@@ -318,6 +317,7 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */,
 				8148DC902CFFAF6A00D490A6 /* SearchUserViewModel.swift */,
 				8148DC962CFFB18B00D490A6 /* CreateNewMessageViewModel.swift */,
@@ -433,7 +433,7 @@
 				2CD5E27E2CF01EBA0024B502 /* PixabayAPI.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
 				B02288502CEE56220089FB7A /* BlockedManager.swift in Sources */,
-				8148DCB12CFFC52800D490A6 /* SignUpView.swift in Sources */,
+				8148DCBF2CFFCD6200D490A6 /* SignUpView.swift in Sources */,
 				684BEE1F2CF449EB00579766 /* HotspotsPage.swift in Sources */,
 				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				8148DC8B2CFFAE0200D490A6 /* ChatLogViewModel.swift in Sources */,

@@ -5,7 +5,6 @@
 //  Created by AM on 03/12/2024.
 //
 
-
 import SwiftUI
 import Firebase
 import FirebaseAuth
@@ -445,4 +444,3 @@ struct SignUpView: View
     
         
         }
-
