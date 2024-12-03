@@ -20,15 +20,10 @@ contents.xcworkspacedata
 # Ignore IDE workspace checks
 IDEWorkspaceChecks.plist
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/xcuserdata/ivan.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
-LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 
-LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 **/Secrets.plist
-LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase/Secrets.plist
-LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 # Ignore specific Xcode project file
-**/LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/project.pbxproj
 
 # Ignore Secrets files
 **/Secrets.plist
