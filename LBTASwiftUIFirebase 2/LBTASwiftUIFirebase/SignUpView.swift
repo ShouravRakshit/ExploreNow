@@ -2,8 +2,9 @@
 //  SignUpView.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by Alisha Lalani on 2024-10-15.
+//  Created by AM on 03/12/2024.
 //
+
 
 import SwiftUI
 import Firebase
@@ -71,7 +72,7 @@ struct SignUpView: View
                     .padding(12) // Padding inside the text field
                     .background(Color.white) // Background color
                     .cornerRadius(15) // Rounded corners
-                    .autocapitalization(.none) 
+                    .autocapitalization(.none)
                     .overlay(
                         RoundedRectangle(cornerRadius: 15) // Rounded border
                             .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
@@ -444,3 +445,4 @@ struct SignUpView: View
     
         
         }
+
