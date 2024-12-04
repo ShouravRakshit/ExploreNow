@@ -35,10 +35,11 @@
 		684A510D2CE1D0D500383B08 /* IndividualPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510C2CE1D0D500383B08 /* IndividualPostView.swift */; };
 		68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A04D752CCA0CFD00BCA36E /* AddPostView.swift */; };
 		68D3B3982CCA37A200166069 /* AddPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B3972CCA37A200166069 /* AddPhotos.swift */; };
-		811CE27F2D00D74B00DCC599 /* HotspotsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE27E2D00D74B00DCC599 /* HotspotsViewModel.swift */; };
-		811CE2812D00D75B00DCC599 /* SuggestionPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2802D00D75B00DCC599 /* SuggestionPageViewModel.swift */; };
-		811CE2832D00D76900DCC599 /* Hotspots.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2822D00D76900DCC599 /* Hotspots.swift */; };
-		811CE2852D00D77900DCC599 /* SuggestionPage .swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2842D00D77900DCC599 /* SuggestionPage .swift */; };
+		811CE28B2D00E04000DCC599 /* CityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE28A2D00E04000DCC599 /* CityImage.swift */; };
+		811CE28F2D00EC2D00DCC599 /* HotspotsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE28E2D00EC2D00DCC599 /* HotspotsView.swift */; };
+		811CE2912D00EC4700DCC599 /* SuggestionPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2902D00EC4700DCC599 /* SuggestionPageView.swift */; };
+		811CE2932D00F01600DCC599 /* HotSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */; };
+		811CE2952D00F1AD00DCC599 /* SuggestionPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */; };
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
 		81447E5E2CB31F14005BE180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E5D2CB31F14005BE180 /* Assets.xcassets */; };
 		81447E612CB31F14005BE180 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E602CB31F14005BE180 /* Preview Assets.xcassets */; };
@@ -113,10 +114,11 @@
 		684A510C2CE1D0D500383B08 /* IndividualPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndividualPostView.swift; sourceTree = "<group>"; };
 		68A04D752CCA0CFD00BCA36E /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
 		68D3B3972CCA37A200166069 /* AddPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotos.swift; sourceTree = "<group>"; };
-		811CE27E2D00D74B00DCC599 /* HotspotsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotspotsViewModel.swift; sourceTree = "<group>"; };
-		811CE2802D00D75B00DCC599 /* SuggestionPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionPageViewModel.swift; sourceTree = "<group>"; };
-		811CE2822D00D76900DCC599 /* Hotspots.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hotspots.swift; sourceTree = "<group>"; };
-		811CE2842D00D77900DCC599 /* SuggestionPage .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SuggestionPage .swift"; sourceTree = "<group>"; };
+		811CE28A2D00E04000DCC599 /* CityImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityImage.swift; sourceTree = "<group>"; };
+		811CE28E2D00EC2D00DCC599 /* HotspotsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotspotsView.swift; sourceTree = "<group>"; };
+		811CE2902D00EC4700DCC599 /* SuggestionPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionPageView.swift; sourceTree = "<group>"; };
+		811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotSpotViewModel.swift; sourceTree = "<group>"; };
+		811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionPageViewModel.swift; sourceTree = "<group>"; };
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
 		81447E5D2CB31F14005BE180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				8148DC882CFFADD800D490A6 /* ChatMessage.swift */,
 				8148DCC82D00A57600D490A6 /* RecentMessage.swift */,
 				8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */,
+				811CE28A2D00E04000DCC599 /* CityImage.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -312,10 +315,10 @@
 			children = (
 				2C1967AC2CE0404E00765C63 /* SplashScreen.swift */,
 				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
-				811CE2822D00D76900DCC599 /* Hotspots.swift */,
+				811CE2902D00EC4700DCC599 /* SuggestionPageView.swift */,
 				8148DC8C2CFFAE6700D490A6 /* ChatLogView.swift */,
-				811CE2842D00D77900DCC599 /* SuggestionPage .swift */,
 				8148DC8E2CFFAE9500D490A6 /* MessageView.swift */,
+				811CE28E2D00EC2D00DCC599 /* HotspotsView.swift */,
 				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
 				8148DC922CFFAF8200D490A6 /* SearchUserView.swift */,
 				8148DC942CFFAFC400D490A6 /* UserRowView.swift */,
@@ -333,13 +336,13 @@
 			children = (
 				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */,
-				811CE2802D00D75B00DCC599 /* SuggestionPageViewModel.swift */,
+				811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */,
 				8148DC902CFFAF6A00D490A6 /* SearchUserViewModel.swift */,
 				8148DC962CFFB18B00D490A6 /* CreateNewMessageViewModel.swift */,
 				2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */,
+				811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */,
 				8148DCA22CFFB72F00D490A6 /* LoginViewModel.swift */,
 				8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */,
-				811CE27E2D00D74B00DCC599 /* HotspotsViewModel.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
@@ -438,11 +441,11 @@
 				8148DCCD2D00A66200D490A6 /* MainMessagesView.swift in Sources */,
 				8177CD9F2D00D2E70043BC92 /* WeatherModels.swift in Sources */,
 				8148DC952CFFAFC400D490A6 /* UserRowView.swift in Sources */,
-				811CE27F2D00D74B00DCC599 /* HotspotsViewModel.swift in Sources */,
 				B036A85B2CEA764D00820825 /* UserSettingsManager.swift in Sources */,
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
 				8148DCA32CFFB72F00D490A6 /* LoginViewModel.swift in Sources */,
 				8148DCCB2D00A63B00D490A6 /* MainMessagesViewModel.swift in Sources */,
+				811CE2932D00F01600DCC599 /* HotSpotViewModel.swift in Sources */,
 				2CD3C7DC2CEDBCB200D21855 /* AllUsersSearchView.swift in Sources */,
 				10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */,
 				B0F30F2C2CE988CA00F4EFE4 /* FriendsManager.swift in Sources */,
@@ -470,12 +473,12 @@
 				8148DC992CFFB1A400D490A6 /* CreateNewMessageView.swift in Sources */,
 				2C132B7B2CC219C70087408A /* AppState.swift in Sources */,
 				B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */,
-				811CE2812D00D75B00DCC599 /* SuggestionPageViewModel.swift in Sources */,
+				811CE28B2D00E04000DCC599 /* CityImage.swift in Sources */,
 				B01523482CC82ED90012FC49 /* EditView.swift in Sources */,
 				10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */,
 				682B8D1F2CCEFF0E00E56AB0 /* LocationPostsPage.swift in Sources */,
-				811CE2832D00D76900DCC599 /* Hotspots.swift in Sources */,
 				10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */,
+				811CE28F2D00EC2D00DCC599 /* HotspotsView.swift in Sources */,
 				2CD5E2802CF01EC90024B502 /* PixabayImage.swift in Sources */,
 				10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */,
 				8148DCA12CFFB70100D490A6 /* LoginView.swift in Sources */,
@@ -487,10 +490,11 @@
 				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				8148DC8D2CFFAE6700D490A6 /* ChatLogView.swift in Sources */,
 				2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */,
+				811CE2912D00EC4700DCC599 /* SuggestionPageView.swift in Sources */,
 				2CD3C7E12CEDBD1200D21855 /* AllUsersSearchViewModel.swift in Sources */,
-				811CE2852D00D77900DCC599 /* SuggestionPage .swift in Sources */,
 				2CD5E2822CF01ED40024B502 /* PixabayImagePickerView.swift in Sources */,
 				10B59CC92CEA7B9000306357 /* PostCard.swift in Sources */,
+				811CE2952D00F1AD00DCC599 /* SuggestionPageViewModel.swift in Sources */,
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				8148DC912CFFAF6A00D490A6 /* SearchUserViewModel.swift in Sources */,

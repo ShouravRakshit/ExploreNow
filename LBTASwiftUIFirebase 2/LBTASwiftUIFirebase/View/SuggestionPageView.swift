@@ -1,23 +1,29 @@
 //
-//  SuggestionPage .swift
+//  SuggestionPageView.swift
 //  LBTASwiftUIFirebase
 //
 //  Created by AM on 04/12/2024.
 //
 
-import SwiftUI
 
+import SwiftUI
+import Combine
 
 struct SuggestionPage: View {
     let city: String
-    @StateObject private var viewModel = SuggestionPageViewModel()
-
+    @StateObject private var viewModel: SuggestionPageViewModel
+    
+    init(city: String) {
+        self.city = city
+        _viewModel = StateObject(wrappedValue: SuggestionPageViewModel(city: city)) // Initialize the ViewModel
+    }
+    
     var body: some View {
         VStack {
-            Text("Welcome to \(city)") // Use binding city or fallback to provided city
+            Text("Welcome to \(viewModel.selectedCity)") // Use the ViewModel's city
                 .font(.largeTitle)
                 .padding()
-
+            
             ScrollView {
                 VStack(spacing: 16) {
                     ForEach(viewModel.detailedImages, id: \.webformatURL) { image in
@@ -33,10 +39,11 @@ struct SuggestionPage: View {
                     }
                 }
             }
-            .onAppear {
-                viewModel.fetchDetailedImages(for: city)
-            }
         }
         .padding()
+        .onAppear {
+            viewModel.fetchDetailedImages(for: city) // Fetch images when the view appears
+        }
     }
 }
+
