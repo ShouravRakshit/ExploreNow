@@ -40,6 +40,7 @@
 		811CE2912D00EC4700DCC599 /* SuggestionPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2902D00EC4700DCC599 /* SuggestionPageView.swift */; };
 		811CE2932D00F01600DCC599 /* HotSpotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */; };
 		811CE2952D00F1AD00DCC599 /* SuggestionPageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */; };
+		811CE2972D00FA5200DCC599 /* WeatherViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE2962D00FA5200DCC599 /* WeatherViewModel.swift */; };
 		81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */; };
 		81447E5E2CB31F14005BE180 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E5D2CB31F14005BE180 /* Assets.xcassets */; };
 		81447E612CB31F14005BE180 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 81447E602CB31F14005BE180 /* Preview Assets.xcassets */; };
@@ -119,6 +120,7 @@
 		811CE2902D00EC4700DCC599 /* SuggestionPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionPageView.swift; sourceTree = "<group>"; };
 		811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotSpotViewModel.swift; sourceTree = "<group>"; };
 		811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionPageViewModel.swift; sourceTree = "<group>"; };
+		811CE2962D00FA5200DCC599 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
 		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
 		81447E5D2CB31F14005BE180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				8148DC962CFFB18B00D490A6 /* CreateNewMessageViewModel.swift */,
 				2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */,
 				811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */,
+				811CE2962D00FA5200DCC599 /* WeatherViewModel.swift */,
 				8148DCA22CFFB72F00D490A6 /* LoginViewModel.swift */,
 				8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */,
 			);
@@ -496,6 +499,7 @@
 				10B59CC92CEA7B9000306357 /* PostCard.swift in Sources */,
 				811CE2952D00F1AD00DCC599 /* SuggestionPageViewModel.swift in Sources */,
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
+				811CE2972D00FA5200DCC599 /* WeatherViewModel.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				8148DC912CFFAF6A00D490A6 /* SearchUserViewModel.swift in Sources */,
 				B09365882CDC952400126005 /* NotificationManager.swift in Sources */,
