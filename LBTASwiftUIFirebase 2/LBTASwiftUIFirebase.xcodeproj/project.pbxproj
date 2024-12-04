@@ -204,8 +204,6 @@
 				B022884F2CEE561F0089FB7A /* BlockedManager.swift */,
 				684BEE1E2CF449EB00579766 /* HotspotsPage.swift */,
 				B022884D2CEE52070089FB7A /* BlockedUsersView.swift */,
-				2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */,
-				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
 				10B59CC82CEA7B9000306357 /* PostCard.swift */,
 				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
 				B0F30F292CE9863100F4EFE4 /* FriendsView.swift */,
@@ -305,6 +303,7 @@
 				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
 				8148DC8C2CFFAE6700D490A6 /* ChatLogView.swift */,
 				8148DC8E2CFFAE9500D490A6 /* MessageView.swift */,
+				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
 				8148DC922CFFAF8200D490A6 /* SearchUserView.swift */,
 				8148DC942CFFAFC400D490A6 /* UserRowView.swift */,
 				8148DC982CFFB1A400D490A6 /* CreateNewMessageView.swift */,
@@ -321,6 +320,7 @@
 				8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */,
 				8148DC902CFFAF6A00D490A6 /* SearchUserViewModel.swift */,
 				8148DC962CFFB18B00D490A6 /* CreateNewMessageViewModel.swift */,
+				2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */,
 				8148DCA22CFFB72F00D490A6 /* LoginViewModel.swift */,
 			);
 			path = ViewModel;
