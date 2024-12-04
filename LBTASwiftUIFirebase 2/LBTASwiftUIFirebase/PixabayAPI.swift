@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-class PixabayAPI {
+class PixabayAPI: ObservableObject {
     static let shared = PixabayAPI()
         
         private let apiKey: String = {
@@ -22,7 +22,7 @@ class PixabayAPI {
             return key
         }()
 
-    private init() {}
+    init() {}
 
     func searchImages(query: String) -> AnyPublisher<[PixabayImage], Error> {
         let urlString = "https://pixabay.com/api/?key=\(apiKey)&q=\(query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")&image_type=photo"
