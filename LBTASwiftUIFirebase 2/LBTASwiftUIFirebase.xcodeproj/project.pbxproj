@@ -242,7 +242,6 @@
 				B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */,
 				81447E802CB42349005BE180 /* Model */,
 				81447E7A2CB34DFC005BE180 /* Utils */,
-				81447E772CB33CCF005BE180 /* MainMessages */,
 				81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */,
 				81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */,
 				81447E5D2CB31F14005BE180 /* Assets.xcassets */,
@@ -261,15 +260,6 @@
 				81447E602CB31F14005BE180 /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		81447E772CB33CCF005BE180 /* MainMessages */ = {
-			isa = PBXGroup;
-			children = (
-				81447E882CB46461005BE180 /* Chat */,
-				81447E832CB428BA005BE180 /* NewMessage */,
-			);
-			path = MainMessages;
 			sourceTree = "<group>";
 		};
 		81447E7A2CB34DFC005BE180 /* Utils */ = {
@@ -296,20 +286,6 @@
 				811CE28A2D00E04000DCC599 /* CityImage.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		81447E832CB428BA005BE180 /* NewMessage */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = NewMessage;
-			sourceTree = "<group>";
-		};
-		81447E882CB46461005BE180 /* Chat */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Chat;
 			sourceTree = "<group>";
 		};
 		8148DC862CFFADB500D490A6 /* View */ = {
