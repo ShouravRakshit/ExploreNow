@@ -489,7 +489,7 @@ struct ProfileView: View {
                                         self.didBlockUser = true
                                         self.friendshipLabelText = "Unblock"
                                         
-                                        self.removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", user_uid)
+                                        userManager.removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", user_uid)
                                     }
                                 }),
                                 .cancel()
@@ -505,7 +505,7 @@ struct ProfileView: View {
                          message: Text("Are you sure you want to unfriend this person?"),
                          primaryButton: .destructive(Text("Unfriend")) {
                              // Unfriend action: Add your unfriending logic here
-                             removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", profileUser?.uid ?? "")
+                             userManager.removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", profileUser?.uid ?? "")
                              self.friendshipLabelText = "Add Friend"
                              self.isFriends = false
                              self.friendsList.removeLast()
@@ -554,55 +554,6 @@ struct ProfileView: View {
         }
     }
         
-    // Remove a friend from both users' friend lists
-    func removeFriend(currentUserUID: String, _ friend_uid: String) {
-        let db = Firestore.firestore()
-        let currentUserRef = db.collection("friends").document(currentUserUID)
-        let friendUserRef = db.collection("friends").document(friend_uid)
-        
-        // Fetch the current user's friend list and the friend's list
-        db.runTransaction { (transaction, errorPointer) -> Any? in
-            do {
-                // Fetch current user's friend list
-                let currentUserDoc = try transaction.getDocument(currentUserRef)
-                guard let currentUserFriends = currentUserDoc.data()?["friends"] as? [String] else {
-                    return nil
-                }
-                
-                // Fetch the friend's friend list
-                let friendUserDoc = try transaction.getDocument(friendUserRef)
-                guard let friendUserFriends = friendUserDoc.data()?["friends"] as? [String] else {
-                    return nil
-                }
-                
-                // Remove friend from both lists
-                var updatedCurrentUserFriends = currentUserFriends
-                var updatedFriendUserFriends = friendUserFriends
-                
-                // Remove each other from the respective lists
-                updatedCurrentUserFriends.removeAll { $0 == friend_uid }
-                updatedFriendUserFriends.removeAll { $0 == currentUserUID }
-                
-                // Update the database with the new lists
-                transaction.updateData(["friends": updatedCurrentUserFriends], forDocument: currentUserRef)
-                transaction.updateData(["friends": updatedFriendUserFriends], forDocument: friendUserRef)
-                
-            } catch {
-                print("Error during transaction: \(error)")
-                errorPointer?.pointee = error as NSError
-                return nil
-            }
-            return nil
-        } completion: { (result, error) in
-            if let error = error {
-               // self.error = error
-                return
-            }
-            
-            print("Successfully removed friend!")
-
-        }
-    }
     
 
     
@@ -851,10 +802,7 @@ struct ProfileView: View {
                 }
         }
         
-        
-        
-        
-        
+   
         private func fetchUserFriends(userId: String, completion: @escaping ([String]?, Error?) -> Void) {
             let db = Firestore.firestore()
             
@@ -894,7 +842,5 @@ struct ProfileView: View {
                 print("Error signing out: %@", signOutError.localizedDescription)
             }
         }
-    
-
-    
+  
 }
