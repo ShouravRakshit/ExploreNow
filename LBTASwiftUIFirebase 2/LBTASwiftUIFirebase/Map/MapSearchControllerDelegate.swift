@@ -15,6 +15,7 @@ protocol MapSearchControllerDelegate: AnyObject {
     func didEndSearch()
 }
 
+// all about search functionality
 
 class MapSearchController: NSObject, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate, MKLocalSearchCompleterDelegate {
     private let mapView: MKMapView

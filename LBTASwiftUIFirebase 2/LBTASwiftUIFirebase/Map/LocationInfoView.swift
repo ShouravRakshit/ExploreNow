@@ -4,6 +4,8 @@ import SwiftUI
 import Firebase
 import FirebaseFirestore
 
+//this class is the little location information cards that pop up when an annotation or cluster is clicked
+
 class LocationInfoView: UIView {
     private let locationLabel = UILabel()
     private let ratingLabel = UILabel()

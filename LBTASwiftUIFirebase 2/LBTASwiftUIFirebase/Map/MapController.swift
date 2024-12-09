@@ -3,7 +3,17 @@
 //  LBTASwiftUIFirebase
 //
 //  Created by Saadman Rahman on 2024-10-18.
-//
+
+
+// THE MAP FUNCTIONALITY HAS BEEN TAKEN WITH ADVICE FROM THE FOLLOWING DOCUMENTATION:
+// https://developer.apple.com/documentation/mapkit/mkannotationview/decluttering_a_map_with_mapkit_annotation_clustering
+
+// this is the git repository that has inspired the implementation of this:
+
+// https://github.com/johnantoni/mapkit-clustering
+
+
+
 
 import MapKit
 import UIKit
@@ -50,19 +60,25 @@ class LocationManager {
 
 class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDelegate {
 
+    // MARK: - Properties
+    // Core map components and managers
     private let mapView = MKMapView()
     private let searchBar = UISearchBar()
     private let containerView = UIView()
     private let userManager = UserManager()
     private let locationManager = CLLocationManager()
     private let locationDataManager = LocationManager.shared
+    
+    // Data storage
     private var eventLocations: [(String, Double, CLLocationCoordinate2D)] = []
     private var allAnnotations: [Location] = []
+    
+    // UI Components
     private var userTrackingButton: MKUserTrackingButton!
     private var scaleView: MKScaleView!
     private let locationInfoScrollView = UIScrollView()
-    private var locationInfoViews: [LocationInfoView] = [] // To hold instances
-    private var hotspotButtonBottomConstraint: NSLayoutConstraint? // Add this property
+    private var locationInfoViews: [LocationInfoView] = []
+    private var hotspotButtonBottomConstraint: NSLayoutConstraint?
 
         
     private lazy var dimmingView: UIView = {
@@ -100,13 +116,13 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         button.backgroundColor = UIColor(red: 255/255, green: 215/255, blue: 0/255, alpha: 1.0)
         button.layer.cornerRadius = 20
         
-        // Add shadow
+        // shadow
         button.layer.shadowColor = UIColor.black.cgColor
         button.layer.shadowOffset = CGSize(width: 0, height: 2)
         button.layer.shadowRadius = 4
         button.layer.shadowOpacity = 0.2
         
-        // Add highlight state
+        // highlight state
         button.addTarget(self, action: #selector(buttonTouchDown), for: .touchDown)
         button.addTarget(self, action: #selector(buttonTouchUp), for: [.touchUpInside, .touchUpOutside])
         
@@ -127,7 +143,9 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         }
     }
 
-
+    // MARK: - View Lifecycle Methods
+    
+    /// Initial setup of the map view and its components
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -141,21 +159,22 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
 
-        // Start listening for location updates
+        // listening for location updates
         startListeningToLocations()
         
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(mapTapped))
         mapView.addGestureRecognizer(tapGesture)
     }
 
+    /// Ensures proper view hierarchy for overlays
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         
-        // Ensure search bar is always on top
         view.bringSubviewToFront(dimmingView)
         view.bringSubviewToFront(searchBar)
     }
     
+    /// Cleanup when view disappears
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         locationManager.stopUpdatingLocation()
@@ -163,9 +182,11 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         mapSearchController.hideSuggestions()
     }
 
-
+    // MARK: - Setup Methods
+    
+    /// Configures main UI components including map and search bar
     private func setupUI() {
-        view.addSubview(mapView) // Add only the map view to fill the entire screen
+        view.addSubview(mapView)
         mapView.delegate = self
         mapView.showsUserLocation = true
         
@@ -174,33 +195,33 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         view.addSubview(dimmingView)
 
 
-        // Set the delegate and search bar properties
+        // delegate and search bar properties
         searchBar.delegate = mapSearchController
         searchBar.placeholder = "Search for places"
 
         // Customize the search bar
-        searchBar.backgroundImage = UIImage() // Remove the default background
-        searchBar.layer.cornerRadius = 20 // Rounded edges
-        searchBar.clipsToBounds = true // Ensure the rounded corners are applied
-        searchBar.backgroundColor = UIColor.clear // Make background transparent
-        searchBar.showsCancelButton = true  // Add this line
+        searchBar.backgroundImage = UIImage()
+        searchBar.layer.cornerRadius = 20
+        searchBar.clipsToBounds = true
+        searchBar.backgroundColor = UIColor.clear
+        searchBar.showsCancelButton = true
 
 
         // Adjust the text field appearance
         if let textField = searchBar.value(forKey: "searchField") as? UITextField {
-            textField.layer.cornerRadius = 20 // Rounded edges
-            textField.clipsToBounds = true // Ensure the corners are applied
-            textField.backgroundColor = UIColor.white.withAlphaComponent(0.8) // Optional: semi-transparent
-            textField.borderStyle = .roundedRect // Add rounded borders
-            textField.textColor = .black // Set text color
+            textField.layer.cornerRadius = 20
+            textField.clipsToBounds = true
+            textField.backgroundColor = UIColor.white.withAlphaComponent(0.8)
+            textField.borderStyle = .roundedRect
+            textField.textColor = .black
         }
 
         // Use Auto Layout to position the search bar
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(searchBar) // Add search bar on top of the map view
+        view.addSubview(searchBar)
 
         NSLayoutConstraint.activate([
-            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16), // Add some padding
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
@@ -221,6 +242,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         ])
     }
 
+    /// Sets up the compass button in navigation bar
     private func setupCompassButton() {
         let compass = MKCompassButton(mapView: mapView)
         compass.compassVisibility = .visible
@@ -228,6 +250,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         mapView.showsCompass = false
     }
 
+    /// Configures user tracking button and map scale view
     private func setupUserTrackingButtonAndScaleView() {
         mapView.showsUserLocation = true
 
@@ -251,7 +274,7 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             stackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ])
     }
-    
+    /// Initializes the scroll view for location information
     private func setupLocationInfoScrollView() {
         locationInfoScrollView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(locationInfoScrollView)
@@ -261,12 +284,13 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
             locationInfoScrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             locationInfoScrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             locationInfoScrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
-            locationInfoScrollView.heightAnchor.constraint(equalToConstant: 100) // Adjust height as needed
+            locationInfoScrollView.heightAnchor.constraint(equalToConstant: 100)
         ])
 
         locationInfoScrollView.isHidden = true // Initially hidden
     }
     
+    /// Sets up the hotspot button with animations
     private func setupHotspotButton() {
         view.addSubview(hotspotButton)
         hotspotButton.translatesAutoresizingMaskIntoConstraints = false
@@ -301,34 +325,18 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         self.navigationController?.pushViewController(hostingController, animated: true)
     }
     
-    private func adjustHotspotButtonPosition(show: Bool) {
-        let window = UIApplication.shared.windows.first
-        let bottomPadding = window?.safeAreaInsets.bottom ?? 0
-        
-        // Bring button to front
-        view.bringSubviewToFront(hotspotButton)
-        
-        // Animate the position change
-        UIView.animate(withDuration: 0.3) {
-            if show {
-                // Move button above the location info view
-                self.hotspotButtonBottomConstraint?.constant = -(bottomPadding + 100 + self.locationInfoScrollView.frame.height)
-            } else {
-                // Return to original position
-                self.hotspotButtonBottomConstraint?.constant = -(bottomPadding + 100)
-            }
-            self.view.layoutIfNeeded()
-        }
-    }
 
 
 
-
+    // MARK: - Location and Annotation Methods
+    
+    /// Registers custom annotation view classes with the map
     private func registerAnnotationViewClasses() {
         mapView.register(LocationAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
         mapView.register(ClusterAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultClusterAnnotationViewReuseIdentifier)
     }
     
+    /// Starts listening for location updates from Firebase
     private func startListeningToLocations() {
         LocationManager.shared.startListeningToLocations { [weak self] locations in
             guard let self = self else { return }
@@ -340,27 +348,109 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         }
     }
 
+    /// Loads location annotations onto the map
     private func loadLocationAnnotations() {
-        // Remove existing annotations except user location
         let existingAnnotations = mapView.annotations.filter { !($0 is MKUserLocation) }
         mapView.removeAnnotations(existingAnnotations)
         
-        // Create and add new annotations
         let locationAnnotations = eventLocations.map { Location(name: $0, rating: $1, coordinate: $2) }
         allAnnotations = locationAnnotations
         mapView.addAnnotations(locationAnnotations)
     }
-
+    
+    /// Resets all annotations on the map
     func resetAnnotationViews() {
-        // Remove all annotations except user location
         mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
         
-        // Re-add all annotations
         loadLocationAnnotations()
     }
 
-
+    // MARK: - UI Update Methods
     
+    /// Adjusts the position of the hotspot button based on info view visibility
+    private func adjustHotspotButtonPosition(show: Bool) {
+        let window = UIApplication.shared.windows.first
+        let bottomPadding = window?.safeAreaInsets.bottom ?? 0
+        
+        view.bringSubviewToFront(hotspotButton)
+        
+        // Animate the position change
+        UIView.animate(withDuration: 0.3) {
+            if show {
+                self.hotspotButtonBottomConstraint?.constant = -(bottomPadding + 100 + self.locationInfoScrollView.frame.height)
+            } else {
+                self.hotspotButtonBottomConstraint?.constant = -(bottomPadding + 100)
+            }
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    /// Displays information for a cluster of locations
+    private func showClusterInfo(for cluster: MKClusterAnnotation) {
+        for infoView in locationInfoViews {
+            infoView.removeFromSuperview()
+        }
+        locationInfoViews.removeAll()
+
+        let clusterLocations = cluster.memberAnnotations.compactMap { $0 as? Location }
+        var previousInfoView: LocationInfoView?
+
+        for location in clusterLocations {
+            let infoView = LocationInfoView(frame: .zero, userManager: userManager)
+            infoView.configure(with: location)
+            infoView.translatesAutoresizingMaskIntoConstraints = false
+            locationInfoScrollView.addSubview(infoView)
+            locationInfoViews.append(infoView)
+
+            NSLayoutConstraint.activate([
+                infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
+                infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
+                infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
+            ])
+
+            if let previous = previousInfoView {
+                infoView.leadingAnchor.constraint(equalTo: previous.trailingAnchor, constant: 16).isActive = true
+            } else {
+                infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor).isActive = true
+            }
+            
+            previousInfoView = infoView
+        }
+
+        if let lastInfoView = locationInfoViews.last {
+            lastInfoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor).isActive = true
+        }
+
+        locationInfoScrollView.contentSize = CGSize(width: (UIScreen.main.bounds.width - 32) * 0.8 * CGFloat(locationInfoViews.count) + CGFloat(16 * (locationInfoViews.count - 1)), height: 100) // Update content size
+        locationInfoScrollView.isHidden = false // Show the scroll view
+    }
+    
+    /// Displays information for a single location
+    private func showLocationInfo(for location: Location) {
+        for infoView in locationInfoViews {
+            infoView.removeFromSuperview()
+        }
+        locationInfoViews.removeAll()
+        
+        let infoView = LocationInfoView(frame: .zero, userManager: userManager)
+        infoView.configure(with: location)
+        locationInfoScrollView.addSubview(infoView)
+        locationInfoViews.append(infoView)
+        
+        infoView.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
+            infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
+            infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor),
+            infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor),
+            infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1)
+        ])
+        
+        locationInfoScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 100)
+        locationInfoScrollView.isHidden = false
+    }
+
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let cluster = view.annotation as? MKClusterAnnotation {
             showClusterInfo(for: cluster)
@@ -376,75 +466,8 @@ class MapController: UIViewController, MKMapViewDelegate, CLLocationManagerDeleg
         adjustHotspotButtonPosition(show: false)
     }
 
-    private func showClusterInfo(for cluster: MKClusterAnnotation) {
-        // Remove any existing info views
-        for infoView in locationInfoViews {
-            infoView.removeFromSuperview()
-        }
-        locationInfoViews.removeAll()
-
-        // Create and configure a LocationInfoView for each member in the cluster
-        let clusterLocations = cluster.memberAnnotations.compactMap { $0 as? Location }
-        var previousInfoView: LocationInfoView?
-
-        for location in clusterLocations {
-            let infoView = LocationInfoView(frame: .zero, userManager: userManager)
-            infoView.configure(with: location)
-            infoView.translatesAutoresizingMaskIntoConstraints = false
-            locationInfoScrollView.addSubview(infoView)
-            locationInfoViews.append(infoView)
-
-            // Set constraints for each info view
-            NSLayoutConstraint.activate([
-                infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
-                infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
-                infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
-            ])
-
-            // Position the info views horizontally
-            if let previous = previousInfoView {
-                infoView.leadingAnchor.constraint(equalTo: previous.trailingAnchor, constant: 16).isActive = true
-            } else {
-                infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor).isActive = true
-            }
-            
-            previousInfoView = infoView
-        }
-
-        // Set the trailing constraint for the last info view
-        if let lastInfoView = locationInfoViews.last {
-            lastInfoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor).isActive = true
-        }
-
-        locationInfoScrollView.contentSize = CGSize(width: (UIScreen.main.bounds.width - 32) * 0.8 * CGFloat(locationInfoViews.count) + CGFloat(16 * (locationInfoViews.count - 1)), height: 100) // Update content size
-        locationInfoScrollView.isHidden = false // Show the scroll view
-    }
     
-    private func showLocationInfo(for location: Location) {
-        for infoView in locationInfoViews {
-            infoView.removeFromSuperview()
-        }
-        locationInfoViews.removeAll()
-        
-        let infoView = LocationInfoView(frame: .zero, userManager: userManager)
-        infoView.configure(with: location)
-        locationInfoScrollView.addSubview(infoView)
-        locationInfoViews.append(infoView)
-        
-        infoView.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Set constraints for single info view
-        NSLayoutConstraint.activate([
-            infoView.topAnchor.constraint(equalTo: locationInfoScrollView.topAnchor),
-            infoView.bottomAnchor.constraint(equalTo: locationInfoScrollView.bottomAnchor),
-            infoView.leadingAnchor.constraint(equalTo: locationInfoScrollView.leadingAnchor),
-            infoView.trailingAnchor.constraint(equalTo: locationInfoScrollView.trailingAnchor),
-            infoView.widthAnchor.constraint(equalTo: locationInfoScrollView.widthAnchor, multiplier: 1) // Width for each info view
-        ])
-        
-        locationInfoScrollView.contentSize = CGSize(width: UIScreen.main.bounds.width - 32, height: 100)
-        locationInfoScrollView.isHidden = false // Show the scroll view
-    }
+    
 
 
 
@@ -465,7 +488,6 @@ extension MapController: MapSearchControllerDelegate {
         
         for annotation in mapView.annotations {
             if let view = mapView.view(for: annotation) {
-                // Skip user location annotation
                 if annotation is MKUserLocation {
                     continue
                 }
@@ -480,13 +502,10 @@ extension MapController: MapSearchControllerDelegate {
                             }
                             return false
                         }
-//                        view.alpha = hasVisibleMembers ? 1.0 : 0.2
                         view.isEnabled = hasVisibleMembers
                     }
                 } else if let location = annotation as? Location {
-                    // Handle regular location annotations
                     let isInRegion = annotationsInRegion.contains(location)
-//                    view.alpha = isInRegion ? 1.0 : 0.2
                     view.isEnabled = isInRegion
                 }
             }
@@ -500,14 +519,12 @@ extension MapController: MapSearchControllerDelegate {
     }
     
     func didStartSearch() {
-        // Called when search begins
         UIView.animate(withDuration: 0.3) {
             self.dimmingView.alpha = 1
         }
     }
     
     func didEndSearch() {
-        // Called when search ends (e.g., when cancel is tapped)
         UIView.animate(withDuration: 0.3) {
             self.dimmingView.alpha = 0
         }
@@ -570,12 +587,9 @@ extension MapController: UISearchBarDelegate {
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        // Let the search controller handle its UI cleanup
         mapSearchController.searchBarCancelButtonClicked(searchBar)
         
-        // Reset map view's annotations without modifying them
         mapView.removeAnnotations(mapView.annotations.filter { !($0 is MKUserLocation) })
-//        mapView.addAnnotations(allAnnotations)
         loadLocationAnnotations()
         
         searchBar.resignFirstResponder()
