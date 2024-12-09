@@ -224,7 +224,6 @@
 				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
-				2CD5E27D2CF01EBA0024B502 /* PixabayAPI.swift */,
 				2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
@@ -266,6 +265,7 @@
 				10431E6C2CF02EA600240AEC /* AppTheme.swift */,
 				10F6BB512CDB39660033B9A5 /* LocationSearchBar.swift */,
 				81447E7B2CB34E26005BE180 /* FirebaseManager.swift */,
+				2CD5E27D2CF01EBA0024B502 /* PixabayAPI.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
