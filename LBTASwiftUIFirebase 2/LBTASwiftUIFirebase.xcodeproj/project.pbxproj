@@ -22,6 +22,7 @@
 		2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1967AC2CE0404E00765C63 /* SplashScreen.swift */; };
 		2C1967B02CE0478E00765C63 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 2C1967AF2CE0478E00765C63 /* Lottie */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
+		2CAC87982D0692A40065B16D /* PixabayImagePickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */; };
 		2CD3C7DC2CEDBCB200D21855 /* AllUsersSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */; };
 		2CD3C7E12CEDBD1200D21855 /* AllUsersSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */; };
 		2CD3C7E32CEDBD4300D21855 /* UserRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */; };
@@ -101,6 +102,7 @@
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2C1967AC2CE0404E00765C63 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayImagePickerViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchView.swift; sourceTree = "<group>"; };
 		2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRow.swift; sourceTree = "<group>"; };
@@ -224,7 +226,6 @@
 				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
-				2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */,
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
 				8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */,
@@ -302,6 +303,7 @@
 				68D3B3972CCA37A200166069 /* AddPhotos.swift */,
 				8148DCA02CFFB70100D490A6 /* LoginView.swift */,
 				8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */,
+				2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -309,6 +311,7 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */,
 				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */,
 				811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */,
@@ -454,6 +457,7 @@
 				10E35B302CC3AA8800F6F7DD /* Location.swift in Sources */,
 				682B8D1F2CCEFF0E00E56AB0 /* LocationPostsPage.swift in Sources */,
 				10E35B312CC3AA8800F6F7DD /* LocationAnnotationView.swift in Sources */,
+				2CAC87982D0692A40065B16D /* PixabayImagePickerViewModel.swift in Sources */,
 				811CE28F2D00EC2D00DCC599 /* HotspotsView.swift in Sources */,
 				2CD5E2802CF01EC90024B502 /* PixabayImage.swift in Sources */,
 				10E35B322CC3AA8800F6F7DD /* MapController.swift in Sources */,

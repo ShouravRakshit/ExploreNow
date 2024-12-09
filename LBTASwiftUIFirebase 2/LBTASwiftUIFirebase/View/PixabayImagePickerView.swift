@@ -9,37 +9,49 @@ import SwiftUI
 import SDWebImageSwiftUI
 import Combine
 
+// A SwiftUI View for selecting images from Pixabay.
+// Supports single and multiple image selection.
 struct PixabayImagePickerView: View {
+    // Environment variable to control the view's presentation state
     @Environment(\.presentationMode) var presentationMode
-    @State private var searchQuery: String = ""
-    @State private var images: [PixabayImage] = []
-    @State private var selectedImages: [PixabayImage] = []
-    @State private var cancellable: AnyCancellable?
-    @State private var isLoading: Bool = false
-
-    var allowsMultipleSelection: Bool 
+    
+    // ViewModel instance to manage state and business logic
+    @StateObject private var viewModel = PixabayImagePickerViewModel()
+    
+    // Indicates whether multiple image selection is allowed
+    var allowsMultipleSelection: Bool
+    
+    // Closure to handle the selected images
     var onImagesSelected: ([PixabayImage]) -> Void
 
     var body: some View {
         NavigationView {
             VStack {
+                // Search bar for querying images
                 searchBar
-                if isLoading {
+                
+                // Show a loading indicator if images are being fetched
+                if viewModel.isLoading {
                     ProgressView("Loading...")
                         .padding()
-                } else if images.isEmpty {
+                }
+                // Show a message if no images are found
+                else if viewModel.images.isEmpty {
                     Text("No images found.")
                         .foregroundColor(.gray)
                         .padding()
                     Spacer()
-                } else {
+                }
+                // Display the fetched images in a grid format
+                else {
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) {
-                            ForEach(images) { image in
+                            ForEach(viewModel.images) { image in
                                 Button(action: {
                                     imageTapped(image)
                                 }) {
                                     ZStack {
+                                        // Display image preview
                                         if let urlString = image.previewURL, let url = URL(string: urlString) {
                                             WebImage(url: url)
                                                 .resizable()
@@ -48,12 +60,14 @@ struct PixabayImagePickerView: View {
                                                 .clipped()
                                                 .cornerRadius(8)
                                                 .overlay(
+                                                    // Highlight selected images with a blue border
                                                     RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(selectedImages.contains(where: { $0.id == image.id }) ? Color.blue : Color.clear, lineWidth: 4)
+                                                        .stroke(viewModel.selectedImages.contains(where: { $0.id == image.id }) ? Color.blue : Color.clear, lineWidth: 4)
                                                 )
-                                                .opacity(selectedImages.contains(where: { $0.id == image.id }) ? 0.7 : 1.0)
+                                                .opacity(viewModel.selectedImages.contains(where: { $0.id == image.id }) ? 0.7 : 1.0)
                                                 .overlay(
-                                                    selectedImages.contains(where: { $0.id == image.id }) ?
+                                                    // Add a checkmark overlay for selected images
+                                                    viewModel.selectedImages.contains(where: { $0.id == image.id }) ?
                                                         Image(systemName: "checkmark.circle.fill")
                                                             .foregroundColor(.blue)
                                                             .font(.system(size: 24))
@@ -70,68 +84,53 @@ struct PixabayImagePickerView: View {
                     }
                 }
             }
+            // Navigation bar configuration
             .navigationBarTitle("Select Images", displayMode: .inline)
             .navigationBarItems(
                 leading: Button("Cancel") {
                     presentationMode.wrappedValue.dismiss()
                 },
                 trailing: allowsMultipleSelection ? Button("Add") {
-                    onImagesSelected(selectedImages)
+                    // Pass the selected images to the parent view
+                    onImagesSelected(viewModel.selectedImages)
                     presentationMode.wrappedValue.dismiss()
                 }
-                .disabled(selectedImages.isEmpty)
+                .disabled(viewModel.selectedImages.isEmpty)
                 : nil
             )
         }
+        // Fetch popular images when the view appears
         .onAppear {
-            fetchImages(query: "popular")
+            viewModel.fetchImages(query: "popular")
         }
     }
 
+    // Search bar view for querying images
     private var searchBar: some View {
         HStack {
-            TextField("Search images...", text: $searchQuery, onCommit: {
-                fetchImages(query: searchQuery)
+            TextField("Search images...", text: $viewModel.searchQuery, onCommit: {
+                // Fetch images based on the search query
+                viewModel.fetchImages(query: viewModel.searchQuery)
             })
             .textFieldStyle(RoundedBorderTextFieldStyle())
             .padding(.horizontal)
-            if isLoading {
+            if viewModel.isLoading {
                 ProgressView()
                     .padding(.trailing)
             }
         }
     }
 
-    private func fetchImages(query: String) {
-        isLoading = true
-        images = []
-        selectedImages = [] // Reset selection when new search occurs
-        cancellable = PixabayAPI.shared.searchImages(query: query)
-            .sink(receiveCompletion: { completion in
-                isLoading = false
-                if case let .failure(error) = completion {
-                    print("Error fetching images: \(error.localizedDescription)")
-                }
-            }, receiveValue: { images in
-                self.images = images
-            })
-    }
-
+    // Handles the image tap action
+    // - Parameter image: The image that was tapped
     private func imageTapped(_ image: PixabayImage) {
         if allowsMultipleSelection {
-            toggleSelection(for: image)
+            // Toggle selection for multiple image mode
+            viewModel.toggleSelection(for: image)
         } else {
-            // Single selection mode
+            // Immediately select the image and dismiss the view
             onImagesSelected([image])
             presentationMode.wrappedValue.dismiss()
-        }
-    }
-
-    private func toggleSelection(for image: PixabayImage) {
-        if let index = selectedImages.firstIndex(where: { $0.id == image.id }) {
-            selectedImages.remove(at: index)
-        } else {
-            selectedImages.append(image)
         }
     }
 }
