@@ -618,6 +618,137 @@ class UserManager: ObservableObject {
             }
     }
     
+    
+    // Function to mark all notifications as read
+    func markNotificationsAsRead() {
+        //print ("Marking notifications as read")
+        // Check if the currentUser exists and if there are notifications
+        guard let currentUser = currentUser else { return }
+        
+        // Get the notifications from currentUser
+        var notifications = currentUser.notifications // Make sure you work with a mutable array
+
+        // Loop through each notification and update its isRead property
+        for i in 0..<notifications.count {
+            var notification = notifications[i] // Create a mutable copy of the notification
+            // Check if notification is unread
+            if !notification.isRead {
+                // Set isRead to true
+                notification.isRead = true
+                self.hasUnreadNotifications = false
+                // Update Firestore
+                updateNotificationStatus(notification)
+                
+                // Update the notification in the array
+                notifications[i] = notification
+            }
+        }
+    }
+    
+
+    
+    // Helper function to update the notification as read in Firestore
+    private func updateNotificationStatus(_ notification: Notification) {
+        guard let currentUser = currentUser else { return }
+        
+        let db = FirebaseManager.shared.firestore
+        let notificationsRef = db.collection("notifications")
+        
+        // Find the notification by its timestamp and receiverId
+        notificationsRef
+            .whereField("timestamp", isEqualTo: notification.timestamp)
+            .whereField("receiverId", isEqualTo: currentUser.uid)
+            .getDocuments { snapshot, error in
+                if let error = error {
+                    print("Failed to update notification status: \(error.localizedDescription)")
+                    return
+                }
+                
+                // If the notification exists, update the isRead field
+                if let document = snapshot?.documents.first {
+                    document.reference.updateData([
+                        "isRead": true
+                    ]) { error in
+                        if let error = error {
+                            print("Error updating notification: \(error.localizedDescription)")
+                        } else {
+                            print("Notification marked as read")
+                        }
+                    }
+                }
+            }
+    }
+    
+    func unblockUser(userId: String) {
+        guard let currentUser = currentUser else { return }
+
+        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUser.uid)
+        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+
+        // Remove the blocked user from the current user's blocks list
+        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
+            if let error = error {
+                print("Error unblocking user: \(error)")
+            } else {
+                print("User unblocked successfully.")
+                //self.blocked_users.removeAll { $0.uid == userId }
+                
+            }
+        }
+
+        // Remove the current user from the blocked user's 'blockedBy' list
+        blockedUserRef.setData(["blockedByIds": FieldValue.arrayRemove([currentUser.uid])], merge: true) { error in
+            if let error = error {
+                print("Error removing blockedBy for user: \(error)")
+            }
+        }
+    }
+    
+    func blockUser(userId: String) {
+        guard let currentUser = currentUser else { return }
+
+        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUser.uid)
+        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+
+        // Add the blocked user to the current user's blocks list
+        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
+            if let error = error {
+                print("Error blocking user: \(error)")
+            } else {
+                print("User blocked successfully.")
+            }
+        }
+
+        // Add the current user to the blocked user's 'blockedBy' list
+        blockedUserRef.setData(["blockedByIds": FieldValue.arrayUnion([currentUser.uid])], merge: true) { error in
+            if let error = error {
+                print("Error adding blockedBy for user: \(error)")
+            }
+        }
+    }
+    
+    func deleteFriendRequest(user_uid: String) {
+        guard let currentUser = currentUser else { return }
+        
+        let db         = FirebaseManager.shared.firestore
+        let senderId   = currentUser.uid
+        let receiverId = user_uid
+        let requestId  = "\(senderId)_\(receiverId)" // Construct the request ID
+
+        // Reference to the friend request document
+        let requestRef = db.collection("friendRequests").document(requestId)
+
+        // Delete the friend request
+        requestRef.delete { error in
+            if let error = error {
+                print("Error deleting friend request: \(error.localizedDescription)")
+            } else {
+                print("Friend request deleted successfully!")
+                
+            }
+        }
+    }
+    
 
 }
 

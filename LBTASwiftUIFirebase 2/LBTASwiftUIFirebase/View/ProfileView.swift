@@ -235,12 +235,16 @@ struct ProfileView: View {
                         HStack{
                             Button(action: {
                                 if (self.didBlockUser) {
-                                    unblockUser (userId: user_uid)
+                                    userManager.unblockUser (userId: user_uid)
+                                    self.didBlockUser = false
+                                    self.friendshipLabelText = "Add Friend"
                                 }
                                 //if request tapped -> remove friend request
                                 else if (self.isRequestSentToOtherUser)
                                 {
-                                    deleteFriendRequest ()
+                                    userManager.deleteFriendRequest (user_uid: user_uid)
+                                    self.isRequestSentToOtherUser = false
+                                    self.friendshipLabelText = "Add Friend"
                                 }
 
                                 else if (self.didUserSendMeRequest)
@@ -472,10 +476,20 @@ struct ProfileView: View {
                                 .destructive(Text(didBlockUser ? "Unblock" : "Block"), action: {
                                     if didBlockUser {
                                         // Call function to unblock user here
-                                        unblockUser(userId: user_uid)
+                                        userManager.unblockUser(userId: user_uid)
+                                        self.didBlockUser = false
+                                        self.friendshipLabelText = "Add Friend"
                                     } else {
                                         // Call function to block user here
-                                        blockUser(userId: user_uid)
+                                        userManager.blockUser(userId: user_uid)
+                                        //clear all possible friendship statuses
+                                        self.isFriends = false
+                                        self.didUserSendMeRequest = false
+                                        self.isRequestSentToOtherUser = false
+                                        self.didBlockUser = true
+                                        self.friendshipLabelText = "Unblock"
+                                        
+                                        self.removeFriend (currentUserUID: userManager.currentUser?.uid ?? "", user_uid)
                                     }
                                 }),
                                 .cancel()
@@ -591,64 +605,6 @@ struct ProfileView: View {
     }
     
 
-    
-    func unblockUser(userId: String) {
-        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-
-        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
-        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
-
-        // Remove the blocked user from the current user's blocks list
-        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
-            if let error = error {
-                print("Error unblocking user: \(error)")
-            } else {
-                print("User unblocked successfully.")
-                //self.blocked_users.removeAll { $0.uid == userId }
-                
-                self.didBlockUser = false
-                self.friendshipLabelText = "Add Friend"
-            }
-        }
-
-        // Remove the current user from the blocked user's 'blockedBy' list
-        blockedUserRef.setData(["blockedByIds": FieldValue.arrayRemove([currentUserId])], merge: true) { error in
-            if let error = error {
-                print("Error removing blockedBy for user: \(error)")
-            }
-        }
-    }
-    
-    func blockUser(userId: String) {
-        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
-
-        let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
-        let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
-
-        // Add the blocked user to the current user's blocks list
-        currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
-            if let error = error {
-                print("Error blocking user: \(error)")
-            } else {
-                print("User blocked successfully.")
-                //clear all possible friendship statuses
-                self.isFriends = false
-                self.didUserSendMeRequest = false
-                self.isRequestSentToOtherUser = false
-                self.didBlockUser = true
-                self.friendshipLabelText = "Unblock"
-                
-                self.removeFriend (currentUserUID: currentUserId, user_uid)
-            }
-        }
-
-        // Add the current user to the blocked user's 'blockedBy' list
-        blockedUserRef.setData(["blockedByIds": FieldValue.arrayUnion([currentUserId])], merge: true) { error in
-            if let error = error {
-                print("Error adding blockedBy for user: \(error)")
-            }
-        }
-    }
     
         // Function to check friendship status
     func checkFriendshipStatus(user1Id: String, user2Id: String) {
@@ -939,30 +895,6 @@ struct ProfileView: View {
             }
         }
     
-    private func deleteFriendRequest() {
-        guard let currentUserId = userManager.currentUser?.uid else {
-            return
-        }
-        
-        let db         = FirebaseManager.shared.firestore
-        let senderId   = currentUserId
-        let receiverId = user_uid
-        let requestId  = "\(senderId)_\(receiverId)" // Construct the request ID
 
-        // Reference to the friend request document
-        let requestRef = db.collection("friendRequests").document(requestId)
-
-        // Delete the friend request
-        requestRef.delete { error in
-            if let error = error {
-                print("Error deleting friend request: \(error.localizedDescription)")
-            } else {
-                print("Friend request deleted successfully!")
-                
-                self.isRequestSentToOtherUser = false
-                self.friendshipLabelText = "Add Friend"
-            }
-        }
-    }
     
 }

@@ -208,7 +208,7 @@ struct NotificationView: View {
                     print("Fetched \(notifications.count) notifications")
                     viewModel.populateNotificationUsers(notifications: notifications)
                     isLoading = false
-                    markNotificationsAsRead()
+                    userManager.markNotificationsAsRead()
                     
                 case .failure(let error):
                     print("Error fetching notifications: \(error.localizedDescription)")
@@ -282,92 +282,6 @@ struct NotificationView: View {
             }
     }
 
-
-    
-    // Function to mark all notifications as read
-    private func markNotificationsAsRead() {
-        //print ("Marking notifications as read")
-        // Check if the currentUser exists and if there are notifications
-        guard let currentUser = userManager.currentUser else { return }
-        
-        // Get the notifications from currentUser
-        var notifications = currentUser.notifications // Make sure you work with a mutable array
-
-        // Loop through each notification and update its isRead property
-        for i in 0..<notifications.count {
-            var notification = notifications[i] // Create a mutable copy of the notification
-            // Check if notification is unread
-            if !notification.isRead {
-                // Set isRead to true
-                notification.isRead = true
-                self.userManager.hasUnreadNotifications = false
-                // Update Firestore
-                updateNotificationStatus(notification)
-                
-                // Update the notification in the array
-                notifications[i] = notification
-            }
-        }
-    }
-    
-
-    
-    // Helper function to update the notification as read in Firestore
-    private func updateNotificationStatus(_ notification: Notification) {
-        guard let currentUser = userManager.currentUser else { return }
-        
-        let db = FirebaseManager.shared.firestore
-        let notificationsRef = db.collection("notifications")
-        
-        // Find the notification by its timestamp and receiverId
-        notificationsRef
-            .whereField("timestamp", isEqualTo: notification.timestamp)
-            .whereField("receiverId", isEqualTo: currentUser.uid)
-            .getDocuments { snapshot, error in
-                if let error = error {
-                    print("Failed to update notification status: \(error.localizedDescription)")
-                    return
-                }
-                
-                // If the notification exists, update the isRead field
-                if let document = snapshot?.documents.first {
-                    document.reference.updateData([
-                        "isRead": true
-                    ]) { error in
-                        if let error = error {
-                            print("Error updating notification: \(error.localizedDescription)")
-                        } else {
-                            print("Notification marked as read")
-                        }
-                    }
-                }
-            }
-    }
-
-    
-    private func saveNotificationToFirestore(_ notification: Notification, completion: @escaping (Bool, Error?) -> Void) {
-        let db = Firestore.firestore()
-        let notificationRef = db.collection("notifications").document()
-        
-        let notificationData: [String: Any] = [
-            "receiverId": notification.receiverId,
-            "senderId": notification.senderId,
-            "message": notification.message,
-            "timestamp": notification.timestamp,
-            "status": notification.status,
-            "isRead": notification.isRead,
-            "type"  : notification.type,
-            "post_id": notification.post_id ?? ""
-        ]
-        
-        notificationRef.setData(notificationData) { error in
-            if let error = error {
-                completion(false, error)
-            } else {
-                completion(true, nil)
-            }
-        }
-    }
  
 }
 
