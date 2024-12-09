@@ -26,7 +26,7 @@ struct PostView: View {
     @State private var post: Post
     @State private var selectedEmoji: String? = nil // Variable to store selected emoji
     @State private var showEmojiPicker = false  // Toggle to show/hide the emoji picker
- 
+    @State private var blockedUserIds: Set<String> = [] // Track the list blocked user ids
    
 
         // Custom initializer to accept values passed from `PostCard`
@@ -158,22 +158,6 @@ struct PostView: View {
         }
     }
     
-//    private var currentUserImage: some View {
-//        if let imageUrl = URL(string: currentUserProfileImageUrl ?? "") {
-//            WebImage(url: imageUrl)
-//                .resizable()
-//                .scaledToFill()
-//                .frame(width: 32, height: 32)
-//                .clipShape(Circle())
-//        } else {
-//            Image(systemName: "person.circle.fill")
-//                .resizable()
-//                .frame(width: 32, height: 32)
-//                .foregroundColor(AppTheme.secondaryText)
-//                .clipShape(Circle())
-//        }
-//    }
-
     
     private var headerSection: some View {
         HStack(spacing: 12) {
@@ -493,7 +477,7 @@ struct PostView: View {
                         .padding(5)
                     }
                 }
-                .padding([.top, .horizontal]) 
+                .padding([.top, .horizontal])
             }
             .background(AppTheme.background)
         }
@@ -677,6 +661,30 @@ struct PostView: View {
            return UIButton()
        }
 
+    // Function to get the list of blocked user ids
+    private func setupBlockedUsersListener() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        FirebaseManager.shared.firestore
+            .collection("blocks")
+            .document(currentUserId)
+            .addSnapshotListener { documentSnapshot, error in
+                if let error = error {
+                    print("Error listening for blocks: \(error)")
+                    return
+                }
+                
+                if let document = documentSnapshot, document.exists {
+                    let blockedUsers = document.data()?["blockedUserIds"] as? [String] ?? []
+                    self.blockedUserIds = Set(blockedUsers)
+                    
+                } else {
+                    self.blockedUserIds = []
+                }
+            }
+    }
+
+    // Function to fetch comments of non-blocked users
     private func fetchComments() {
         let db = FirebaseManager.shared.firestore
         db.collection("comments")
@@ -710,11 +718,16 @@ struct PostView: View {
                             comment.likedByCurrentUser = likedByCurrentUser[currentUserId] ?? false
                         }
                         
-                        // Fetch user data for this comment
-                        fetchUserData(for: comment.userID) { username, profileImageUrl in
-                            // Store user data in the cache
-                            userData[comment.userID] = (username, profileImageUrl)
-                            newComments.append(comment)
+                        // Filter comments by blocked users
+                        if !blockedUserIds.contains(comment.userID) {
+                            // Fetch user data for this comment'
+                            fetchUserData(for: comment.userID) { username, profileImageUrl in
+                                // Store user data in the cache
+                                userData[comment.userID] = (username, profileImageUrl)
+                                newComments.append(comment)
+                                group.leave()
+                            }
+                        } else {
                             group.leave()
                         }
                     } else {
@@ -858,8 +871,3 @@ struct PostView: View {
             }
     }
 }
-
-    
-    
-
-

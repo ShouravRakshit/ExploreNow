@@ -21,6 +21,7 @@ struct PostCard: View {
     @State private var liked: Bool = false
     @State private var isCurrentUserPost: Bool = false
     @State private var showDeleteConfirmation = false
+    @State private var blockedUserIds: Set<String> = []
     
     var onDelete: ((Post) -> Void)?
 
@@ -208,6 +209,29 @@ struct PostCard: View {
         }
     }
 
+    private func setupBlockedUsersListener() {
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+        
+        FirebaseManager.shared.firestore
+            .collection("blocks")
+            .document(currentUserId)
+            .addSnapshotListener { documentSnapshot, error in
+                if let error = error {
+                    print("Error listening for blocks: \(error)")
+                    return
+                }
+                
+                if let document = documentSnapshot, document.exists {
+                    let blockedUsers = document.data()?["blockedUserIds"] as? [String] ?? []
+                    self.blockedUserIds = Set(blockedUsers)
+                    
+                } else {
+                    self.blockedUserIds = []
+                }
+            }
+    }
+
+    
     private func fetchLikes() {
         let db = FirebaseManager.shared.firestore
         db.collection("likes")
@@ -215,19 +239,30 @@ struct PostCard: View {
             .getDocuments { snapshot, error in
                 if let error = error {
                     print("Error fetching likes: \(error)")
-                } else {
-                    // Count how many users liked the post
-                    self.likesCount = snapshot?.documents.count ?? 0
-                    
-                    // Track users who liked this post
-                    self.likedByUserIds = snapshot?.documents.compactMap { document in
-                        return document.data()["userId"] as? String
-                    } ?? []
-                    
-                    // Check if the current user liked the post
-                    if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid {
-                        self.liked = self.likedByUserIds.contains(currentUserId)
-                    }
+                    return
+                }
+
+                guard let documents = snapshot?.documents else {
+                    self.likesCount = 0
+                    self.likedByUserIds = []
+                    self.liked = false
+                    return
+                }
+
+                // Filter likes to exclude blocked users
+                let unblockedLikes = documents.compactMap { document -> String? in
+                    let userId = document.data()["userId"] as? String
+                    // Only include user IDs that are not in the blocked list
+                    return (userId != nil && !(blockedUserIds.contains(userId!))) ? userId : nil
+                }
+
+                // Update likes count and liked user IDs
+                self.likesCount = unblockedLikes.count
+                self.likedByUserIds = unblockedLikes
+
+                // Check if the current user liked the post
+                if let currentUserId = FirebaseManager.shared.auth.currentUser?.uid {
+                    self.liked = unblockedLikes.contains(currentUserId)
                 }
             }
     }
@@ -294,17 +329,27 @@ struct PostCard: View {
             .getDocuments { snapshot, error in
                 if let error = error {
                     print("Error fetching comments: \(error)")
-                } else {
-                    // Decode Firestore documents into Comment objects
-                    self.comments = snapshot?.documents.compactMap { document in
-                        Comment(document: document)
-                    } ?? []
-                    
-                    // Update comment count
-                    self.commentCount = self.comments.count
+                    return
                 }
+
+                guard let documents = snapshot?.documents else {
+                    self.comments = []
+                    self.commentCount = 0
+                    return
+                }
+
+                // Filter comments to exclude those from blocked users
+                self.comments = documents.compactMap { document in
+                    let comment = Comment(document: document)
+                    // Ensure the comment's userID is not in the blocked list
+                    return (comment != nil && !(blockedUserIds.contains(comment!.userID))) ? comment : nil
+                }
+
+                // Update comment count after filtering
+                self.commentCount = self.comments.count
             }
     }
+
 
     private func formatDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
