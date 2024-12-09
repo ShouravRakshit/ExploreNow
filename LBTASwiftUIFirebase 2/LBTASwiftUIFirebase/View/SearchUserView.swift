@@ -5,53 +5,53 @@
 //  Created by AM on 03/12/2024.
 //
 
+
+
 import SwiftUI
-import SwiftUI
-import SDWebImageSwiftUI
 
 struct SearchUserView: View {
-    @StateObject private var viewModel = SearchUserViewModel()
-    var didSelectUser: (ChatUser) -> Void
+    @StateObject private var viewModel = SearchUserViewModel() // ViewModel used for managing search query and filtered users
+    var didSelectUser: (ChatUser) -> Void // Closure to handle selection of a user, passed into the view
 
     var body: some View {
         VStack(spacing: 0) {
             // Search Bar with purple border
             HStack {
-                TextField("Search", text: $viewModel.searchQuery)
-                    .foregroundColor(.gray)
-                    .padding(.leading, 12)
-                    .padding(.vertical, 10)
+                TextField("Search", text: $viewModel.searchQuery) // TextField to enter search query, bound to viewModel's searchQuery
+                    .foregroundColor(.gray) // Gray text color for the input
+                    .padding(.leading, 12) // Padding on the leading edge of the TextField
+                    .padding(.vertical, 10) // Padding for top and bottom of TextField
                 
-                Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
-                    .padding(.trailing, 10)
+                Image(systemName: "magnifyingglass") // Magnifying glass icon for search
+                    .foregroundColor(.gray) // Gray color for the icon
+                    .padding(.trailing, 10) // Padding on the trailing edge of the icon
             }
-            .background(Color.white)
-            .cornerRadius(10)
+            .background(Color.white) // White background for the search bar
+            .cornerRadius(10) // Rounded corners for the search bar
             .overlay(
-                RoundedRectangle(cornerRadius: 20)
-                    .stroke(Color.customPurple, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 20) // Custom border with purple color and rounded corners
+                    .stroke(Color.customPurple, lineWidth: 1) // Purple border with 1px width
             )
-            .padding(.horizontal)
-            .padding(.bottom, 20)
+            .padding(.horizontal) // Padding on the horizontal sides of the search bar
+            .padding(.bottom, 20) // Bottom padding to separate search bar from user list
             
             // Users List
             ScrollView {
-                LazyVStack(spacing: 8) {
-                    ForEach(viewModel.filteredUsers) { user in
+                LazyVStack(spacing: 8) { // LazyVStack to efficiently display a vertical list of users
+                    ForEach(viewModel.filteredUsers) { user in // Iterate over the filtered users
                         Button(action: {
-                            didSelectUser(user)
+                            didSelectUser(user) // Call the didSelectUser closure when a user is selected
                         }) {
-                            UserRowView(user: user)
+                            UserRowView(user: user) // Custom view for displaying individual user row
                         }
                     }
                 }
-                .padding(.horizontal, 8)
+                .padding(.horizontal, 8) // Horizontal padding for the user list
             }
-            .background(Color(.systemGray6))
+            .background(Color(.systemGray6)) // Light gray background for the user list
         }
-        .onChange(of: viewModel.searchQuery) { newValue in
-            viewModel.filterUsers(query: newValue)
+        .onChange(of: viewModel.searchQuery) { newValue in // React to changes in the search query
+            viewModel.filterUsers(query: newValue) // Filter users based on the new search query
         }
     }
 }
