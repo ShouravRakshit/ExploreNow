@@ -219,10 +219,7 @@
 				8148DC862CFFADB500D490A6 /* View */,
 				B01DEEBF2CF170200072DFB2 /* Secrets.plist */,
 				2CDC81862CF153810021398A /* Secrets.template.plist */,
-				10B59CC82CEA7B9000306357 /* PostCard.swift */,
-				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
-				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 				10E35B2E2CC3AA8800F6F7DD /* Map */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
 				B02A96AA2CC0AC21008B6E8B /* Info.plist */,
@@ -230,7 +227,6 @@
 				81447E802CB42349005BE180 /* Model */,
 				81447E7A2CB34DFC005BE180 /* Utils */,
 				81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */,
-				81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */,
 				81447E5D2CB31F14005BE180 /* Assets.xcassets */,
 				81447E5F2CB31F14005BE180 /* Preview Content */,
 				B02392902CBDD511007CC920 /* GoogleService-Info.plist */,
@@ -270,6 +266,7 @@
 				8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */,
 				811CE28A2D00E04000DCC599 /* CityImage.swift */,
 				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
+				10B59CC82CEA7B9000306357 /* PostCard.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -303,6 +300,9 @@
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
+				81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */,
+				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
+				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
