@@ -219,19 +219,9 @@
 				8148DC862CFFADB500D490A6 /* View */,
 				B01DEEBF2CF170200072DFB2 /* Secrets.plist */,
 				2CDC81862CF153810021398A /* Secrets.template.plist */,
-				B022884F2CEE561F0089FB7A /* BlockedManager.swift */,
 				10B59CC82CEA7B9000306357 /* PostCard.swift */,
-				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
-				B0F30F292CE9863100F4EFE4 /* FriendsView.swift */,
-				B09365872CDC951E00126005 /* NotificationManager.swift */,
-				B09365852CDC231900126005 /* NotificationView.swift */,
 				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
-				B01523472CC82ED50012FC49 /* EditView.swift */,
-				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
-				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
-				8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */,
-				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
 				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 				10E35B2E2CC3AA8800F6F7DD /* Map */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
@@ -245,8 +235,6 @@
 				81447E5D2CB31F14005BE180 /* Assets.xcassets */,
 				81447E5F2CB31F14005BE180 /* Preview Content */,
 				B02392902CBDD511007CC920 /* GoogleService-Info.plist */,
-				B01523452CC814060012FC49 /* ProfileSettingsView.swift */,
-				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
 				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
 			);
 			path = LBTASwiftUIFirebase;
@@ -294,6 +282,7 @@
 				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
 				811CE2902D00EC4700DCC599 /* SuggestionPageView.swift */,
 				8148DC8C2CFFAE6700D490A6 /* ChatLogView.swift */,
+				8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */,
 				8148DC8E2CFFAE9500D490A6 /* MessageView.swift */,
 				811CE28E2D00EC2D00DCC599 /* HotspotsView.swift */,
 				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
@@ -306,6 +295,13 @@
 				8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */,
 				2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */,
 				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
+				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
+				B0F30F292CE9863100F4EFE4 /* FriendsView.swift */,
+				B09365852CDC231900126005 /* NotificationView.swift */,
+				B01523452CC814060012FC49 /* ProfileSettingsView.swift */,
+				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
+				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
+				B01523472CC82ED50012FC49 /* EditView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -325,6 +321,10 @@
 				811CE2962D00FA5200DCC599 /* WeatherViewModel.swift */,
 				8148DCA22CFFB72F00D490A6 /* LoginViewModel.swift */,
 				8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */,
+				B09365872CDC951E00126005 /* NotificationManager.swift */,
+				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
+				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
+				B022884F2CEE561F0089FB7A /* BlockedManager.swift */,
 			);
 			path = ViewModel;
 			sourceTree = "<group>";
