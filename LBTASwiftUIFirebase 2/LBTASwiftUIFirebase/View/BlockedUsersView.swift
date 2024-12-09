@@ -75,13 +75,11 @@ struct BlockedUsersView: View {
                  title: Text("Unblock \(friendToUnblock?.username ?? "")?"),
                  message: Text("Are you sure you want to unfriend this person?"),
                  primaryButton: .destructive(Text("Unblock")) {
-                     // Unfriend action: Add your unfriending logic here
                      if let friendToUnblock = friendToUnblock {
                          blockedManager.unblockUser (userId: friendToUnblock.uid)
                      }
                  },
                  secondaryButton: .cancel {
-                     // Cancel action (dismiss the alert)
                      print("Unfriend canceled.")
                  }
              )
@@ -100,7 +98,7 @@ struct BlockedUsersView: View {
         }
     }
     
-    // Define a variable for the row content, which will display each friend's information
+    // Defining a variable for the row content, which will display each friend's information
     private func row(for friend: User) -> some View {
         HStack(alignment: .top, spacing: 15) {
             // Profile Image
@@ -154,9 +152,7 @@ struct BlockedUsersView: View {
             }
             .buttonStyle(PlainButtonStyle()) // Use PlainButtonStyle to ensure no default List row interactions
 
-            //Spacer() // This will push the content to the left if needed
         }
-        //.padding(.vertical, 1)
     }
     
 }

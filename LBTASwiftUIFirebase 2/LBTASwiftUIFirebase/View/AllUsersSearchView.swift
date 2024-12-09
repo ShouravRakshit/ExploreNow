@@ -49,19 +49,7 @@ struct AllUsersSearchView: View {
         }
         // Set navigation bar title and display mode for the current view
         .navigationBarTitle("Search Users", displayMode: .inline)
-        //.navigationBarBackButtonHidden(false) // Ensure the back button is visible (optional)
-        /*
-         .toolbar {
-         ToolbarItem(placement: .navigationBarLeading) {
-         Button(action: {
-         presentationMode.wrappedValue.dismiss()  // Dismiss the view when "Cancel" is tapped
-         print("Search view dismissed")
-         }) {
-         Text("Cancel")  // "Cancel" button to dismiss the view
-         }
-         }
-         }*/
-        // Triggered when the view appears, it fetches all users from the ViewModel
+        
         .onAppear {
             print("AllUsersSearchView appeared")  // Log when the view appears
             vm.fetchAllUsers()  // Fetch the list of users from the ViewModel

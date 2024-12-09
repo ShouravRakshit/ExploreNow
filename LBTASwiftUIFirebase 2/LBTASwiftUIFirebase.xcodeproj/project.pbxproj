@@ -22,7 +22,6 @@
 		2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1967AC2CE0404E00765C63 /* SplashScreen.swift */; };
 		2C1967B02CE0478E00765C63 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 2C1967AF2CE0478E00765C63 /* Lottie */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
-		2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */; };
 		2CD3C7DC2CEDBCB200D21855 /* AllUsersSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */; };
 		2CD3C7E12CEDBD1200D21855 /* AllUsersSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */; };
 		2CD3C7E32CEDBD4300D21855 /* UserRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */; };
@@ -102,7 +101,6 @@
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2C1967AC2CE0404E00765C63 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchView.swift; sourceTree = "<group>"; };
 		2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRow.swift; sourceTree = "<group>"; };
@@ -278,7 +276,6 @@
 				2CD5E27F2CF01EC90024B502 /* PixabayImage.swift */,
 				10F6BB532CDB704D0033B9A5 /* Post.swift */,
 				684A510A2CE1D0AC00383B08 /* Comment.swift */,
-				2C1CDE7C2CC492DA007B711B /* ProfileViewModel.swift */,
 				81447E812CB42371005BE180 /* ChatUser.swift */,
 				8148DC882CFFADD800D490A6 /* ChatMessage.swift */,
 				8148DCC82D00A57600D490A6 /* RecentMessage.swift */,
@@ -464,7 +461,6 @@
 				81447E5A2CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift in Sources */,
 				8148DC932CFFAF8200D490A6 /* SearchUserView.swift in Sources */,
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
-				2C1CDE7D2CC492E4007B711B /* ProfileViewModel.swift in Sources */,
 				8148DC892CFFADD800D490A6 /* ChatMessage.swift in Sources */,
 				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				8148DC8D2CFFAE6700D490A6 /* ChatLogView.swift in Sources */,
