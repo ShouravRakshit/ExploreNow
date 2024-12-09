@@ -224,7 +224,6 @@
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
 				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 				10E35B2E2CC3AA8800F6F7DD /* Map */,
-				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
 				B02A96AA2CC0AC21008B6E8B /* Info.plist */,
 				B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */,
@@ -235,7 +234,6 @@
 				81447E5D2CB31F14005BE180 /* Assets.xcassets */,
 				81447E5F2CB31F14005BE180 /* Preview Content */,
 				B02392902CBDD511007CC920 /* GoogleService-Info.plist */,
-				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
 			);
 			path = LBTASwiftUIFirebase;
 			sourceTree = "<group>";
@@ -271,6 +269,7 @@
 				8148DCC82D00A57600D490A6 /* RecentMessage.swift */,
 				8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */,
 				811CE28A2D00E04000DCC599 /* CityImage.swift */,
+				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -302,6 +301,8 @@
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
 				2C1CDE7A2CC4869E007B711B /* ProfileView.swift */,
 				B01523472CC82ED50012FC49 /* EditView.swift */,
+				2C132B7C2CC22A700087408A /* ContentView.swift */,
+				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -323,7 +324,6 @@
 				8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */,
 				B09365872CDC951E00126005 /* NotificationManager.swift */,
 				B036A85A2CEA764800820825 /* UserSettingsManager.swift */,
-				B0F9839C2CC71D5600E1CBE3 /* UserManager.swift */,
 				B022884F2CEE561F0089FB7A /* BlockedManager.swift */,
 			);
 			path = ViewModel;

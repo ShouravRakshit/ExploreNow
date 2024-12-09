@@ -425,15 +425,7 @@ struct NotificationView: View {
             }
         }
     }
-    
-
-
-
-
-    
-    
-
-    
+ 
 }
 
 
