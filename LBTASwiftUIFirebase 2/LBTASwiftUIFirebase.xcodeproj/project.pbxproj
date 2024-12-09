@@ -23,6 +23,7 @@
 		2C1967B02CE0478E00765C63 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 2C1967AF2CE0478E00765C63 /* Lottie */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
 		2CAC87982D0692A40065B16D /* PixabayImagePickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */; };
+		2CAC879C2D069DB60065B16D /* SuggestProfilePicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */; };
 		2CD3C7DC2CEDBCB200D21855 /* AllUsersSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */; };
 		2CD3C7E12CEDBD1200D21855 /* AllUsersSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */; };
 		2CD3C7E32CEDBD4300D21855 /* UserRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */; };
@@ -103,6 +104,7 @@
 		2C1967AC2CE0404E00765C63 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayImagePickerViewModel.swift; sourceTree = "<group>"; };
+		2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchView.swift; sourceTree = "<group>"; };
 		2CD3C7E02CEDBD0900D21855 /* AllUsersSearchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRow.swift; sourceTree = "<group>"; };
@@ -229,13 +231,11 @@
 				B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */,
 				682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */,
 				8148DCBE2CFFCD6200D490A6 /* SignUpView.swift */,
-				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
 				B0F983942CC70D6F00E1CBE3 /* NavBar.swift */,
 				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 				10E35B2E2CC3AA8800F6F7DD /* Map */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				2C132B7A2CC219C00087408A /* AppState.swift */,
-				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
 				B02A96AA2CC0AC21008B6E8B /* Info.plist */,
 				B02A96A82CC0AB81008B6E8B /* Sansation-Regular.ttf */,
 				81447E802CB42349005BE180 /* Model */,
@@ -267,6 +267,7 @@
 				10F6BB512CDB39660033B9A5 /* LocationSearchBar.swift */,
 				81447E7B2CB34E26005BE180 /* FirebaseManager.swift */,
 				2CD5E27D2CF01EBA0024B502 /* PixabayAPI.swift */,
+				B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -304,6 +305,7 @@
 				8148DCA02CFFB70100D490A6 /* LoginView.swift */,
 				8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */,
 				2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */,
+				B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -311,6 +313,7 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */,
 				2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */,
 				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */,
@@ -476,6 +479,7 @@
 				811CE2952D00F1AD00DCC599 /* SuggestionPageViewModel.swift in Sources */,
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				811CE2972D00FA5200DCC599 /* WeatherViewModel.swift in Sources */,
+				2CAC879C2D069DB60065B16D /* SuggestProfilePicViewModel.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				8148DC912CFFAF6A00D490A6 /* SearchUserViewModel.swift in Sources */,
 				B09365882CDC952400126005 /* NotificationManager.swift in Sources */,
