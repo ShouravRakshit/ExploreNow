@@ -12,6 +12,7 @@ struct HomeViewTest: View {
     @State private var friendIds: Set<String> = []
     @State private var navigateToSearchView = false
     @State private var blockedUserIds: Set<String> = []
+    @State private var isFetching = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -123,9 +124,16 @@ struct HomeViewTest: View {
         }
         .onAppear {
             if userManager.currentUser != nil {
+                self.posts = []
+                self.isLoading = true
+                
                 checkIfNotifications()
                 setupBlockedUsersListener()
                 fetchAllPosts()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    isFetching = false
+                }
 
             }
         }
