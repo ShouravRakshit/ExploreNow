@@ -56,12 +56,6 @@ struct NotificationView: View {
                                 
                                 ZStack
                                 {
-                                    /*
-                                    // Circular border
-                                    Circle()
-                                        .stroke(Color.black, lineWidth: 4) // Black border
-                                        .frame(width: 41, height: 41) // Slightly larger than the image
-                                    */
                                     if !user.profileImageUrl.isEmpty
                                         {
                                         WebImage(url: URL(string: user.profileImageUrl))
@@ -76,16 +70,7 @@ struct NotificationView: View {
                                         }
                                     else
                                         {
-                                        /*
-                                        Image(systemName: "person.fill")
-                                            .font(.system(size: 40))
-                                            .padding()
-                                            .scaledToFill()
-                                            .foregroundColor(Color(.label))
-                                            .frame(width: 40, height: 40) // Set size for placeholder
-                                            .background(Color.gray.opacity(0.2)) // Optional background
-                                            .clipShape(Circle()) // Clip to circle shape*/
-                                        
+
                                         Image(systemName: "person.circle.fill")
                                             .resizable()
                                             .scaledToFill()
@@ -109,16 +94,6 @@ struct NotificationView: View {
                                 }
                                 .buttonStyle(PlainButtonStyle()) // Prevent default button styling (optional)
                                 .listRowBackground(Color.clear) // Ensures no arrow appears in List
-                                /*
-                                Text(user.full_message ?? "")  // Show notification message
-                                    .font(.subheadline)
-                                    .bold()
-                                    .padding(.bottom, 5)
-                                    .lineLimit(nil)  // Allow unlimited lines
-                                    .fixedSize(horizontal: false, vertical: true) // Allow vertical resizing (wrapping)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.customPurple)  // Optional: To make the text look clickable
-*/
 
                                 if user.notification.type == "friendRequest"
                                 {
@@ -191,14 +166,6 @@ struct NotificationView: View {
                             else
                                 {
                                 if let post = user.post, user.post_url != nil {
-                                    /*
-                                    NavigationLink(destination: PostView(post: post, likesCount: post.likesCount, liked: post.liked)) {
-                                        WebImage(url: URL(string: user.post_url ?? ""))
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 40, height: 40) // Set size
-                                    }
-                                    .buttonStyle(PlainButtonStyle()) */
 
                                 WebImage(url: URL(string: user.post_url ?? ""))
                                     .resizable()
@@ -210,11 +177,6 @@ struct NotificationView: View {
                             }
                             HStack
                                 {
-                                /*
-                                Text("From: \(user.notification.senderId)")  // Show sender's ID
-                                    .font(.footnote)
-                                    .foregroundColor(.gray)
-                                 */
                                 
                                 Spacer()
                                 
@@ -222,8 +184,7 @@ struct NotificationView: View {
                                     .font(.footnote)
                                     .foregroundColor(.gray)
                                 }
-                            
-                            //Divider() // Divider for each notification
+
                         }
                         //.padding(.vertical, 5)
                     }
@@ -254,26 +215,9 @@ struct NotificationView: View {
                     // Handle the error appropriately (e.g., show an error message to the user)
                 }
             }
-                
-            //viewModel.populateNotificationUsers()  // Fetch users when view appears
-            //userManager.fetchNotifications()
+
             }
-        /*
-        .onDisappear(){
-            // Re-fetch notifications to ensure the read status is reflected
-            userManager.fetchNotifications { result in
-                switch result {
-                case .success(let notifications):
-                    // Now you have the notifications, you can populate the users
-                    print("Fetched \(notifications.count) notifications")
-                    viewModel.populateNotificationUsers(notifications: notifications)
-                    
-                case .failure(let error):
-                    print("Error fetching notifications: \(error.localizedDescription)")
-                    // Handle the error appropriately (e.g., show an error message to the user)
-                }
-            }
-        }*/
+
         .navigationBarTitle("Notifications", displayMode: .inline)
         .navigationBarBackButtonHidden(false) // Ensure back button is shown
         
@@ -399,7 +343,6 @@ struct NotificationView: View {
                 }
             }
     }
-    
 
     
     private func saveNotificationToFirestore(_ notification: Notification, completion: @escaping (Bool, Error?) -> Void) {
@@ -429,100 +372,3 @@ struct NotificationView: View {
 }
 
 
-/*struct NotificationView_Preview: PreviewProvider
-    {
-    static var previews: some View
-        {
-        NotificationView()
-        }
-    }
-*/
-
-// ViewModel to manage notification users
-class NotificationViewModel: ObservableObject {
-    @Published var notificationUsers      : [NotificationUser] = []
-    @Published var unreadNotificationUsers: [NotificationUser] = []
-    @Published var restNotificationUsers  : [NotificationUser] = []
-    private var userManager: UserManager  // Store userManager
-    
-    // Custom initializer to inject userManager
-    init(userManager: UserManager) {
-        self.userManager = userManager
-    }
-    
-    func resetNotificationUsers() {
-        self.notificationUsers = [] // Reset the list
-    }
-    
-    func populateNotificationUsers2() {
-        resetNotificationUsers()
-        //print("After resetting notification users count:  \(notificationUsers.count)")
-        if let notifications = userManager.currentUser?.notifications {
-            NotificationManager.shared.populateNotificationUsers(notifications: notifications) { result in
-                switch result {
-                case .success(let notificationUsers):
-                    
-                    for notificationUser in notificationUsers {
-                        self.notificationUsers.append(notificationUser)
-                        print("populateNotificationUsers: \(notificationUser.notification.message)")
-                    }
-                    
-                    self.notificationUsers = notificationUsers
-                    self.notificationUsers.sort { $0.notification.timestamp.dateValue() > $1.notification.timestamp.dateValue() }
-                    // Split the notificationUsers array into unread and rest notifications
-                    self.unreadNotificationUsers = notificationUsers.filter { !$0.notification.isRead }
-                    self.restNotificationUsers = notificationUsers.filter { $0.notification.isRead }
-                    
-                    
-                    print("Notification view After sorting final:")
-                    
-                    
-                    // Loop through each notification user and print their full_message
-                    for user in notificationUsers
-                        {
-                        print("User Full Message: \(user.full_message ?? "No message") timestamp: \(user.notification.timestamp.dateValue())")
-                        }
-                case .failure(let error):
-                    print("Failed to fetch notification users: \(error.localizedDescription)")
-                }
-            }
-        }
-        
-    }
-    
-    func populateNotificationUsers(notifications: [Notification]) {
-        resetNotificationUsers()
-        //print("After resetting notification users count:  \(notificationUsers.count)")
-        NotificationManager.shared.populateNotificationUsers(notifications: notifications) { result in
-            switch result {
-            case .success(let notificationUsers):
-                
-                for notificationUser in notificationUsers {
-                    self.notificationUsers.append(notificationUser)
-                    print("populateNotificationUsers: \(notificationUser.notification.message)")
-                }
-                
-                self.notificationUsers = notificationUsers
-                self.notificationUsers.sort { $0.notification.timestamp.dateValue() > $1.notification.timestamp.dateValue() }
-                // Split the notificationUsers array into unread and rest notifications
-                self.unreadNotificationUsers = notificationUsers.filter { !$0.notification.isRead }
-                self.restNotificationUsers = notificationUsers.filter { $0.notification.isRead }
-                
-                
-                print("Notification view After sorting final:")
-                
-                
-                // Loop through each notification user and print their full_message
-                for user in notificationUsers
-                    {
-                    print("User Full Message: \(user.full_message ?? "No message") timestamp: \(user.notification.timestamp.dateValue())")
-                    }
-            case .failure(let error):
-                print("Failed to fetch notification users: \(error.localizedDescription)")
-            }
-        }
-        
-    }
-    
-
-}

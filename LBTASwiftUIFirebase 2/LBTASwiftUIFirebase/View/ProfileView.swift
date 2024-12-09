@@ -405,25 +405,6 @@ struct ProfileView: View {
                 }
                 .navigationBarBackButtonHidden(false)
                 .navigationBarTitleDisplayMode(.inline)
-                /*
-                .toolbar {
-                    // Toolbar with the gear icon
-                    ToolbarItem(placement: .principal) {
-                        if !viewingOtherProfile {
-                            HStack {
-                                Spacer()
-                                Button(action: {
-                                    shouldShowLogOutOptions = true
-                                }) {
-                                    Image(systemName: "gearshape.fill")
-                                        .font(.system(size: 20))
-                                        .foregroundColor(Color.customPurple)
-                                }
-                            }
-                        }
-                    }
-                }*/
-                .navigationBarTitleDisplayMode(.inline)
                 .background(Color.white)
                 .fullScreenCover(isPresented: $showProfileSettings) {
                     ProfileSettingsView()
@@ -605,13 +586,7 @@ struct ProfileView: View {
             }
             
             print("Successfully removed friend!")
-            /*
-            self.friendshipLabelText = "Add Friend"
-            self.isFriends = false
-            self.friendsList.removeLast()*/
-            //delete all notifications associated with friend requests
-            //self.deleteFriendRequestNotifications(user1UID: currentUserUID, user2UID: friend.uid)
-            // Optionally, reload friends after removal
+
         }
     }
     
