@@ -8,13 +8,16 @@
 import SwiftUI
 import PhotosUI
 
+// A SwiftUI wrapper for PHPickerViewController to allow users to select multiple images.
 struct AddPhotos: UIViewControllerRepresentable {
+    // Binding to hold the selected images.
     @Binding var images: [UIImage] // Now using an array to support multiple images
 
     func makeCoordinator() -> Coordinator {
         return Coordinator(parent: self)
     }
 
+    // Coordinator to handle PHPickerViewController delegation.
     class Coordinator: NSObject, UINavigationControllerDelegate, PHPickerViewControllerDelegate {
         let parent: AddPhotos
 
@@ -22,6 +25,7 @@ struct AddPhotos: UIViewControllerRepresentable {
             self.parent = parent
         }
 
+        // Handles the user's selection of photos.
         func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
             picker.dismiss(animated: true)
 
@@ -45,9 +49,11 @@ struct AddPhotos: UIViewControllerRepresentable {
     }
 
     func makeUIViewController(context: Context) -> PHPickerViewController {
+        // Configure the PHPickerViewController for multiple image selection
         var configuration = PHPickerConfiguration()
         configuration.selectionLimit = 0 // 0 for unlimited selection
         configuration.filter = .images
+        
         let picker = PHPickerViewController(configuration: configuration)
         picker.delegate = context.coordinator
         return picker
