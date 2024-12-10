@@ -1,5 +1,7 @@
-
-
+//
+//  HomeViewTest.swift
+//  LBTASwiftUIFirebase
+//
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
 //  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
 
@@ -11,13 +13,14 @@ import SDWebImageSwiftUI
 
 struct HomeViewTest: View {
     @EnvironmentObject var userManager: UserManager
-    @State private var hasNotifications = false
-    @State private var navigateToNotifications = false
-    @State private var posts: [Post] = []
+    
+    @State private var hasNotifications = false // To keep track if new notifications have been added
+    @State private var navigateToNotifications = false // Navigate to notifications view
+    @State private var posts: [Post] = [] // List of posts that appear on home view
     @State private var isLoading = true
-    @State private var friendIds: Set<String> = []
-    @State private var navigateToSearchView = false
-    @State private var blockedUserIds: Set<String> = []
+    @State private var friendIds: Set<String> = [] // To track the user ids of the friends of current user
+    @State private var navigateToSearchView = false // Navigate to search user view
+    @State private var blockedUserIds: Set<String> = [] // Track the list blocked user ids
     @State private var isFetching = false
 
     var body: some View {
@@ -145,6 +148,7 @@ struct HomeViewTest: View {
         }
     }
     
+    // MARK: - UI Components
     // Helper View for Empty States
     private struct EmptyStateView: View {
         let icon: String
@@ -176,7 +180,8 @@ struct HomeViewTest: View {
     }
 
 
-
+    // MARK: - Supporting functions
+    // Function to fetch the user ids of friends of current user in session
     private func fetchFriends(completion: @escaping () -> Void) {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else {
             print("DEBUG: No current user found")
@@ -236,6 +241,7 @@ struct HomeViewTest: View {
         }
     }
     
+    // Function to fetch all the friends posts excluding the blocked users
     private func fetchAllPosts() {
         print("DEBUG: Starting fetchAllPosts")
         isLoading = true
@@ -426,7 +432,7 @@ struct HomeViewTest: View {
 
 
 
-    
+    // Function to get the list of blocked user ids of the current user in session
     private func setupBlockedUsersListener() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -453,7 +459,7 @@ struct HomeViewTest: View {
             }
     }
 
-
+    // Function to fetch the notifications for the current user
     private func checkIfNotifications() {
         userManager.fetchNotifications {result in
             switch result {
@@ -465,7 +471,6 @@ struct HomeViewTest: View {
                 // Handle the error, e.g., show an alert or log the issue
             }
         }
-        //hasNotifications = !(userManager.currentUser?.notifications.isEmpty ?? true)
     }
     
     // Helper function to get safe area top padding
@@ -477,5 +482,3 @@ struct HomeViewTest: View {
         return 0
     }
 }
-
-
