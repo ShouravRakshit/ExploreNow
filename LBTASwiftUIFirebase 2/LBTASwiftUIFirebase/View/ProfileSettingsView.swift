@@ -16,11 +16,18 @@ struct ProfileSettingsView: View {
     let settingsManager = UserSettingsManager()
     //    @State var shouldShowImagePicker = false
     
+    // Pass appState to the ViewModel
+    @StateObject private var viewModel: ProfileSettingsViewModel
+
+    // Pass appState and userManager to the ViewModel
+    init(appState: AppState, userManager: UserManager) {
+        _viewModel = StateObject(wrappedValue: ProfileSettingsViewModel(appState: appState, userManager: userManager))
+    }
+    
     @State var image: UIImage?
     @State private var showImageSourceOptions = false
     @State private var showPixabayPicker = false
     @State private var selectedRow: String? // Track the selected row
-    @State private var isUploading  = false // Loading state
     @State private var showEditView       = false
     @State private var showChangePassword = false
     @State private var showBlockedUsers   = false
@@ -54,7 +61,7 @@ struct ProfileSettingsView: View {
                 Circle()
                     .stroke(Color.customPurple, lineWidth: 4) // Purple border
                     .frame(width: 188, height: 188) // Slightly larger than the image
-                if isUploading {
+                if viewModel.isUploading {
                     // Show loading spinner
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle(tint: .customPurple))
@@ -108,11 +115,11 @@ struct ProfileSettingsView: View {
                     if let selectedImage = selectedImages.first,
                        let urlString = selectedImage.largeImageURL,
                        let url = URL(string: urlString) {
-                        downloadImage(from: url) { downloadedImage in
+                        viewModel.downloadImage(from: url) { downloadedImage in
                             if let downloadedImage = downloadedImage {
                                 self.image = downloadedImage
                                 // Call persistImageToStorage() after image is set
-                                persistImageToStorage()
+                                viewModel.persistImageToStorage(image: downloadedImage)
                             } else {
                                 print("Image download failed.")
                             }
@@ -279,11 +286,11 @@ struct ProfileSettingsView: View {
                  title: Text("Delete Account?"),
                  message: Text("Are you sure you want to delete your account?"),
                  primaryButton: .destructive(Text("Delete")) {
-                     deleteUserAccount { result in
+                     viewModel.deleteAccount { result in
                          switch result {
                          case .success:
                              print("Account deleted successfully.")
-                             handleSignOut()
+                             viewModel.signOut()
                          case .failure(let error):
                              print("Failed to delete account:", error.localizedDescription)
                          }
@@ -296,121 +303,7 @@ struct ProfileSettingsView: View {
              )
          }
     }
-    
-    private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) { // Added function
-                SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
-                    if let image = image, finished {
-                        DispatchQueue.main.async {
-                            completion(image)
-                        }
-                    } else {
-                        print("Failed to download image: \(error?.localizedDescription ?? "Unknown error")")
-                        completion(nil)
-                    }
-                }
-    }
-
-    
-    // Function to upload the image to Firebase Storage
-    private func persistImageToStorage() {
-        isUploading = true // Start loading
-
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-        let uniqueImagePath = "profile_images/\(uid)_\(UUID().uuidString).jpg" // Unique path to prevent caching issues
-        let ref = FirebaseManager.shared.storage.reference(withPath: uniqueImagePath)
-        guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else { return }
-
-        ref.putData(imageData, metadata: nil) { metadata, err in
-            if let err = err {
-                print("Failed to push image to Storage: \(err.localizedDescription)")
-                isUploading = false // Stop loading
-                return
-            }
-            ref.downloadURL { url, err in
-                if let err = err {
-                    print("Failed to retrieve downloadURL: \(err.localizedDescription)")
-                    isUploading = false // Stop loading
-                    return
-                }
-                guard let url = url else { return }
-                print("New profileImageUrl: \(url.absoluteString)") // Debugging
-                self.storeUserInformation(imageProfileUrl: url)
-            }
-        }
-    }
-
-    // Function to update the user's profileImageUrl in Firestore
-    private func storeUserInformation(imageProfileUrl: URL) {
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else { return }
-
-        let userData = ["profileImageUrl": imageProfileUrl.absoluteString]
-
-        FirebaseManager.shared.firestore.collection("users")
-            .document(uid).updateData(userData) { err in
-                isUploading = false // Stop loading
-                if let err = err {
-                    print("Failed to update user data: \(err.localizedDescription)")
-                    return
-                }
-                print("Profile image URL successfully updated.")
-                // Refresh the currentUser data in userManager
-                self.userManager.fetchCurrentUser()
-            }
-    }
-    
-    private func showDeleteAccountConfirmation() {
-        let alert = UIAlertController(title: "Confirm Deletion", message: "Are you sure you want to delete your account? This action cannot be undone.", preferredStyle: .alert)
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { _ in
-            deleteUserAccount { result in
-                switch result {
-                case .success:
-                    print("Account deleted successfully.")
-                    handleSignOut()
-                case .failure(let error):
-                    print("Failed to delete account:", error.localizedDescription)
-                }
-            }
-        }))
-
-        DispatchQueue.main.async {
-            if let topController = UIApplication.shared.windows.first?.rootViewController {
-                topController.present(alert, animated: true)
-            }
-        }
-    }
-    private func handleSignOut() {
-        do {
-            try FirebaseManager.shared.auth.signOut()
-            appState.isLoggedIn = false // Update authentication state
-        } catch let signOutError as NSError {
-            print("Error signing out: %@", signOutError.localizedDescription)
-        }
-    }
-    
-    func deleteUserAccount(completion: @escaping (Result<Void, Error>) -> Void) {
-        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
-            completion(.failure(NSError(domain: "", code: 404, userInfo: [NSLocalizedDescriptionKey: "User not found."])))
-            return
-        }
-
-        FirebaseManager.shared.auth.currentUser?.delete { error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-
-            FirebaseManager.shared.firestore.collection("users").document(uid).delete { error in
-                if let error = error {
-                    completion(.failure(error))
-                    return
-                }
-                completion(.success(()))
-            }
-        }
-    }
-    
+ 
 }
 
 struct ToggleButtonView: View {

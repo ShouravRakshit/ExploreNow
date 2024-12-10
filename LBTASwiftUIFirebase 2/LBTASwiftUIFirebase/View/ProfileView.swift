@@ -411,7 +411,7 @@ struct ProfileView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Color.white)
                 .fullScreenCover(isPresented: $showProfileSettings) {
-                    ProfileSettingsView()
+                    ProfileSettingsView(appState: appState, userManager: userManager)
                         .environmentObject(userManager)
                         .environmentObject(appState)
                 }
