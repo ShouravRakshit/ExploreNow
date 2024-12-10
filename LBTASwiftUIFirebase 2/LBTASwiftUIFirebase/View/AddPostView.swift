@@ -1,5 +1,9 @@
+//
+//  AddPostView.swift
+//  LBTASwiftUIFirebase
+//
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
-//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
 
 
 import SwiftUI
@@ -14,15 +18,14 @@ import Combine
 
 struct AddPostView: View {
     // Keeping all existing state variables
-    @State private var descriptionText: String = ""
-    @State private var rating: Int = 0
-    @State private var selectedLocation: String = ""
-    @State private var images: [UIImage] = []
-//    @State private var isImagePickerPresented = false
-    @State private var searchText: String = ""
-    @State private var addPostStatusMessage: String = ""
-    @State private var latitude: Double = 0.0
-    @State private var longitude: Double = 0.0
+    @State private var descriptionText: String = "" // To add the description of the place visited
+    @State private var rating: Int = 0  // To add the rating
+    @State private var selectedLocation: String = ""    // To store the location tagged
+    @State private var images: [UIImage] = []   // To store the images selected
+    @State private var searchText: String = ""  // To search for the location
+    @State private var addPostStatusMessage: String = ""    // To track the status of the post (processing, uploaded or failed)
+    @State private var latitude: Double = 0.0 // To store the coordinates of the location
+    @State private var longitude: Double = 0.0 // To store the coordinates of the location
     @State private var isLoading = false
     @State private var showPixabayPicker = false
     @State private var showImageSourceOptions = false
@@ -225,7 +228,8 @@ struct AddPostView: View {
 
     }
 
-    
+    // MARK: - Supporting Functions
+    // Function to download the images from Pixabay
     private func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
             SDWebImageDownloader.shared.downloadImage(with: url) { image, data, error, finished in
                 DispatchQueue.main.async {
@@ -239,6 +243,7 @@ struct AddPostView: View {
             }
         }
     
+    // Function to check if all the necessary fields in Add post view are filled before uploading
     private func addPost() {
         // Input validation
         if descriptionText.isEmpty {
@@ -272,6 +277,9 @@ struct AddPostView: View {
         }
     }
 
+    // Function to get the corrdinates of the location tagged and add them to the map view
+    // If the location pin already exists on map then add to it
+    // If a new location is added then create a new pin on the map
     private func handleLocation(completion: @escaping (DocumentReference) -> Void) {
         let db = FirebaseManager.shared.firestore
         
@@ -317,6 +325,7 @@ struct AddPostView: View {
             }
     }
 
+    // Function to add the newly created post to the Firebase database
     private func uploadPost(userID: String, locationRef: DocumentReference) {
         // Upload images first
         var imageURLs: [String] = []
@@ -394,6 +403,7 @@ struct AddPostView: View {
         }
     }
 
+    // Function to update the average rating of the location depending the new reating added
     private func updateLocationAverageRating(locationRef: DocumentReference) {
         let db = FirebaseManager.shared.firestore
         
@@ -430,6 +440,7 @@ struct AddPostView: View {
             }
     }
 
+    // Function to clear the add post form once the new post information is added into the database
     private func clearForm() {
         descriptionText = ""
         selectedLocation = ""
