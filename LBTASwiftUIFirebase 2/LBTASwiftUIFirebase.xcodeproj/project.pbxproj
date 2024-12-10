@@ -80,6 +80,7 @@
 		B0F0DEAA2D06AAD600303B38 /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F0DEA92D06AAD400303B38 /* Notification.swift */; };
 		B0F0DEAC2D06AB8F00303B38 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F0DEAB2D06AB8C00303B38 /* User.swift */; };
 		B0F0DEAE2D07B9FC00303B38 /* ProfileSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */; };
+		B0F0DEB02D07C22E00303B38 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */; };
 		B0F30F2A2CE9863400F4EFE4 /* FriendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F30F292CE9863100F4EFE4 /* FriendsView.swift */; };
 		B0F30F2C2CE988CA00F4EFE4 /* FriendsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */; };
 		B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */; };
@@ -159,6 +160,7 @@
 		B0F0DEA92D06AAD400303B38 /* Notification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
 		B0F0DEAB2D06AB8C00303B38 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsViewModel.swift; sourceTree = "<group>"; };
+		B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		B0F30F292CE9863100F4EFE4 /* FriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsView.swift; sourceTree = "<group>"; };
 		B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsManager.swift; sourceTree = "<group>"; };
 		B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
@@ -316,6 +318,7 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */,
 				B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */,
 				B0F0DEA72D06A84600303B38 /* NotificationViewModel.swift */,
 				2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */,
@@ -448,6 +451,7 @@
 				10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */,
 				2CD5E27E2CF01EBA0024B502 /* PixabayAPI.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
+				B0F0DEB02D07C22E00303B38 /* ProfileViewModel.swift in Sources */,
 				8148DCBF2CFFCD6200D490A6 /* SignUpView.swift in Sources */,
 				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				8148DC8B2CFFAE0200D490A6 /* ChatLogViewModel.swift in Sources */,
