@@ -13,16 +13,17 @@ import SDWebImageSwiftUI
 struct PostCard: View {
     let post: Post
     @EnvironmentObject var userManager: UserManager
+    
     @State private var currentImageIndex = 0
-    @State private var comments: [Comment] = []
-    @State private var commentCount: Int = 0
-    @State private var likesCount: Int = 0
-    @State private var likedByUserIds: [String] = []
-    @State private var liked: Bool = false
-    @State private var isCurrentUserPost: Bool = false
-    @State private var showDeleteConfirmation = false
-    @State private var blockedUserIds: Set<String> = []
-    @State private var blockedByIds: Set<String> = []
+    @State private var comments: [Comment] = [] // List of comments on the post
+    @State private var commentCount: Int = 0    // Number of comments on the post
+    @State private var likesCount: Int = 0  // Number of likes on the post
+    @State private var likedByUserIds: [String] = [] // Track of user ids that liked the post
+    @State private var liked: Bool = false  // To check if the post is liked or not
+    @State private var isCurrentUserPost: Bool = false  // To check if the post is from the current user in session
+    @State private var showDeleteConfirmation = false   // To confirm delete action
+    @State private var blockedUserIds: Set<String> = [] // Track the list blocked user ids
+    @State private var blockedByIds: Set<String> = []   // Track the list of users that blocked current logged in user ids
     
     var onDelete: ((Post) -> Void)?
 
@@ -189,14 +190,16 @@ struct PostCard: View {
         }
         .buttonStyle(PlainButtonStyle())
         .onAppear {
-            setupBlockedUsersListener()
-            fetchBlockedByUsers()
-            fetchLikes()
-            fetchComments()
+            setupBlockedUsersListener() // To fetch the user ids blocked by the current user
+            fetchBlockedByUsers()   // To fetch the user ids that have blocked the current user
+            fetchLikes()    // To get the number of likes by non-blocked users on the current post in view
+            fetchComments() // To fetch the comments of non-blocked users on the current post in view
             isCurrentUserPost = post.uid == userManager.currentUser?.id
         }
     }
     
+    // MARK: - Supporting Views
+    // Function to delete the post
     func deletePost() {
         let postId = post.id
         
@@ -236,6 +239,7 @@ struct PostCard: View {
             }
     }
     
+    // Function to get the list of blocked user ids
     private func setupBlockedUsersListener() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -258,7 +262,7 @@ struct PostCard: View {
             }
     }
 
-    
+    // To fetch number of likes by non-blocked users
     private func fetchLikes() {
         let db = FirebaseManager.shared.firestore
         db.collection("likes")
@@ -294,6 +298,7 @@ struct PostCard: View {
             }
     }
 
+    // Function to add or delete the like count on the post when clicked by the user
     private func toggleLike() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -348,6 +353,7 @@ struct PostCard: View {
         }
     }
     
+    // To fetch the comments by non-blocked users
     private func fetchComments() {
         let db = FirebaseManager.shared.firestore
         db.collection("comments")
@@ -378,12 +384,14 @@ struct PostCard: View {
     }
 
 
+    // To format the date of the post added
     private func formatDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
     }
     
+    // To update the average location rating based on the new post added
     private func updateLocationRating(locationRef: DocumentReference) {
         let db = FirebaseManager.shared.firestore
         
