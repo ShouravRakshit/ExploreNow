@@ -82,7 +82,6 @@
 		B0F0DEAE2D07B9FC00303B38 /* ProfileSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */; };
 		B0F0DEB02D07C22E00303B38 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */; };
 		B0F30F2A2CE9863400F4EFE4 /* FriendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F30F292CE9863100F4EFE4 /* FriendsView.swift */; };
-		B0F30F2C2CE988CA00F4EFE4 /* FriendsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */; };
 		B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */; };
 		B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983942CC70D6F00E1CBE3 /* NavBar.swift */; };
 		B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */; };
@@ -162,7 +161,6 @@
 		B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsViewModel.swift; sourceTree = "<group>"; };
 		B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		B0F30F292CE9863100F4EFE4 /* FriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsView.swift; sourceTree = "<group>"; };
-		B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FriendsManager.swift; sourceTree = "<group>"; };
 		B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChangePasswordView.swift; sourceTree = "<group>"; };
 		B0F983942CC70D6F00E1CBE3 /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
 		B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
@@ -323,7 +321,6 @@
 				B0F0DEA72D06A84600303B38 /* NotificationViewModel.swift */,
 				2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */,
 				2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */,
-				B0F30F2B2CE988C600F4EFE4 /* FriendsManager.swift */,
 				8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */,
 				811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */,
 				8148DC902CFFAF6A00D490A6 /* SearchUserViewModel.swift */,
@@ -441,7 +438,6 @@
 				811CE2932D00F01600DCC599 /* HotSpotViewModel.swift in Sources */,
 				2CD3C7DC2CEDBCB200D21855 /* AllUsersSearchView.swift in Sources */,
 				10B0F3522CC4F7F3003FB476 /* MapSearchControllerDelegate.swift in Sources */,
-				B0F30F2C2CE988CA00F4EFE4 /* FriendsManager.swift in Sources */,
 				10F6BB522CDB39660033B9A5 /* LocationSearchBar.swift in Sources */,
 				101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */,
 				8148DC8F2CFFAE9500D490A6 /* MessageView.swift in Sources */,

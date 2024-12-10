@@ -1,4 +1,6 @@
 import FirebaseFirestore
+import Firebase
+import FirebaseCore
 import Combine
 
 // NotificationUser model to represent a user fetched from Firestore
