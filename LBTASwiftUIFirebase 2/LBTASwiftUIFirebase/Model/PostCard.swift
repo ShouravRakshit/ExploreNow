@@ -188,6 +188,7 @@ struct PostCard: View {
         }
         .buttonStyle(PlainButtonStyle())
         .onAppear {
+            setupBlockedUsersListener()
             fetchLikes()
             fetchComments()
             isCurrentUserPost = post.uid == userManager.currentUser?.id
