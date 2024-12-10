@@ -16,26 +16,30 @@ class UserSettingsManager {
         let settingsRef = db.collection("settings").document(userId)
         
         settingsRef.getDocument { document, error in
+            // Handle errors from Firestore
             if let error = error {
-                print("Error fetching document: \(error.localizedDescription)")
-                self.publicAccount = false
-                completion(false)
+                print("Error fetching document: \(error.localizedDescription)") // Consider logging for better error tracking
+                self.publicAccount = false // Default to `false` if there's an error
+                completion(false) // Return `false` to indicate failure
                 return
             }
             
+            // Process the document if it exists
             if let document = document, document.exists {
+                // Check for the 'public' field in the document
                 if let publicField = document.get("public") as? Bool {
-                    self.publicAccount = publicField
-                    completion(publicField)
+                    self.publicAccount = publicField // Update the local variable
+                    completion(publicField) // Pass the value to the completion handler
                 } else {
-                    print("Field 'public' not found, setting to false.")
-                    self.publicAccount = false
-                    completion(false)
+                    print("Field 'public' not found, setting to false.") // Inform about the missing field
+                    self.publicAccount = false // Default to `false` if the field is missing
+                    completion(false)  // Return `false`
                 }
             } else {
-                print("Document does not exist, setting default value.")
-                self.publicAccount = false
-                completion(false)
+                // Handle the case where the document doesn't exist
+                print("Document does not exist, setting default value.") // Inform about the missing document
+                self.publicAccount = false // Default to `false`
+                completion(false) // Return `false`
             }
         }
     }

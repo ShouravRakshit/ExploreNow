@@ -9,40 +9,44 @@ import SwiftUI
 import Combine
 import Firebase
 
+// Represents a notification, typically sent between users (e.g., for interactions like likes, comments, or messages)
 struct Notification {
-    let receiverId: String
-    let senderId: String
-    var message: String
-    let timestamp: Timestamp
-    var status: String
-    var isRead: Bool
-    let type: String
-    let post_id: String? //Optional
+    let receiverId: String // The ID of the user receiving the notification
+    let senderId: String // The ID of the user sending the notification
+    var message: String  // The message content of the notification
+    let timestamp: Timestamp // Timestamp when the notification was created
+    var status: String // Status of the notification (e.g., "pending", "completed")
+    var isRead: Bool // Indicates whether the notification has been read
+    let type: String  // Type of notification (e.g., "like", "comment", "follow")
+    let post_id: String? // Optional ID of the associated post, if applicable (e.g., for likes/comments on posts)
     
     
     // Initializer that takes a Firestore document
     init(from document: QueryDocumentSnapshot) {
-        let data = document.data()
-        self.receiverId = data["receiverId"] as? String ?? ""
-        self.senderId = data["senderId"] as? String ?? ""
-        self.message = data["message"] as? String ?? "No message"
+        let data = document.data() // Retrieves the document's data as a dictionary
+        
+        // Maps Firestore fields to the struct's properties with fallback/default values
+
+        self.receiverId = data["receiverId"] as? String ?? "" // Default to an empty string if missing
+        self.senderId = data["senderId"] as? String ?? "" // Default to an empty string if missing
+        self.message = data["message"] as? String ?? "No message" // Default message if none exists
         self.timestamp = data["timestamp"] as? Timestamp ?? Timestamp(date: Date()) // Default to current time if not found
-        self.isRead = data["isRead"] as? Bool ?? false // Default to unread
-        self.status = data ["status"] as? String ?? ""
-        self.type = data ["type"] as? String ?? ""
-        self.post_id = data ["post_id"] as? String ?? ""
+        self.isRead = data["isRead"] as? Bool ?? false // Default to `false` (unread status)
+        self.status = data ["status"] as? String ?? "" // Default to an empty string if no status is provided
+        self.type = data ["type"] as? String ?? "" // Default to an empty string if no type is provided
+        self.post_id = data ["post_id"] as? String ?? "" // Optional field; defaults to `nil` if missing
     }
     
     // Initializer to create a Notification from Firestore data
     init(receiverId: String, senderId: String, message: String, timestamp: Timestamp, isRead: Bool, status: String, type: String, post_id: String? = nil) {
-        self.receiverId = receiverId
-        self.senderId = senderId
-        self.message = message
-        self.timestamp = timestamp
-        self.isRead = isRead
-        self.status = status
-        self.type   = type
-        self.post_id = post_id // This can be nil if no post_id is passed
+        self.receiverId = receiverId // Sets the receiver's ID, a required parameter
+        self.senderId = senderId // Sets the sender's ID, a required parameter
+        self.message = message  // Sets the message content of the notification
+        self.timestamp = timestamp   // Sets the timestamp, which is typically a Firestore
+        self.isRead = isRead // Indicates whether the notification has been read
+        self.status = status // Sets the status of the notification (e.g., "pending", "completed")
+        self.type   = type // Sets the type of notification (e.g., "like", "comment", "follow")
+        self.post_id = post_id  // Optionally sets the associated post ID, defaults to `nil` if not provided
     }
     
     // You can add a computed property to display the time nicely
