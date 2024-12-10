@@ -2,8 +2,8 @@
 //  FriendsManager.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by Alisha Lalani on 2024-11-16.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
 
 import Foundation
 import FirebaseFirestore

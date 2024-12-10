@@ -2,8 +2,9 @@
 //  NotificationViewModel.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by Alisha Lalani on 2024-12-08.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
+
 import SwiftUI
 
 // ViewModel to manage notification users

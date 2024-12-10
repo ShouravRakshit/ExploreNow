@@ -2,8 +2,12 @@
 //  SuggestionPageView.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by AM on 04/12/2024.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
+
+//  When a location is clicked, the location page view for that location
+//  can be displayed (similar to how it is displayed in the Explore page),
+//  so that the user can view all posts present in that location.
 
 
 import SwiftUI

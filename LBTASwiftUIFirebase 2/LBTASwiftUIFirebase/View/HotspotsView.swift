@@ -2,8 +2,12 @@
 //  HotspotsView.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by AM on 04/12/2024.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
+
+//  To further expand this implementation, the locations present on the Hotspot
+//  page can be collected using an algorithm that grabs the most popular locations
+//  from the database
 
 import SwiftUI
 import Foundation

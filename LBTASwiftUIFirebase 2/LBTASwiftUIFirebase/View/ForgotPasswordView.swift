@@ -2,8 +2,9 @@
 //  ForgotPasswordView.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by AM on 07/10/2024.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
+
 import SwiftUI
 import FirebaseAuth
 

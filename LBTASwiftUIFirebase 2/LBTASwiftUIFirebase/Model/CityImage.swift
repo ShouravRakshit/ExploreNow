@@ -2,9 +2,8 @@
 //  CityImage.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by AM on 04/12/2024.
-//
-
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
 import Foundation
 
 // Define a model to represent a city and its corresponding image

@@ -2,8 +2,8 @@
 //  PostCard.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by Saadman Rahman on 2024-11-17.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
 
 import SwiftUI
 import Firebase

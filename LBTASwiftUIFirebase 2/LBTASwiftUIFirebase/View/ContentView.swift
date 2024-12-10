@@ -2,8 +2,8 @@
 //  ContentView.swift
 //  LBTASwiftUIFirebase
 //
-//  Created by Ivan on 2024-10-17.
-//
+//  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
 
 import SwiftUI
 
