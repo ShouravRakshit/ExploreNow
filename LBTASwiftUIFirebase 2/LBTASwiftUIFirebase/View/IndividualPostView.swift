@@ -27,6 +27,7 @@ struct PostView: View {
     @State private var selectedEmoji: String? = nil // Variable to store selected emoji
     @State private var showEmojiPicker = false  // Toggle to show/hide the emoji picker
     @State private var blockedUserIds: Set<String> = [] // Track the list blocked user ids
+    @State private var blockedByIds: Set<String> = [] // Track the list of users that blocked current logged in user ids
    
 
         // Custom initializer to accept values passed from `PostCard`
@@ -133,6 +134,7 @@ struct PostView: View {
         .onAppear {
             fetchCurrentUserProfile()
             setupBlockedUsersListener()
+            fetchBlockedByUsers()
             fetchLikes()
             fetchComments()
         }
@@ -662,6 +664,32 @@ struct PostView: View {
            return UIButton()
        }
 
+    
+    // Function to get the list of users that blocked the current loged in user
+    private func fetchBlockedByUsers() {
+        // Ensure the current user is authenticated and retrieve their user ID
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+
+        // Access the Firestore database and listen for changes to the "blocks" collection, specifically the document for the current user
+        FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+            .addSnapshotListener { documentSnapshot, error in
+                // Handle any errors that occur during the fetch operation
+                if let error = error {
+                    print("Error fetching blockedBy users: \(error)")
+                    return
+                }
+                // If data is successfully retrieved, update the blockedByUsers property with the list of blocked user IDs
+                if let document = documentSnapshot, document.exists {
+                    let blockedByUsers = document.data()?["blockedByIds"] as? [String] ?? []
+                    self.blockedByIds = Set(blockedByUsers)
+                } else {
+                    self.blockedByIds = []
+                }
+                
+            }
+    }
+
+    
     // Function to get the list of blocked user ids
     private func setupBlockedUsersListener() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
@@ -720,7 +748,7 @@ struct PostView: View {
                         }
                         
                         // Filter comments by blocked users
-                        if !blockedUserIds.contains(comment.userID) {
+                        if (!blockedUserIds.contains(comment.userID) && !blockedByIds.contains(comment.userID)) {
                             // Fetch user data for this comment'
                             fetchUserData(for: comment.userID) { username, profileImageUrl in
                                 // Store user data in the cache
