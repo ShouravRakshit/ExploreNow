@@ -132,6 +132,7 @@ struct PostView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             fetchCurrentUserProfile()
+            setupBlockedUsersListener()
             fetchLikes()
             fetchComments()
         }
