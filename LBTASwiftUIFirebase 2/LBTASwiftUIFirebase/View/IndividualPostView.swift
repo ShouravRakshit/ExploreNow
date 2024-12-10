@@ -1,5 +1,9 @@
+//
+//  IndividualPostView.swift
+//  LBTASwiftUIFirebase
+//
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
-//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
 
 
 import SwiftUI
@@ -20,8 +24,9 @@ extension Comment {
 
 struct PostView: View {
     @EnvironmentObject var userManager: UserManager
-    @State private var comments: [Comment] = []
-    @State private var commentText: String = ""
+    
+    @State private var comments: [Comment] = [] // To store the comments for the current post id
+    @State private var commentText: String = "" // To add a new comment
     @State private var userData: [String: (username: String, profileImageUrl: String?)] = [:] // Cache for user data
     @State private var currentUserProfileImageUrl: String? // To store the current user's profile image URL
     @State private var scrollOffset: CGFloat = 0 // To track the scroll position
@@ -41,6 +46,7 @@ struct PostView: View {
             self._liked = State(initialValue: liked)
         }
     
+    // To format the comment timestamp in terms of "Just Now", "min", "hr ago" , "d ago" and "wk ago"
     private func formatCommentTimestamp(_ timestamp: Date) -> String {
         let currentTime = Date()
         let timeInterval = currentTime.timeIntervalSince(timestamp)
@@ -68,7 +74,7 @@ struct PostView: View {
     }
 
 
-   
+    // Function to calculate the time since the post was posted
     private var timeAgo: String {
            let calendar = Calendar.current
            let now = Date()
@@ -136,15 +142,16 @@ struct PostView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            fetchCurrentUserProfile()
-            setupBlockedUsersListener()
-            fetchBlockedByUsers()
-            fetchLikes()
-            fetchComments()
+            fetchCurrentUserProfile() // To fetch the current user details
+            setupBlockedUsersListener() // To fetch the user ids blocked by the current user
+            fetchBlockedByUsers()   // To fetch the user ids that have blocked the current user
+            fetchLikes()    // To get the number of likes on the current post in view
+            fetchComments() // To fetch the comments of non-blocked users on the current post in view
         }
     }
     
     // MARK: - UI Components
+    // Defines the profile picture of the user if available or use the default image otherwise
     private var profileImage: some View {
         Group {
             if let imageUrl = URL(string: post.userProfileImageUrl) {
@@ -165,7 +172,7 @@ struct PostView: View {
         }
     }
     
-    
+    // Defines the post view header section including profile image and username
     private var headerSection: some View {
         HStack(spacing: 12) {
             profileImage  // Use the new component
@@ -188,6 +195,7 @@ struct PostView: View {
         .background(AppTheme.background)
     }
 
+    // Tab view for all the images in the current post
     private var imageSection: some View {
         TabView {
             ForEach(post.imageUrls.indices, id: \.self) { index in
@@ -214,6 +222,7 @@ struct PostView: View {
         .frame(height: 400)
     }
 
+    // View for likes and location information
     private var interactionBar: some View {
         HStack(spacing: 20) {
             Button(action: { toggleLike() }) {
@@ -252,6 +261,7 @@ struct PostView: View {
         .padding(.horizontal, 16)
     }
     
+    // View for the description of the place recently visited
     private var descriptionSection: some View {
         Text(post.description)
             .font(.system(size: 15))
@@ -261,6 +271,7 @@ struct PostView: View {
             .background(AppTheme.background)
     }
     
+    // View for the comments in
     private var commentsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -291,6 +302,7 @@ struct PostView: View {
         .padding(.bottom, 60) // Space for input bar
     }
     
+    // View for adding a new comment
     private var commentInputSection: some View {
         VStack(spacing: 0) {
             Divider()
@@ -346,6 +358,7 @@ struct PostView: View {
     }
 
     // MARK: - Supporting Views
+    // View for each individual comment displayed
     private struct CommentRow: View {
         let comment: Comment
         let userData: (username: String, profileImageUrl: String?)?
@@ -416,7 +429,7 @@ struct PostView: View {
         }
     }
 
-
+    // View for adding emojis to the comment
     private struct EmojiPickerView: View {
         @Binding var text: String
         @Binding var showPicker: Bool
@@ -491,7 +504,8 @@ struct PostView: View {
     }
 
 
-    
+    // MARK: - View Model Functions
+    // Function to open the location tagged in the post in maps
     private func openInMaps() {
         // First, get the location reference
         post.locationRef.getDocument { snapshot, error in
@@ -519,7 +533,7 @@ struct PostView: View {
         }
     }
 
-    
+    // Function to like comments and keep count of number of likes on each comment
     private func toggleLikeForComment(_ comment: Comment) {
           guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
           
@@ -584,7 +598,7 @@ struct PostView: View {
           }
       }
 
-
+    // Function to add a new comment to the post
     private func addComment() {
         guard !commentText.isEmpty else { return } // Avoid posting empty comments
         guard let userID = FirebaseManager.shared.auth.currentUser?.uid else { return }
@@ -638,6 +652,7 @@ struct PostView: View {
         }
     }
 
+    // Function to change the comment view when liked
     private func updateCommentUI() {
           
            for comment in self.comments {
@@ -650,7 +665,8 @@ struct PostView: View {
            }
        }
 
-       private func updateLikeButtonAppearance(for comment: Comment, isLiked: Bool) {
+    // Function to change the like heart colour to red from default when liked
+    private func updateLikeButtonAppearance(for comment: Comment, isLiked: Bool) {
           
            
            let likeButton = getLikeButton(for: comment) // A method to get the button or image view for the specific comment
@@ -811,6 +827,7 @@ struct PostView: View {
         }
     }
 
+    // Function to delete a comment added by the current user in session
     private func deleteComment(_ comment: Comment) {
           let db = FirebaseManager.shared.firestore
           db.collection("comments").document(comment.id).delete { error in
@@ -841,6 +858,8 @@ struct PostView: View {
             }
         }
     }
+    
+    // Function to add or delete the like count on the post when clicked by the user
     private func toggleLike() {
         guard let userID = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -890,6 +909,7 @@ struct PostView: View {
             
         }
     }
+    
     // Fetch Likes
     private func fetchLikes() {
         FirebaseManager.shared.firestore.collection("likes")  // Use firestore here
