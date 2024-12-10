@@ -22,6 +22,7 @@ struct PostCard: View {
     @State private var isCurrentUserPost: Bool = false
     @State private var showDeleteConfirmation = false
     @State private var blockedUserIds: Set<String> = []
+    @State private var blockedByIds: Set<String> = []
     
     var onDelete: ((Post) -> Void)?
 
@@ -189,6 +190,7 @@ struct PostCard: View {
         .buttonStyle(PlainButtonStyle())
         .onAppear {
             setupBlockedUsersListener()
+            fetchBlockedByUsers()
             fetchLikes()
             fetchComments()
             isCurrentUserPost = post.uid == userManager.currentUser?.id
@@ -210,6 +212,30 @@ struct PostCard: View {
         }
     }
 
+    // Function to get the list of users that blocked the current loged in user
+    private func fetchBlockedByUsers() {
+        // Ensure the current user is authenticated and retrieve their user ID
+        guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
+
+        // Access the Firestore database and listen for changes to the "blocks" collection, specifically the document for the current user
+        FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
+            .addSnapshotListener { documentSnapshot, error in
+                // Handle any errors that occur during the fetch operation
+                if let error = error {
+                    print("Error fetching blockedBy users: \(error)")
+                    return
+                }
+                // If data is successfully retrieved, update the blockedByUsers property with the list of blocked user IDs
+                if let document = documentSnapshot, document.exists {
+                    let blockedByUsers = document.data()?["blockedByIds"] as? [String] ?? []
+                    self.blockedByIds = Set(blockedByUsers)
+                } else {
+                    self.blockedByIds = []
+                }
+                
+            }
+    }
+    
     private func setupBlockedUsersListener() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -254,7 +280,7 @@ struct PostCard: View {
                 let unblockedLikes = documents.compactMap { document -> String? in
                     let userId = document.data()["userId"] as? String
                     // Only include user IDs that are not in the blocked list
-                    return (userId != nil && !(blockedUserIds.contains(userId!))) ? userId : nil
+                    return (userId != nil && !(blockedUserIds.contains(userId!)) && !(blockedByIds.contains(userId!))) ? userId : nil
                 }
 
                 // Update likes count and liked user IDs
@@ -343,7 +369,7 @@ struct PostCard: View {
                 self.comments = documents.compactMap { document in
                     let comment = Comment(document: document)
                     // Ensure the comment's userID is not in the blocked list
-                    return (comment != nil && !(blockedUserIds.contains(comment!.userID))) ? comment : nil
+                    return (comment != nil && !(blockedUserIds.contains(comment!.userID)) && !(blockedByIds.contains(comment!.userID))) ? comment : nil
                 }
 
                 // Update comment count after filtering
