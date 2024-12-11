@@ -362,49 +362,58 @@ class ChatLogViewModel: ObservableObject {
     }
 
     func blockUser(userId: String) {
+        // Retrieve the current authenticated user's ID. If not authenticated, exit the function.
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
 
+        // References to the Firestore documents for the current user's block list and the target user's block list
         let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
         let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
 
-        // Add the blocked user to the current user's blocks list
+        // Add the target user to the current user's block list using Firestore's arrayUnion to ensure no duplicates
         currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
+            // Handle any error that occurs when attempting to update the current user's block list
             if let error = error {
-                print("Error blocking user: \(error)")
+                print("Error blocking user: \(error)") // Log the error if blocking fails
             } else {
-                print("User blocked successfully.")
-                self.blockedUsers.append(userId)
-                self.removeFriend (currentUserUID: currentUserId, friend_uid: userId)
+                print("User blocked successfully.") // Log success when user is blocked successfully
+                self.blockedUsers.append(userId)  // Update the local blocked users list
+                self.removeFriend (currentUserUID: currentUserId, friend_uid: userId) // Remove the user from the friends list, if applicable
             }
         }
 
-        // Add the current user to the blocked user's 'blockedBy' list
+        // Add the current user to the blocked user's 'blockedBy' list, marking the current user as the one who blocked them
         blockedUserRef.setData(["blockedByIds": FieldValue.arrayUnion([currentUserId])], merge: true) { error in
+            // Handle any error that occurs when updating the blocked user's 'blockedBy' list
             if let error = error {
-                print("Error adding blockedBy for user: \(error)")
+                print("Error adding blockedBy for user: \(error)") // Log the error if updating 'blockedBy' fails
             }
         }
     }
 
     func unblockUser(userId: String) {
+        // Retrieve the current authenticated user's ID. If not authenticated, exit the function.
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
 
+        // References to the Firestore documents for the current user's block list and the target user's block list
         let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUserId)
         let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
 
-        // Remove the blocked user from the current user's blocks list
+        // Remove the blocked user from the current user's block list using Firestore's arrayRemove to ensure the user is removed
         currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
+            // Handle any error that occurs when attempting to update the current user's block list
             if let error = error {
-                print("Error unblocking user: \(error)")
+                print("Error unblocking user: \(error)") // Log the error if unblocking fails
             } else {
-                print("User unblocked successfully.")
-                self.blockedUsers.removeAll { $0 == userId }
+                print("User unblocked successfully.") // Log success when user is unblocked successfully
+                self.blockedUsers.removeAll { $0 == userId }  // Update the local blocked users list by removing the unblocked user
             }
         }
 
         // Remove the current user from the blocked user's 'blockedBy' list
         blockedUserRef.setData(["blockedByIds": FieldValue.arrayRemove([currentUserId])], merge: true) { error in
+            // Check for any error that may occur while updating the blocked user's 'blockedByIds' list
             if let error = error {
+                // Log the error if removing the current user from the 'blockedByIds' list fails
                 print("Error removing blockedBy for user: \(error)")
             }
         }

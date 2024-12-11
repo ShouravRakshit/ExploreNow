@@ -46,6 +46,7 @@ class NotificationViewModel: ObservableObject {
                     self.notificationUsers = notificationUsers
                     // Sort the notification users by timestamp in descending order (newest first)
                     self.notificationUsers.sort { $0.notification.timestamp.dateValue() > $1.notification.timestamp.dateValue() }
+                    
                     // Split the notificationUsers array into unread and rest notifications
                     
                     self.unreadNotificationUsers = notificationUsers.filter { !$0.notification.isRead }
