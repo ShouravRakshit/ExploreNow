@@ -412,48 +412,59 @@ class ChatLogViewModel: ObservableObject {
     
     // Remove a friend from both users' friend lists
     func removeFriend(currentUserUID: String, friend_uid: String) {
+        // Reference to the Firestore database
         let db = Firestore.firestore()
+        
+        // References to the current user and friend's 'friends' documents in Firestore
         let currentUserRef = db.collection("friends").document(currentUserUID)
         let friendUserRef  = db.collection("friends").document(friend_uid)
         
-        // Fetch the current user's friend list and the friend's list
+        // Run a Firestore transaction to ensure atomic operations on both documents
         db.runTransaction { (transaction, errorPointer) -> Any? in
             do {
-                // Fetch current user's friend list
+                // Fetch the current user's friend list document
                 let currentUserDoc = try transaction.getDocument(currentUserRef)
+                
+                // Ensure that the friend's list exists and is of the correct type
                 guard let currentUserFriends = currentUserDoc.data()?["friends"] as? [String] else {
                     return nil
                 }
                 
-                // Fetch the friend's friend list
+                // Fetch the friend's friend list document
                 let friendUserDoc = try transaction.getDocument(friendUserRef)
+                // Ensure that the friend's list exists and is of the correct type
                 guard let friendUserFriends = friendUserDoc.data()?["friends"] as? [String] else {
                     return nil
                 }
                 
-                // Remove friend from both lists
+                // Remove the friend from both users' friend lists
                 var updatedCurrentUserFriends = currentUserFriends
                 var updatedFriendUserFriends = friendUserFriends
                 
-                // Remove each other from the respective lists
+                // Remove the friend's UID from the current user's friend list
                 updatedCurrentUserFriends.removeAll { $0 == friend_uid }
+                
+                // Remove the current user's UID from the friend's friend list
                 updatedFriendUserFriends.removeAll { $0 == currentUserUID }
                 
-                // Update the database with the new lists
+                // Update the Firestore database with the new friend lists
                 transaction.updateData(["friends": updatedCurrentUserFriends], forDocument: currentUserRef)
                 transaction.updateData(["friends": updatedFriendUserFriends], forDocument: friendUserRef)
                 
             } catch {
+                // If an error occurs during the transaction, print the error and return
                 print("Error during transaction: \(error)")
                 errorPointer?.pointee = error as NSError
                 return nil
             }
             return nil
         } completion: { (result, error) in
+            // If no error occurs in the transaction completion
             if let error = error {
                 return
             }
             
+            // If no error occurs in the transaction completion
             print("Successfully removed friend!")
             //delete all notifications associated with friend requests
             //self.deleteFriendRequestNotifications(user1UID: currentUserUID, user2UID: friend.uid)
