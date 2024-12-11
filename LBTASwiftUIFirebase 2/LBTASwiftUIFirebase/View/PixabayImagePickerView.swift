@@ -37,7 +37,7 @@ struct PixabayImagePickerView: View {
                 }
                 // Show a message if no images are found
                 else if viewModel.images.isEmpty {
-                    Text("No images found.")
+                    Text("No images fteound.")
                         .foregroundColor(.gray)
                         .padding()
                     Spacer()

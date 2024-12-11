@@ -108,19 +108,19 @@ struct ChatLogView: View {
         // Programmatically triggering navigation when isNavigating is true
         .background(
             NavigationLink(
-                destination: ProfileView(user_uid: chatUser?.uid ?? ""),
-                isActive: $isNavigating // Binding to isNavigating state to trigger navigation
+                destination: ProfileView(user_uid: chatUser?.uid ?? ""), // Destination view when navigation occurs
+                isActive: $isNavigating // Binding to isNavigating state to trigger navigation programmatically
             ) {
-                EmptyView() // NavigationLink content is invisible, but triggers navigation
+                EmptyView() // The content of the NavigationLink is invisible. It only triggers navigation when isNavigating is true
             }
         )
         // Monitoring changes to the chatUser and updating the view when it changes
         .onChange(of: chatUser) { newUser in
             if let user = newUser {
-                print("User changed, reloading messages for \(user.name)")
-                vm.setChatUser(user) // Update the ViewModel with the new user
+                print("User changed, reloading messages for \(user.name)") // Print log when a new user is selected
+                vm.setChatUser(user)  // Update the ViewModel with the new user to reload messages or other user-related data
             } else {
-                print("No user selected, cannot reload messages")
+                print("No user selected, cannot reload messages")  // If no user is selected, print a message indicating that messages cannot be reloaded
             }
         }
     }
@@ -177,10 +177,14 @@ struct ChatLogView: View {
     }
 
     
-    
+    // Function to scroll to the bottom of the ScrollView programmatically
     private func scrollToBottom(scrollViewProxy: ScrollViewProxy) {
+        // Ensures the scroll happens on the main thread to avoid UI-related issues
         DispatchQueue.main.async {
+            // Check if there are any messages in the chat
             if let lastMessage = vm.chatMessages.last {
+                // Scroll to the last message using its ID as the target for scrolling
+                // The 'anchor' parameter is set to '.bottom' to align the last message at the bottom of the screen
                 scrollViewProxy.scrollTo(lastMessage.id, anchor: .bottom)
             }
         }
@@ -275,25 +279,34 @@ struct ChatLogView: View {
             "🇺🇸", "🇬🇧", "🇨🇦", "🇮🇳", "🇦🇺", "🇫🇷", "🇩🇪", "🇯🇵", "🇧🇷", "🇰🇷", "🇨🇳", "🇮🇹"
         ]
         
+        // A VStack that contains the entire emoji picker UI
         return VStack {
+            // ScrollView to allow scrolling if there are many emojis
             ScrollView {
+                // LazyVGrid is used to display emojis in a flexible grid layout
+                // It repeats the GridItem 4 times to create a 4-column grid
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 4), spacing: 10) {
+                    // Iterate through each emoji in the 'emojis' array
                     ForEach(emojis, id: \.self) { emoji in
+                        // Button for each emoji that appends the selected emoji to chatText
                         Button(action: {
+                            // Append selected emoji to the chat text
                             vm.chatText += emoji
-                            showEmojiPicker = false // Close picker after selection
+                            // Close the emoji picker after selection
+                            showEmojiPicker = false
                         }) {
+                            // Display the emoji as text with a large font size
                             Text(emoji)
-                                .font(.largeTitle)
+                                .font(.largeTitle) // Adjust the emoji size to make it large
                         }
                     }
                 }
-                .padding()
+                .padding() // Add padding around the content of the ScrollView for better spacing between elements
             }
-            .frame(maxHeight: 300) // Limit the height of the picker for better UI
-            .background(Color.white)
-            .cornerRadius(10)
-            .shadow(radius: 5)
+            .frame(maxHeight: 300) // Set a maximum height of 300 points for the emoji picker to prevent it from taking up too much space on the screen
+            .background(Color.white) // Set a white background color for the emoji picker, making it visually distinct from the surrounding elements
+            .cornerRadius(10) // Apply rounded corners with a radius of 10 points to create a softer, more modern look
+            .shadow(radius: 5) // Add a subtle shadow effect with a radius of 5 to create a lifting effect, making the picker appear elevated
         }
     }
 }
