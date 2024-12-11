@@ -53,6 +53,3 @@ extension Comment {
         self.likedByCurrentUser = data["likedByCurrentUser"] as? Bool ?? false // Default to false if 'likedByCurrentUser' is not found.
     }
 }
-
-
-

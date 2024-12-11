@@ -45,3 +45,4 @@ struct ChatUser: Identifiable, Equatable {
         self.name = data["name"] as? String ?? ""              // Default to empty string if name is missing or invalid.
     }
 }
+

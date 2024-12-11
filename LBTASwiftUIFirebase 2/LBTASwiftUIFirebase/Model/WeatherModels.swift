@@ -3,7 +3,7 @@
 //  LBTASwiftUIFirebase
 //
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
-//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
 
 
 import SwiftUI
@@ -30,3 +30,4 @@ struct Weather1: Codable {
         let icon: String        // A reference to an icon, typically used for displaying weather icons in the UI.
     }
 }
+

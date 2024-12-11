@@ -3,7 +3,7 @@
 //  LBTASwiftUIFirebase
 //
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
-//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
 
 // Import necessary modules
 import Foundation
@@ -54,3 +54,4 @@ struct ChatMessage: Identifiable {
         self.timestamp = data[FirebaseConstants.timestamp] as? Timestamp ?? Timestamp(date: Date())
     }
 }
+
