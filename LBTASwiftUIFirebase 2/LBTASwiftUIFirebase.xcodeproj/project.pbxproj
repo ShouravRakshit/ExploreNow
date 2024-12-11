@@ -51,7 +51,6 @@
 		81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E7B2CB34E26005BE180 /* FirebaseManager.swift */; };
 		81447E7F2CB356BD005BE180 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 81447E7E2CB356BD005BE180 /* SDWebImageSwiftUI */; };
 		81447E822CB42371005BE180 /* ChatUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E812CB42371005BE180 /* ChatUser.swift */; };
-		81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */; };
 		8148DC892CFFADD800D490A6 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC882CFFADD800D490A6 /* ChatMessage.swift */; };
 		8148DC8B2CFFAE0200D490A6 /* ChatLogViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */; };
 		8148DC8D2CFFAE6700D490A6 /* ChatLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC8C2CFFAE6700D490A6 /* ChatLogView.swift */; };
@@ -129,7 +128,6 @@
 		81447E602CB31F14005BE180 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		81447E7B2CB34E26005BE180 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
 		81447E812CB42371005BE180 /* ChatUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatUser.swift; sourceTree = "<group>"; };
-		81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForgotPasswordView.swift; sourceTree = "<group>"; };
 		8148DC882CFFADD800D490A6 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
 		8148DC8A2CFFAE0200D490A6 /* ChatLogViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogViewModel.swift; sourceTree = "<group>"; };
 		8148DC8C2CFFAE6700D490A6 /* ChatLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatLogView.swift; sourceTree = "<group>"; };
@@ -306,7 +304,6 @@
 				B01523472CC82ED50012FC49 /* EditView.swift */,
 				2C132B7C2CC22A700087408A /* ContentView.swift */,
 				B0F8B6AD2CC8961500E220B6 /* ChangePasswordView.swift */,
-				81447E8B2CB49CFE005BE180 /* ForgotPasswordView.swift */,
 				684A510C2CE1D0D500383B08 /* IndividualPostView.swift */,
 				68A04D752CCA0CFD00BCA36E /* AddPostView.swift */,
 			);
@@ -477,7 +474,6 @@
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				B0F0DEAE2D07B9FC00303B38 /* ProfileSettingsViewModel.swift in Sources */,
 				8148DC892CFFADD800D490A6 /* ChatMessage.swift in Sources */,
-				81447E8C2CB49CFF005BE180 /* ForgotPasswordView.swift in Sources */,
 				8148DC8D2CFFAE6700D490A6 /* ChatLogView.swift in Sources */,
 				2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */,
 				811CE2912D00EC4700DCC599 /* SuggestionPageView.swift in Sources */,

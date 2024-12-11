@@ -27,96 +27,98 @@ struct PixabayImagePickerView: View {
     var body: some View {
         NavigationView {
             VStack {
-                // Search bar for querying images
-                searchBar
+               
+                searchBar  // Displays the search bar UI for user input
                 
                 // Show a loading indicator if images are being fetched
                 if viewModel.isLoading {
-                    ProgressView("Loading...")
-                        .padding()
+                    ProgressView("Loading...")  // A loading spinner displayed during image fetch
+                        .padding()  // Adds padding around the progress view
                 }
                 // Show a message if no images are found
                 else if viewModel.images.isEmpty {
-                    Text("No images fteound.")
-                        .foregroundColor(.gray)
-                        .padding()
-                    Spacer()
+                    Text("No images found.")  // Message displayed when no images are available
+                        .foregroundColor(.gray) // Sets the text color to gray
+                        .padding() // Adds padding around the text
+                    Spacer() // Pushes content upwards, creating space below the message
                 }
                 // Display the fetched images in a grid format
                 else {
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) {
-                            ForEach(viewModel.images) { image in
-                                Button(action: {
-                                    imageTapped(image)
+                    ScrollView { // A scrollable view to allow vertical scrolling of images
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) { // A grid layout with adaptive column sizes, minimum width of 100, and 10 points of spacing
+                            ForEach(viewModel.images) { image in  // Iterates through the fetched images
+                                Button(action: { // Action for when an image is tapped
+                                    imageTapped(image) // Calls the imageTapped function with the tapped image
                                 }) {
-                                    ZStack {
+                                    ZStack { // A stack that layers its children on top of each other
                                         // Display image preview
-                                        if let urlString = image.previewURL, let url = URL(string: urlString) {
-                                            WebImage(url: url)
-                                                .resizable()
-                                                .scaledToFill()
-                                                .frame(width: 100, height: 100)
-                                                .clipped()
-                                                .cornerRadius(8)
+                                        if let urlString = image.previewURL, let url = URL(string: urlString) { // Checks if preview URL exists and is valid
+                                            WebImage(url: url) // Displays the image from the URL
+                                                .resizable()  // Makes the image resizable
+                                                .scaledToFill() // Scales the image to fill the frame, potentially cropping
+                                                .frame(width: 100, height: 100) // Sets the image frame to 100x100
+                                                .clipped()   // Clips the image to ensure it fits the frame
+                                                .cornerRadius(8) // Rounds the corners of the image
                                                 .overlay(
+                                                    // Adds an overlay for additional UI effects
                                                     // Highlight selected images with a blue border
-                                                    RoundedRectangle(cornerRadius: 8)
-                                                        .stroke(viewModel.selectedImages.contains(where: { $0.id == image.id }) ? Color.blue : Color.clear, lineWidth: 4)
+                                                    RoundedRectangle(cornerRadius: 8) // Creates a rounded rectangle overlay
+                                                        .stroke(viewModel.selectedImages.contains(where: { $0.id == image.id }) ? Color.blue : Color.clear, lineWidth: 4) // Applies a blue border if the image is selected, otherwise clear
                                                 )
-                                                .opacity(viewModel.selectedImages.contains(where: { $0.id == image.id }) ? 0.7 : 1.0)
+                                                .opacity(viewModel.selectedImages.contains(where: { $0.id == image.id }) ? 0.7 : 1.0) // Adjusts opacity for selected images, making them semi-transparent (0.7) when selected, or fully opaque (1.0) when not selected
                                                 .overlay(
+                                                    // Adds an overlay for selected images
                                                     // Add a checkmark overlay for selected images
-                                                    viewModel.selectedImages.contains(where: { $0.id == image.id }) ?
-                                                        Image(systemName: "checkmark.circle.fill")
-                                                            .foregroundColor(.blue)
-                                                            .font(.system(size: 24))
-                                                            .padding(4)
-                                                        : nil,
-                                                    alignment: .topTrailing
+                                                    viewModel.selectedImages.contains(where: { $0.id == image.id }) ?  // Checks if the image is selected by matching its ID
+                                                        Image(systemName: "checkmark.circle.fill") // Displays a checkmark circle icon
+                                                            .foregroundColor(.blue)  // Sets the checkmark color to blue
+                                                            .font(.system(size: 24)) // Adjusts the font size of the checkmark icon
+                                                            .padding(4) // Adds padding around the checkmark
+                                                        : nil,  // If the image is not selected, no overlay is applied
+                                                    alignment: .topTrailing // Positions the checkmark in the top-right corner
                                                 )
                                         }
                                     }
                                 }
                             }
                         }
-                        .padding()
+                        .padding() // Adds padding around the entire VStack, ensuring elements don't touch the edges of the screen
                     }
                 }
             }
             // Navigation bar configuration
-            .navigationBarTitle("Select Images", displayMode: .inline)
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
+            .navigationBarTitle("Select Images", displayMode: .inline)  // Sets the title of the navigation bar to "Select Images" with an inline display style
+            .navigationBarItems( // Configures the items in the navigation bar
+                leading: Button("Cancel") {  // Adds a "Cancel" button on the left side
+                    presentationMode.wrappedValue.dismiss()  // Dismisses the current view when "Cancel" is pressed
                 },
-                trailing: allowsMultipleSelection ? Button("Add") {
+                trailing: allowsMultipleSelection ? Button("Add") { // Adds an "Add" button on the right side only if multiple selection is allowed
                     // Pass the selected images to the parent view
-                    onImagesSelected(viewModel.selectedImages)
-                    presentationMode.wrappedValue.dismiss()
+                    onImagesSelected(viewModel.selectedImages)  // Sends the selected images to the parent view when "Add" is pressed
+                    presentationMode.wrappedValue.dismiss() // Dismisses the current view after selecting images
                 }
-                .disabled(viewModel.selectedImages.isEmpty)
-                : nil
+                .disabled(viewModel.selectedImages.isEmpty)  // Disables the "Add" button if no images are selected
+                : nil // If multiple selection is not allowed, the "Add" button is not shown
             )
         }
         // Fetch popular images when the view appears
         .onAppear {
-            viewModel.fetchImages(query: "popular")
+            viewModel.fetchImages(query: "popular") // Fetches popular images from the view model when the view first appears
         }
     }
 
     // Search bar view for querying images
     private var searchBar: some View {
-        HStack {
-            TextField("Search images...", text: $viewModel.searchQuery, onCommit: {
+        HStack {  // Horizontal stack to arrange the search field and progress indicator side by side
+            TextField("Search images...", text: $viewModel.searchQuery, onCommit: {  // TextField for entering the search query
                 // Fetch images based on the search query
-                viewModel.fetchImages(query: viewModel.searchQuery)
+                viewModel.fetchImages(query: viewModel.searchQuery) // Calls the view model's fetchImages function when the user presses 'Return'
             })
-            .textFieldStyle(RoundedBorderTextFieldStyle())
-            .padding(.horizontal)
-            if viewModel.isLoading {
-                ProgressView()
-                    .padding(.trailing)
+            .textFieldStyle(RoundedBorderTextFieldStyle()) // Applies a rounded border style to the text field
+            .padding(.horizontal) // Adds horizontal padding around the text field for spacing
+            if viewModel.isLoading {  // Conditionally shows a progress indicator when images are being fetched
+                ProgressView() // Displays a spinning progress indicator
+                    .padding(.trailing) // Adds trailing padding to ensure the indicator doesn't touch the edge of the screen
             }
         }
     }
@@ -124,13 +126,13 @@ struct PixabayImagePickerView: View {
     // Handles the image tap action
     // - Parameter image: The image that was tapped
     private func imageTapped(_ image: PixabayImage) {
-        if allowsMultipleSelection {
+        if allowsMultipleSelection {  // Checks if multiple image selection is allowed
             // Toggle selection for multiple image mode
-            viewModel.toggleSelection(for: image)
+            viewModel.toggleSelection(for: image)  // Calls the toggleSelection function on the view model to toggle the image's selection status
         } else {
             // Immediately select the image and dismiss the view
-            onImagesSelected([image])
-            presentationMode.wrappedValue.dismiss()
+            onImagesSelected([image])  // Passes the selected image to the parent view through the onImagesSelected callback
+            presentationMode.wrappedValue.dismiss() // Dismisses the current view after selecting the image
         }
     }
 }
