@@ -69,6 +69,7 @@
 		8148DCCB2D00A63B00D490A6 /* MainMessagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */; };
 		8148DCCD2D00A66200D490A6 /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */; };
 		8177CD9F2D00D2E70043BC92 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */; };
+		819189042D0B9E13005E59C5 /* HomeViewModel .swift in Sources */ = {isa = PBXBuildFile; fileRef = 819189032D0B9E13005E59C5 /* HomeViewModel .swift */; };
 		B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523452CC814060012FC49 /* ProfileSettingsView.swift */; };
 		B01523482CC82ED90012FC49 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523472CC82ED50012FC49 /* EditView.swift */; };
 		B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */; };
@@ -148,6 +149,7 @@
 		8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesViewModel.swift; sourceTree = "<group>"; };
 		8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
 		8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
+		819189032D0B9E13005E59C5 /* HomeViewModel .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeViewModel .swift"; sourceTree = "<group>"; };
 		B01523452CC814060012FC49 /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		B01523472CC82ED50012FC49 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicView.swift; sourceTree = "<group>"; };
@@ -319,6 +321,7 @@
 			children = (
 				2C05EDC52D0B6501003183CA /* AddPostViewModel.swift */,
 				2C05EDC62D0B6501003183CA /* IndividualPostViewModel.swift */,
+				819189032D0B9E13005E59C5 /* HomeViewModel .swift */,
 				B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */,
 				B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */,
 				B0F0DEA72D06A84600303B38 /* NotificationViewModel.swift */,
@@ -492,6 +495,7 @@
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				811CE2972D00FA5200DCC599 /* WeatherViewModel.swift in Sources */,
 				2CAC879C2D069DB60065B16D /* SuggestProfilePicViewModel.swift in Sources */,
+				819189042D0B9E13005E59C5 /* HomeViewModel .swift in Sources */,
 				B0F0DEAA2D06AAD600303B38 /* Notification.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				8148DC912CFFAF6A00D490A6 /* SearchUserViewModel.swift in Sources */,
