@@ -8,11 +8,11 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct PostView: View {
-    @StateObject private var viewModel: PostViewModel
+struct IndividualPostView: View {
+    @StateObject private var viewModel: IndividualPostViewModel
 
     init(post: Post, likesCount: Int, liked: Bool) {
-        _viewModel = StateObject(wrappedValue: PostViewModel(post: post, likesCount: likesCount, liked: liked))
+        _viewModel = StateObject(wrappedValue: IndividualPostViewModel(post: post, likesCount: likesCount, liked: liked))
     }
     
     var body: some View {

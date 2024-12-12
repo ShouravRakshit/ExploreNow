@@ -10,7 +10,7 @@ import Firebase
 import FirebaseFirestore
 import MapKit
 
-class PostViewModel: ObservableObject {
+class IndividualPostViewModel: ObservableObject {
 
     @Published var comments: [Comment] = [] // To store the comments for the current post id
     @Published var commentText: String = "" // To add a new comment
