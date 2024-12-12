@@ -445,168 +445,251 @@ class UserManager: ObservableObject {
     }
     
     func sendLikeNotification(likerId: String, post: Post, completion: @escaping (Bool, Error?) -> Void) {
+        // Function to send a "like" notification.
+        // Parameters:
+        // - likerId: ID of the user who liked the post.
+        // - post: The post object that was liked.
+        // - completion: A closure that returns a success status (Bool) and an optional error (Error?).
+            
         // Check if the post belongs to the current user and if the liker is not the post's author
         if post.uid != likerId {
+            // Ensures that a user cannot like their own post, avoiding unnecessary notifications.
+
             // Create a message for the notification
             let message = "liked your post."
             
+            // Sets the notification message to inform the receiver about the "like."
+            // Consider localizing the string for internationalization.
+
             // Create a timestamp for the notification
             let timestamp = Timestamp(date: Date())
             
+            // Captures the current date and time to track when the notification was sent.
+
             // Create a Notification object
             let notification = Notification(
-                receiverId: post.uid,
-                senderId: likerId,
-                message: message,
-                timestamp: timestamp,
-                isRead: false,
-                status: "Like",
-                type: "Like",
-                post_id: post.id
+                receiverId: post.uid,               // ID of the user who will receive the notification (post owner).
+                senderId: likerId,                  // ID of the user who sent the "like" notification.
+                message: message,                   // The content of the notification
+                timestamp: timestamp,               // The time when the notification was created.
+                isRead: false,                      // Indicates that the notification is unread when first created.
+                status: "Like",                     // Specifies the type of action/status associated with the notification.
+                type: "Like",                       // Defines the notification type (e.g., "Like" in this case).
+                post_id: post.id                    // ID of the post that the notification refers to.
             )
             
-            
+            // Save the notification object to Firestore
             saveNotificationToFirestore(notification) { success, error in
                 if success {
                     completion(true, nil)
+                    // If saving is successful, invoke the completion handler with success = true and no error.
                 } else {
                     completion(false, error)
+                    // If saving fails, invoke the completion handler with success = false and provide the error.
                 }
             }
         }
     }
     
     func sendCommentNotification(commenterId: String, post: Post, commentMessage: String, completion: @escaping (Bool, Error?) -> Void) {
+        // Function to send a "comment" notification.
+        // Parameters:
+        // - commenterId: ID of the user who commented on the post.
+        // - post: The post object that was commented on.
+        // - commentMessage: The actual comment content.
+        // - completion: A closure that returns a success status (Bool) and an optional error (Error?).
+
         // Check if the post belongs to the current user and if the commenter is not the post's author
         if post.uid != commenterId {
+            // Ensures that a user cannot send a comment notification to themselves.
+            // Avoids unnecessary or redundant notifications.
+
             // Create a message for the notification
             let message = "commented on your post: \"\(commentMessage)\"."
             
+            // Formats the notification message to include the comment's content for more context.
+            // Further Documentation: Consider truncating the commentMessage if it is too long to prevent overly verbose notifications.
+
             // Create a timestamp for the notification
             let timestamp = Timestamp(date: Date())
             
+            // Captures the current date and time to timestamp the notification.
+            // Useful for sorting or filtering notifications by time.
+
             // Create a Notification object for the comment
             let notification = Notification(
-                receiverId: post.uid,
-                senderId: commenterId,
-                message: message,
-                timestamp: timestamp,
-                isRead: false,
-                status: "Comment",
-                type: "Comment",
-                post_id: post.id
+                receiverId: post.uid,                   // ID of the user who will receive the notification (post owner).
+                senderId: commenterId,                  // ID of the user who sent the comment notification.
+                message: message,                       // The content of the notification, including the comment message.
+                timestamp: timestamp,                   // The time when the notification was created.
+                isRead: false,                          // Indicates that the notification is unread when first created.
+                status: "Comment",                      // Specifies the type of action/status associated with the notification (Comment).
+                type: "Comment",                        // Defines the notification type (e.g., "Comment" in this case).
+                post_id: post.id                        // ID of the post that the notification refers to.
             )
             
             // Save the notification to Firestore
             saveNotificationToFirestore(notification) { success, error in
                 if success {
                     completion(true, nil)
+                    // If saving is successful, invoke the completion handler with success = true and no error.
                 } else {
                     completion(false, error)
+                    // If saving fails, invoke the completion handler with success = false and provide the error.
                 }
             }
         }
     }
     
     func sendCommentLikeNotification(commenterId: String, post: Post, commentMessage: String, completion: @escaping (Bool, Error?) -> Void) {
+        // Function to send a "like on comment" notification.
+        // Parameters:
+        // - commenterId: ID of the user who wrote the comment.
+        // - post: The post object to which the comment belongs.
+        // - commentMessage: The content of the comment that was liked.
+        // - completion: A closure that returns a success status (Bool) and an optional error (Error?).
+
         // Check if the post belongs to the current user and if the commenter is not the post's author
         if post.uid != commenterId {
+            // Ensures that the notification is only sent if the commenter is not the post owner.
+            // Prevents redundant notifications to the post's author if they liked their own comment.
+
             // Create a message for the notification
             let message = "liked your comment: \"\(commentMessage)\"."
             
+            // Formats the notification message to include the comment content for clarity.
+            // Further documentation: Consider truncating `commentMessage` if it exceeds a certain length for better display.
+
             // Create a timestamp for the notification
             let timestamp = Timestamp(date: Date())
             
+            // Captures the current date and time when the notification is created.
+
             // Create a Notification object for the comment
             let notification = Notification(
-                receiverId: commenterId,
-                senderId: currentUser?.uid ?? "",
-                message: message,
-                timestamp: timestamp,
-                isRead: false,
-                status: "Comment",
-                type: "Comment",
-                post_id: post.id
+                receiverId: commenterId,                    // ID of the user who will receive the notification (comment's author).
+                senderId: currentUser?.uid ?? "",           // ID of the user who liked the comment. Defaults to an empty string if `currentUser` is nil.
+                message: message,                           // The content of the notification.
+                timestamp: timestamp,                       // The time when the notification was created.
+                isRead: false,                              // Indicates that the notification is unread when first created.
+                status: "Comment",                          // Specifies the type of action/status associated with the notification (Comment-related).
+                type: "Comment",                            // Defines the notification type (e.g., "Comment" in this case).
+                post_id: post.id                            // ID of the post to which the comment belongs.
             )
             
             // Save the notification to Firestore
             saveNotificationToFirestore(notification) { success, error in
                 if success {
                     completion(true, nil)
+                    // If saving is successful, invoke the completion handler with success = true and no error.
                 } else {
                     completion(false, error)
+                    // If saving fails, invoke the completion handler with success = false and provide the error
                 }
             }
         }
     }
     
     private func saveNotificationToFirestore(_ notification: Notification, completion: @escaping (Bool, Error?) -> Void) {
+        // Function to save a notification object to Firestore.
+        // Parameters:
+        // - notification: The Notification object to be saved.
+        // - completion: A closure that returns a success status (Bool) and an optional error (Error?).
+
         let db = Firestore.firestore()
+        // Initializes a Firestore database instance to interact with the Firestore database.
         let notificationRef = db.collection("notifications").document()
+        // Creates a reference to a new document in the "notifications" collection.
+        // A unique document ID is automatically generated for the notification.
+
+        // Prepare the notification data in a dictionary format for Firestore
         
         let notificationData: [String: Any] = [
-            "receiverId": notification.receiverId,
-            "senderId": notification.senderId,
-            "message": notification.message,
-            "timestamp": notification.timestamp,
-            "status": notification.status,
-            "isRead": notification.isRead,
-            "type"  : notification.type,
-            "post_id": notification.post_id ?? ""
+            "receiverId": notification.receiverId,               // ID of the user who will receive the notification.
+            "senderId": notification.senderId,                   // ID of the user who triggered the notification.
+            "message": notification.message,                     // The notification message content.
+            "timestamp": notification.timestamp,                 // The timestamp when the notification was created.
+            "status": notification.status,                       // The status/type of the notification (e.g., "Like", "Comment").
+            "isRead": notification.isRead,                       // Indicates whether the notification has been read or not.
+            "type"  : notification.type,                         // Specifies the type of notification (e.g., "Like", "Comment").
+            "post_id": notification.post_id ?? ""                // The ID of the related post. Defaults to an empty string if nil.
         ]
         
+        // Save the notification data to Firestore
         notificationRef.setData(notificationData) { error in
+            // Attempts to write the data to the Firestore document.
             if let error = error {
                 completion(false, error)
+                // If an error occurs during the write operation, invoke the completion handler with `false` and the error.
             } else {
                 completion(true, nil)
+                // If the write operation succeeds, invoke the completion handler with `true` and no error.
             }
         }
     }
     
     
     func acceptFriendRequest(requestId: String, receiverId: String, senderId: String) {
+        // Step 1: Get a reference to the Firestore database
         let db = Firestore.firestore()
-        // Step 1: Update the request status to "accepted"
+        // Step 2: Define a reference to the friend request document using the provided requestId
         let requestRef = db.collection("friendRequests").document(requestId)
+        // Step 3: Update the status of the friend request to "accepted"
         requestRef.updateData([
             "status": "accepted"
         ]) { error in
+            // Step 4: Check if there was an error while updating the request status
             if let error = error {
+                // Step 5: Print error message if update fails
                 print("Error updating request status: \(error.localizedDescription)")
                 return
             }
+            // Step 6: Print success message if the update was successful
             print("Friend request accepted successfully!")
 
-            // Step 2: Add sender and receiver to each other's friends list
-            
-            // Add senderId to receiver's friends list (if the document exists, update it; if not, create it)
+            // Step 7: Add sender and receiver to each other's friends list
+
+            // Step 8: Define a reference to the receiver's friends list in Firestore
             let receiverRef = db.collection("friends").document(receiverId)
+            // Step 9: Retrieve the document for the receiver's friends list to check if it exists
             receiverRef.getDocument { document, error in
+                // Step 10: Check for errors in fetching the document
                 if let error = error {
+                    // Step 11: Print error message if fetching fails
                     print("Error checking receiver's friends document: \(error.localizedDescription)")
                     return
                 }
                 
                 if let document = document, document.exists {
-                    // Document exists, update the friends list
+                    // Step 1: Check if the document exists in Firestore
+                    // 'document' is unwrapped, and if it exists, proceed with updating the friends list
+                    // This ensures that you only modify the list if the document is already available
+
+                    // Step 2: If document exists, update the friends list by adding the senderId
                     receiverRef.updateData([
-                        "friends": FieldValue.arrayUnion([senderId])
+                        "friends": FieldValue.arrayUnion([senderId])   // Adds the senderId to the "friends" array
                     ]) { error in
+                        // Step 3: Handle the result of the update operation
                         if let error = error {
+                            // Step 4: Print error message if the update fails
                             print("Error adding sender to receiver's friends list: \(error.localizedDescription)")
                         } else {
+                            // Step 5: Print success message if the sender was successfully added to the friends list
                             print("Sender added to receiver's friends list.")
                         }
                     }
                 } else {
-                    // Document does not exist, create it with senderId as the first friend
+                    // Step 6: If the document does not exist, create a new friends list document with senderId
+                    // In this case, it's the first time the receiver is getting a friend, so we create their friends list with the senderId as the only entry
                     receiverRef.setData([
-                        "friends": [senderId]
+                        "friends": [senderId]   // Initializes the friends array with the senderId
                     ]) { error in
+                        // Step 7: Handle the result of the create operation
                         if let error = error {
+                            // Step 8: Print error message if the document creation fails
                             print("Error creating receiver's friends list: \(error.localizedDescription)")
                         } else {
+                            // Step 9: Print success message if the receiver's friends list was created successfully
                             print("Receiver's friends list created with sender.")
                         }
                     }
@@ -615,21 +698,30 @@ class UserManager: ObservableObject {
 
             // Add receiverId to sender's friends list (same logic as above)
             let senderRef = db.collection("friends").document(senderId)
+            // This line creates a reference to the sender's friends list document in the "friends" collection of Firestore using the senderId as the document identifier.
             senderRef.getDocument { document, error in
+                // This begins an asynchronous call to retrieve the sender's friends list document from Firestore. It returns the document or an error.
                 if let error = error {
                     print("Error checking sender's friends document: \(error.localizedDescription)")
                     return
                 }
+                // If there is an error fetching the document, it prints the error message and exits the function.
+
                 
                 if let document = document, document.exists {
+                    // This block checks if the document exists. If it does, we proceed to update the friends list.
+
                     // Document exists, update the friends list
                     senderRef.updateData([
                         "friends": FieldValue.arrayUnion([receiverId])
                     ]) { error in
+                        // This updates the "friends" field of the sender's document by adding the receiverId using arrayUnion, which ensures the receiverId is added only once.
                         if let error = error {
                             print("Error adding receiver to sender's friends list: \(error.localizedDescription)")
+                            // If there is an error updating the document, an error message is printed.
                         } else {
                             print("Receiver added to sender's friends list.")
+                            // If the update is successful, a success message is printed.
                         }
                     }
                 } else {
@@ -637,10 +729,13 @@ class UserManager: ObservableObject {
                     senderRef.setData([
                         "friends": [receiverId]
                     ]) { error in
+                        // If the sender's friends list document does not exist, this creates a new document and initializes the "friends" array with the receiverId.
                         if let error = error {
                             print("Error creating sender's friends list: \(error.localizedDescription)")
+                            // If there is an error creating the document, an error message is printed.
                         } else {
                             print("Sender's friends list created with receiver.")
+                            // If the document is created successfully, a success message is printed.
                         }
                     }
                 }
@@ -650,10 +745,17 @@ class UserManager: ObservableObject {
     
     //The user who sent the friend request should be notified it was accepted
     func sendNotificationToAcceptedUser(receiverId: String, senderId: String, completion: @escaping (Bool, Error?) -> Void) {
+        // This function is responsible for sending a notification to the user who sent the friend request.
+        // It uses the receiverId and senderId to identify the users involved.
         sendRequestAcceptedNotification(to: receiverId, senderId: senderId) { success, error in
+            // Calls the function `sendRequestAcceptedNotification` which will send the actual notification.
+            // It passes the receiverId and senderId to that function, and once the notification is sent, it receives a
+            // `success` flag and an optional `error` that indicates whether the operation was successful or failed.
             if success {
+                // If the notification was successfully sent, it calls the completion handler with a success result (true) and no error.
                 completion(true, nil)
             } else {
+                // If there was an error sending the notification, it calls the completion handler with a failure result (false) and the error.
                 completion(false, error)
             }
         }
@@ -661,33 +763,50 @@ class UserManager: ObservableObject {
     
     // Helper function to update the notification as read in Firestore
     func updateNotificationAccepted(_ notificationUser: NotificationUser) {
+        // This function updates the notification to mark it as read and updates its status in Firestore.
         guard let currentUser = currentUser else { return }
-
+        // Checks if the currentUser is available. If not, it exits the function early to prevent errors.
         let db = FirebaseManager.shared.firestore
+        // Creates a reference to the Firestore database from a shared FirebaseManager instance.
+
         let notificationsRef = db.collection("notifications")
         
-        // Find the notification by its timestamp and receiverId and order by timestamp descending
+        // Creates a reference to the "notifications" collection in Firestore where the notification data is stored.
+
+        // Find the notification by its timestamp and receiverId, and order by timestamp descending
         notificationsRef
             .whereField("receiverId", isEqualTo: currentUser.uid)
+        // Filters the notifications collection to find notifications where the receiverId matches the current user's UID.
+
             .order(by: "timestamp", descending: true)  // Order by timestamp in descending order
+        // Orders the notifications by timestamp in descending order to get the latest notifications first.
             .whereField("timestamp", isEqualTo: notificationUser.notification.timestamp)
+        // Filters the notifications collection to find the notification with the same timestamp as the one in the notificationUser parameter.
             .getDocuments { snapshot, error in
+                // Retrieves the documents that match the query asynchronously.
                 if let error = error {
                     print("Failed to update notification status: \(error.localizedDescription)")
+                    // If there’s an error fetching the documents, print an error message and return to exit the function.
                     return
                 }
                 
                 // If the notification exists, update the isRead field
                 if let document = snapshot?.documents.first {
+                    // Checks if any documents were found and takes the first document in the snapshot.
                     document.reference.updateData([
                         "status": "accepted",
+                        // Updates the "status" field of the document to "accepted".
                         "message": "You and $NAME are now friends.",
+                        // Updates the "message" field to indicate that the users are now friends. `$NAME` should be dynamically replaced with the friend’s name.
                         "timestamp": Timestamp()
+                        // Updates the "timestamp" field to the current time (Firestore Timestamp) to reflect when the status was updated.
                     ]) { error in
                         if let error = error {
                             print("Error updating notification: \(error.localizedDescription)")
+                            // If there’s an error updating the document, print the error message.
                         } else {
                             print("Notification marked as read")
+                            // If the document update is successful, print a success message indicating the notification has been marked as read.
                         }
                     }
                 }
@@ -696,34 +815,54 @@ class UserManager: ObservableObject {
     
     // Helper function to update the notification as read in Firestore
     func updateNotificationAccepted(senderId: String) {
-        //change "__ sent you a friend request" to "you and __ are now friends"
-        guard let currentUser = currentUser else { return }
+        // This function updates the status of a notification when a friend request is accepted.
+        // It changes the message to indicate that the two users are now friends and marks the notification as read.
 
+        guard let currentUser = currentUser else { return }
+        // Checks if the currentUser is available. If the currentUser is nil, the function exits early.
         let db = FirebaseManager.shared.firestore
+        // Gets a reference to the Firestore instance from a singleton FirebaseManager class.
         let notificationsRef = db.collection("notifications")
+        // Creates a reference to the "notifications" collection where the notifications are stored in Firestore.
+
+        // Find the notification by its senderId, receiverId, and type (filter by "friendRequest" type)
         
-        // Find the notification by its receiverId and type (filter by "friendRequest" type)
         notificationsRef
             .whereField("senderId", isEqualTo: senderId)
-            .whereField("receiverId", isEqualTo: currentUser.uid) // Filter by receiverId
-            .whereField("type", isEqualTo: "friendRequest")  // Filter by type == "friendRequest"
+        // Filters the notifications to find those sent by the specified senderId.
+
+            .whereField("receiverId", isEqualTo: currentUser.uid)
+        // Filters the notifications to find those received by the current user.
+
+            .whereField("type", isEqualTo: "friendRequest")
+        // Filters the notifications to only consider those with a type of "friendRequest".
             .getDocuments { snapshot, error in
+                // Executes the query to get the matching notifications asynchronously.
                 if let error = error {
                     print("Failed to update notification status: \(error.localizedDescription)")
+                    // If there’s an error while fetching the documents, prints an error message and returns from the function
                     return
                 }
                 
-                // If the notification exists, update the isRead field
+                // If the notification exists, update the status and message
                 if let document = snapshot?.documents.first {
+                    // If a matching notification document is found, take the first document from the snapshot.
                     document.reference.updateData([
                         "status": "accepted",
+                        // Updates the "status" field of the document to "accepted", indicating the friend request was accepted.
                         "message": "You and $NAME are now friends.", // Replace $NAME with userName or other field
+                        // Updates the "message" field with a message indicating the users are now friends. $NAME is a placeholder
+                        // that should be dynamically replaced with the name of the user.
+
                         "timestamp": Timestamp() // Optionally update timestamp
+                        // Optionally updates the "timestamp" field to the current timestamp (indicating when the status was updated).
                     ]) { error in
                         if let error = error {
                             print("Error updating notification: \(error.localizedDescription)")
+                            // If there’s an error while updating the document, print an error message.
                         } else {
                             print("Notification marked as read")
+                            // If the document update is successful, print a success message.
                         }
                     }
                 }
@@ -761,30 +900,44 @@ class UserManager: ObservableObject {
     
     // Helper function to update the notification as read in Firestore
     private func updateNotificationStatus(_ notification: Notification) {
+        // This function updates a notification’s "isRead" status in Firestore when it's marked as read.
+        // It searches for the notification based on its timestamp and receiverId, then updates its status.
         guard let currentUser = currentUser else { return }
+        // Checks if the currentUser is available. If it's nil, the function returns early to prevent further execution.
         
         let db = FirebaseManager.shared.firestore
+        // Accesses the Firestore instance via the shared FirebaseManager singleton.
         let notificationsRef = db.collection("notifications")
         
+        // Creates a reference to the "notifications" collection where notification documents are stored in Firestore.
+
         // Find the notification by its timestamp and receiverId
         notificationsRef
             .whereField("timestamp", isEqualTo: notification.timestamp)
+        // Filters the notifications to match the provided `timestamp` field of the notification.
             .whereField("receiverId", isEqualTo: currentUser.uid)
+        // Filters the notifications to find those where the `receiverId` matches the current user's ID.
             .getDocuments { snapshot, error in
+                // Executes the query to retrieve matching documents asynchronously.
                 if let error = error {
                     print("Failed to update notification status: \(error.localizedDescription)")
+                    // If there’s an error while fetching the documents, prints an error message and returns early.
                     return
                 }
                 
                 // If the notification exists, update the isRead field
                 if let document = snapshot?.documents.first {
+                    // If a matching document is found in the snapshot, get the first document.
                     document.reference.updateData([
                         "isRead": true
                     ]) { error in
+                        // Updates the "isRead" field to true, marking the notification as read.
                         if let error = error {
                             print("Error updating notification: \(error.localizedDescription)")
+                            // If there’s an error while updating the document, prints an error message.
                         } else {
                             print("Notification marked as read")
+                            // If the update is successful, prints a success message.
                         }
                     }
                 }
@@ -792,70 +945,113 @@ class UserManager: ObservableObject {
     }
     
     func unblockUser(userId: String) {
+        // This function unblocks a user by removing them from the current user's block list and the blocked user's "blockedBy" list.
         guard let currentUser = currentUser else { return }
-
+        // Checks if there is a valid `currentUser` (the user attempting to unblock). If there isn't, the function exits early.
         let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUser.uid)
+        // Creates a reference to the "blocks" collection in Firestore for the current user. This points to the user's block list by using their unique `uid`.
         let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+        // Creates a reference to the "blocks" collection in Firestore for the blocked user, using their `userId`.
 
         // Remove the blocked user from the current user's blocks list
+        
         currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayRemove([userId])], merge: true) { error in
+            // Uses `setData` to modify the current user's block list by removing the `userId` from the "blockedUserIds" array.
+            // `merge: true` ensures that other data in the document remains intact while updating the "blockedUserIds" field.
             if let error = error {
+                // If an error occurs during the operation, this block of code handles it by printing the error message.
                 print("Error unblocking user: \(error)")
             } else {
+                // If no error occurs, this block executes, indicating the unblock was successful.
                 print("User unblocked successfully.")
-                //self.blocked_users.removeAll { $0.uid == userId }
+                // Optionally, the blocked user could be removed from an in-memory list (e.g., `blocked_users`) using:
+                // self.blocked_users.removeAll { $0.uid == userId }
+
                 
             }
         }
 
         // Remove the current user from the blocked user's 'blockedBy' list
         blockedUserRef.setData(["blockedByIds": FieldValue.arrayRemove([currentUser.uid])], merge: true) { error in
+            // Similar to the previous operation, this removes the current user's `uid` from the "blockedByIds" array of the blocked user's document.
+            // It ensures that the "blockedByIds" field of the blocked user is updated accordingly.
+
             if let error = error {
+                // If an error occurs during this operation, the error is printed.
                 print("Error removing blockedBy for user: \(error)")
             }
         }
     }
     
     func blockUser(userId: String) {
+        // This function blocks a user by adding the user's ID to the current user's block list and adding the current user's ID to the blocked user's "blockedBy" list.
         guard let currentUser = currentUser else { return }
+        // Checks if there is a valid `currentUser` (the user attempting to block). If not, the function exits early.
 
         let currentUserBlocksRef = FirebaseManager.shared.firestore.collection("blocks").document(currentUser.uid)
+        // Creates a reference to the current user's block list in Firestore by using their unique `uid`. The document corresponds to the current user.
         let blockedUserRef = FirebaseManager.shared.firestore.collection("blocks").document(userId)
+        // Creates a reference to the blocked user's block list in Firestore by using the provided `userId`. This points to the document for the blocked user.
 
         // Add the blocked user to the current user's blocks list
+
         currentUserBlocksRef.setData(["blockedUserIds": FieldValue.arrayUnion([userId])], merge: true) { error in
+            // Uses `setData` to modify the current user's block list by adding the `userId` to the "blockedUserIds" array using `FieldValue.arrayUnion`,
+            // which ensures that the `userId` is added only once, even if it appears multiple times.
+            // `merge: true` ensures that other data in the document remains intact while updating the "blockedUserIds" field.
             if let error = error {
+                // If an error occurs during this operation, this block of code handles it by printing the error message.
                 print("Error blocking user: \(error)")
             } else {
+                // If no error occurs, this block executes, indicating the block was successful.
                 print("User blocked successfully.")
             }
         }
 
         // Add the current user to the blocked user's 'blockedBy' list
         blockedUserRef.setData(["blockedByIds": FieldValue.arrayUnion([currentUser.uid])], merge: true) { error in
+            // Similar to the previous operation, this line adds the current user's `uid` to the "blockedByIds" array of the blocked user's document.
+            // It uses `FieldValue.arrayUnion` to ensure that the current user is added only once.
+            // `merge: true` ensures that only the "blockedByIds" field is modified without affecting other fields in the document.
             if let error = error {
+                // If an error occurs during this operation, the error is printed.
                 print("Error adding blockedBy for user: \(error)")
             }
         }
     }
     
     func deleteFriendRequest(user_uid: String) {
+        // This function deletes a friend request between the current user and the user specified by `user_uid`.
         guard let currentUser = currentUser else { return }
+        // Checks if there is a valid `currentUser` object (the user attempting to delete the friend request). If not, the function exits early.
         
         let db         = FirebaseManager.shared.firestore
+        // Creates a reference to the Firestore instance, using a shared instance of the `FirebaseManager` class to access the Firestore database.
         let senderId   = currentUser.uid
+        // The `senderId` is the UID of the current user, which will be used to identify who sent the friend request.
         let receiverId = user_uid
+        // The `receiverId` is the `user_uid` passed to the function, representing the user who received the friend request.
+
         let requestId  = "\(senderId)_\(receiverId)" // Construct the request ID
+
+        // Constructs a unique request ID by combining the sender's and receiver's UIDs into a single string, separated by an underscore. This ensures that the request ID is unique to the two users involved.
 
         // Reference to the friend request document
         let requestRef = db.collection("friendRequests").document(requestId)
 
+        // Creates a reference to the specific friend request document in the Firestore "friendRequests" collection using the `requestId`.
+
         // Delete the friend request
         requestRef.delete { error in
+            // Deletes the document at the `requestRef` reference, which corresponds to the specific friend request.
             if let error = error {
+                // If an error occurs during the deletion, this block is executed.
                 print("Error deleting friend request: \(error.localizedDescription)")
+                // Prints the error message to the console for debugging purposes
             } else {
+                // If the deletion is successful, this block is executed.
                 print("Friend request deleted successfully!")
+                // Prints a success message to the console.
                 
             }
         }
@@ -863,50 +1059,86 @@ class UserManager: ObservableObject {
     
     // Remove a friend from both users' friend lists
     func removeFriend(currentUserUID: String, _ friend_uid: String) {
+        // This function removes a friend from both the current user's and the friend's friend list in Firestore.
         let db = Firestore.firestore()
+        // Creates a reference to the Firestore instance to interact with the database.
         let currentUserRef = db.collection("friends").document(currentUserUID)
+        // Creates a reference to the current user's document in the "friends" collection using the current user's UID.
         let friendUserRef = db.collection("friends").document(friend_uid)
-        
+        // Creates a reference to the friend's document in the "friends" collection using the friend's UID.
+
         // Fetch the current user's friend list and the friend's list
+        
         db.runTransaction { (transaction, errorPointer) -> Any? in
+            // Runs a Firestore transaction to atomically fetch and modify both users' friend lists to ensure consistency.
             do {
                 // Fetch current user's friend list
                 let currentUserDoc = try transaction.getDocument(currentUserRef)
+                // Retrieves the current user's document from Firestore within the transaction.
+                
                 guard let currentUserFriends = currentUserDoc.data()?["friends"] as? [String] else {
-                    return nil
-                }
+                              // Attempts to retrieve the current user's friend list, expected to be an array of strings (friend IDs).
+                              return nil
+                          }
+                          
                 
                 // Fetch the friend's friend list
                 let friendUserDoc = try transaction.getDocument(friendUserRef)
+                // Retrieves the friend's document from Firestore within the transaction.
                 guard let friendUserFriends = friendUserDoc.data()?["friends"] as? [String] else {
+                    // Attempts to retrieve the friend's friend list, expected to be an array of strings (friend IDs).
                     return nil
                 }
                 
                 // Remove friend from both lists
                 var updatedCurrentUserFriends = currentUserFriends
+                // Creates a mutable copy of the current user's friend list for modification.
                 var updatedFriendUserFriends = friendUserFriends
-                
+                // Creates a mutable copy of the friend's friend list for modification.
                 // Remove each other from the respective lists
                 updatedCurrentUserFriends.removeAll { $0 == friend_uid }
+                // Removes the friend's UID from the current user's friend list if it exists.
                 updatedFriendUserFriends.removeAll { $0 == currentUserUID }
-                
-                // Update the database with the new lists
+                // Removes the current user's UID from the friend's friend list if it exists.
+                            
+                // Commit the changes
                 transaction.updateData(["friends": updatedCurrentUserFriends], forDocument: currentUserRef)
+                // Updates the current user's friend list with the modified list that no longer includes the friend.
                 transaction.updateData(["friends": updatedFriendUserFriends], forDocument: friendUserRef)
+                // Updates the friend's friend list with the modified list that no longer includes the current user.
                 
             } catch {
+                // If any error occurs during the transaction (e.g., failure to retrieve or update the documents), handle it here.
                 print("Error during transaction: \(error)")
+                // Logs the error message to the console, providing information about the failure that occurred during the transaction.
                 errorPointer?.pointee = error as NSError
+                // Assigns the caught error (converted to NSError) to the error pointer, which is used for handling errors in the transaction block.
+                // This makes the error available outside of the catch block, if needed.
+
                 return nil
+                // Exits the transaction early and returns nil if an error occurred, preventing further execution of the transaction block.
+                // The return value of nil indicates that the transaction could not complete successfully.
             }
             return nil
+            // The return statement is executed if the transaction completes successfully (i.e., there is no error), but the function still returns nil.
+            // further documentation: It may be redundant as the earlier return statement in the catch block already handles early exits.
+
         } completion: { (result, error) in
+            // Completion handler for the transaction, executed after the transaction is finished.
+            // This block is called whether the transaction succeeds or fails, and it receives two parameters:
+            // `result` (the result of the transaction) and `error` (any error that occurred during the transaction).
             if let error = error {
-               // self.error = error
+                // If an error occurs in the transaction, this block is executed.
+                // Checks if an error is passed in the completion handler (indicating that the transaction failed).
+
                 return
+                // Exits the completion block early if an error occurred, effectively stopping further processing in case of failure.
+                // The `return` here is used to skip over any success-related code.
             }
             
             print("Successfully removed friend!")
+            // If no error occurs in the transaction, this line prints a success message to the console,
+            // indicating that the operation (e.g., removing a friend) was successful.
 
         }
     }
