@@ -29,7 +29,7 @@ struct PostCard: View {
 
 
     var body: some View {
-        NavigationLink(destination: PostView(post: post, likesCount: likesCount, liked: liked)) {
+        NavigationLink(destination: IndividualPostView(post: post, likesCount: likesCount, liked: liked)) {
             VStack(alignment: .leading, spacing: 0) {
                 // Header Section
                 HStack(spacing: 12) {

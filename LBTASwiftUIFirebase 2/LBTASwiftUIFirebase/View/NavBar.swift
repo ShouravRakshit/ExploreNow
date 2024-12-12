@@ -72,7 +72,7 @@ struct NavBar: View {
                 }
                 .environmentObject(userManager) // Passes the userManager as an environment object, making it accessible to this view and its children.
                 .toolbarBackground(.white, for: .tabBar) // Applies a white background to the tab bar when this tab is selected.
-                .toolbarBackground(.visible, for: .tabBar) // Ensures the tab bar remains visible when the AddPostView is displayed.
+                .toolbarBackground(.visible, for: .tabBar) // Ensures the tab bar remains visible when the IndividualPostView is displayed.
 
             MainMessagesView() // This view is used to display the main message threads or conversations in the app.
                 .tabItem {
