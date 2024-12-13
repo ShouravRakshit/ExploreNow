@@ -9,7 +9,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 // SwiftUI view representing the detailed view of an individual post
-struct IndividualPostView: View 
+struct IndividualPostView: View {
     // State object to manage the view model's state
     @StateObject private var viewModel: IndividualPostViewModel
 

@@ -36,6 +36,7 @@
 		682B8D1F2CCEFF0E00E56AB0 /* LocationPostsPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */; };
 		684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510A2CE1D0AC00383B08 /* Comment.swift */; };
 		684A510D2CE1D0D500383B08 /* IndividualPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510C2CE1D0D500383B08 /* IndividualPostView.swift */; };
+		6885725E2D0BF9B500775176 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6885725D2D0BF9B500775176 /* HomeViewModel.swift */; };
 		68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68A04D752CCA0CFD00BCA36E /* AddPostView.swift */; };
 		68D3B3982CCA37A200166069 /* AddPhotos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68D3B3972CCA37A200166069 /* AddPhotos.swift */; };
 		811CE28B2D00E04000DCC599 /* CityImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811CE28A2D00E04000DCC599 /* CityImage.swift */; };
@@ -69,7 +70,6 @@
 		8148DCCB2D00A63B00D490A6 /* MainMessagesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */; };
 		8148DCCD2D00A66200D490A6 /* MainMessagesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */; };
 		8177CD9F2D00D2E70043BC92 /* WeatherModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */; };
-		819189042D0B9E13005E59C5 /* HomeViewModel .swift in Sources */ = {isa = PBXBuildFile; fileRef = 819189032D0B9E13005E59C5 /* HomeViewModel .swift */; };
 		B01523462CC814060012FC49 /* ProfileSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523452CC814060012FC49 /* ProfileSettingsView.swift */; };
 		B01523482CC82ED90012FC49 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01523472CC82ED50012FC49 /* EditView.swift */; };
 		B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */; };
@@ -119,6 +119,7 @@
 		682B8D1E2CCEFF0E00E56AB0 /* LocationPostsPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPostsPage.swift; sourceTree = "<group>"; };
 		684A510A2CE1D0AC00383B08 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		684A510C2CE1D0D500383B08 /* IndividualPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndividualPostView.swift; sourceTree = "<group>"; };
+		6885725D2D0BF9B500775176 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		68A04D752CCA0CFD00BCA36E /* AddPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPostView.swift; sourceTree = "<group>"; };
 		68D3B3972CCA37A200166069 /* AddPhotos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPhotos.swift; sourceTree = "<group>"; };
 		811CE28A2D00E04000DCC599 /* CityImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CityImage.swift; sourceTree = "<group>"; };
@@ -149,7 +150,6 @@
 		8148DCCA2D00A63B00D490A6 /* MainMessagesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesViewModel.swift; sourceTree = "<group>"; };
 		8148DCCC2D00A66200D490A6 /* MainMessagesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMessagesView.swift; sourceTree = "<group>"; };
 		8177CD9E2D00D2E60043BC92 /* WeatherModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherModels.swift; sourceTree = "<group>"; };
-		819189032D0B9E13005E59C5 /* HomeViewModel .swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "HomeViewModel .swift"; sourceTree = "<group>"; };
 		B01523452CC814060012FC49 /* ProfileSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsView.swift; sourceTree = "<group>"; };
 		B01523472CC82ED50012FC49 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		B01DE7102CC1585000C158DD /* SuggestProfilePicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicView.swift; sourceTree = "<group>"; };
@@ -319,9 +319,9 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				6885725D2D0BF9B500775176 /* HomeViewModel.swift */,
 				2C05EDC52D0B6501003183CA /* AddPostViewModel.swift */,
 				2C05EDC62D0B6501003183CA /* IndividualPostViewModel.swift */,
-				819189032D0B9E13005E59C5 /* HomeViewModel .swift */,
 				B0F0DEAF2D07C22900303B38 /* ProfileViewModel.swift */,
 				B0F0DEAD2D07B9F600303B38 /* ProfileSettingsViewModel.swift */,
 				B0F0DEA72D06A84600303B38 /* NotificationViewModel.swift */,
@@ -448,6 +448,7 @@
 				101D815E2CC6A1B70075C2AD /* LocationInfoView.swift in Sources */,
 				8148DC8F2CFFAE9500D490A6 /* MessageView.swift in Sources */,
 				B09365862CDC231F00126005 /* NotificationView.swift in Sources */,
+				6885725E2D0BF9B500775176 /* HomeViewModel.swift in Sources */,
 				B0F0DEAC2D06AB8F00303B38 /* User.swift in Sources */,
 				81447E7C2CB34E26005BE180 /* FirebaseManager.swift in Sources */,
 				10B0F34E2CC4BEFC003FB476 /* ClusterAnnotationView.swift in Sources */,
@@ -495,7 +496,6 @@
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				811CE2972D00FA5200DCC599 /* WeatherViewModel.swift in Sources */,
 				2CAC879C2D069DB60065B16D /* SuggestProfilePicViewModel.swift in Sources */,
-				819189042D0B9E13005E59C5 /* HomeViewModel .swift in Sources */,
 				B0F0DEAA2D06AAD600303B38 /* Notification.swift in Sources */,
 				684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */,
 				8148DC912CFFAF6A00D490A6 /* SearchUserViewModel.swift in Sources */,
