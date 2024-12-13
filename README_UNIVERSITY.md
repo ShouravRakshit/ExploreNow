@@ -73,6 +73,14 @@ Use the ⌘ + R shortcut or click the "Run" button in Xcode.
 The API key for [PixaBay](https://pixabay.com/) and [OpenWeather](https://openweathermap.org/) is included in the Secrets.plist file for evaluation purposes.
 
 # **Contributors**
-Shourav Rakshit Ivan Email: shouravrakshit.ivan@ucalgary.ca
+- Shourav Rakshit Ivan, Email: shouravrakshit.ivan@ucalgary.ca  (UCID: 30131085)
+- Alisha Lalani, Email: alisha.lalani@ucalgary.ca
+- Alina Mansuri, Email: alina.mansuri@ucalgary.ca	
+- Saadman Rahman, Email: saadman.rahman1@ucalgary.ca	
+- Vidhi Soni, Email: vidhi.soni1@ucalgary.ca	
+- Manvi Juneja, Email: manvi.juneja@ucalgary.ca	
+- Shree PATEL, Email: shree.patel@ucalgary.ca	
+- Zaid Nissar, Email: zaid.nissar@ucalgary.ca	
+- Qusai Dahodwalla, Email: qusai.dahodwalla@ucalgary.ca	
 
 University of Calgary
