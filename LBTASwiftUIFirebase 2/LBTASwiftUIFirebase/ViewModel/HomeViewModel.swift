@@ -33,6 +33,7 @@ class HomeViewModel: ObservableObject {
     }
 
     // MARK: - Supporting functions
+    
         // Function to fetch the user ids of friends of current user in session
         func fetchFriends(completion: @escaping () -> Void) {
             guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else {
@@ -281,8 +282,6 @@ class HomeViewModel: ObservableObject {
                     }
             }
         }
-
-
 
         // Function to get the list of blocked user ids of the current user in session
         func setupBlockedUsersListener() {
