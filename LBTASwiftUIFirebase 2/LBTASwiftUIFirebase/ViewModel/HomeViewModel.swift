@@ -12,18 +12,22 @@ import FirebaseFirestore
 import Combine
 import SDWebImageSwiftUI
 
+// The view model class for managing the state and data of the Home view
 class HomeViewModel: ObservableObject {
-    @Published var hasNotifications = false
-    @Published var posts: [Post] = []
-    @Published var isLoading = true
-    @Published var friendIds: Set<String> = []
-    @Published var blockedUserIds: Set<String> = []
-    @Published var isFetching = false
 
-    private var cancellables = Set<AnyCancellable>()
-    //private let userManager: UserManager
+    // MARK: - Published Properties
+    @Published var hasNotifications = false    // Indicates if there are unread notifications
+    @Published var posts: [Post] = []    // List of posts to display in the feed
+    @Published var isLoading = true    // Indicates if data is currently loading
+    @Published var friendIds: Set<String> = []    // Set of friend IDs for the current user.
+    @Published var blockedUserIds: Set<String> = []    // Set of blocked user IDs.
+    @Published var isFetching = false    // Tracks whether data fetching is in progress.
     @Published var userManager: UserManager // Manages user-related logic and actions.
 
+    // MARK: - Private Properties
+    private var cancellables = Set<AnyCancellable>()
+
+     // MARK: - Initializer
     init() {
         self.userManager = UserManager()
     }
