@@ -8,50 +8,55 @@
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct IndividualPostView: View {
+// SwiftUI view representing the detailed view of an individual post
+struct IndividualPostView: View 
+    // State object to manage the view model's state
     @StateObject private var viewModel: IndividualPostViewModel
 
+    // Initializer for setting up the view model
     init(post: Post, likesCount: Int, liked: Bool) {
         _viewModel = StateObject(wrappedValue: IndividualPostViewModel(post: post, likesCount: likesCount, liked: liked))
     }
     
     var body: some View {
+        // Main scrollable container for the post view
         ScrollView {
             VStack(spacing: 0) {
-                headerSection
-                imageSection
-                interactionBar
+                headerSection    // Displays user profile and post header
+                imageSection    // Displays images associated with the post
+                interactionBar    // Interaction buttons like Like and Location
                     .padding(.vertical, 12)
                 if !viewModel.post.description.isEmpty {
-                    descriptionSection
+                    descriptionSection    // Shows the post description if available
                 }
                 Divider()
                     .padding(.horizontal)
                     .padding(.vertical, 8)
-                commentsSection
+                commentsSection    // Displays comments on the post
             }
         }
         .overlay(alignment: .bottom) {
-            commentInputSection
+            commentInputSection    // Input section for adding comments
                 .background(AppTheme.background)
                 .shadow(color: Color.black.opacity(0.05), radius: 10, y: -5)
         }
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            viewModel.fetchInitialData()
+            viewModel.fetchInitialData()    // Fetches initial data when the view appears
         }
     }
-    
+
+    // Header section showing the profile image, username, and timestamp
     private var headerSection: some View {
         HStack(spacing: 12) {
-            profileImage
+            profileImage    // User profile image
             VStack(alignment: .leading, spacing: 2) {
                 NavigationLink(destination: ProfileView(user_uid: viewModel.post.uid)) {
                     Text(viewModel.post.username)
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(AppTheme.primaryPurple)
                 }
-                Text(viewModel.timeAgo)
+                Text(viewModel.timeAgo)    // Post timestamp
                     .font(.system(size: 12))
                     .foregroundColor(AppTheme.secondaryText)
             }
@@ -60,7 +65,8 @@ struct IndividualPostView: View {
         .padding(16)
         .background(AppTheme.background)
     }
-    
+
+    // Profile image or placeholder if the URL is unavailable
     private var profileImage: some View {
         Group {
             if let imageUrl = URL(string: viewModel.post.userProfileImageUrl) {
@@ -80,7 +86,8 @@ struct IndividualPostView: View {
             }
         }
     }
-    
+
+    // Tabview of the images posted 
     private var imageSection: some View {
         TabView {
             ForEach(viewModel.post.imageUrls.indices, id: \.self) { index in
@@ -106,7 +113,8 @@ struct IndividualPostView: View {
         .tabViewStyle(PageTabViewStyle())
         .frame(height: 400)
     }
-    
+
+    // Interaction bar for likes, location, and rating
     private var interactionBar: some View {
         HStack(spacing: 20) {
             Button(action: { viewModel.toggleLike() }) {
@@ -131,6 +139,7 @@ struct IndividualPostView: View {
             }
             Spacer()
             HStack(spacing: 4) {
+                // Star rating display
                 ForEach(1...5, id: \.self) { index in
                     Image(systemName: index <= viewModel.post.rating ? "star.fill" : "star")
                         .font(.system(size: 14))
@@ -140,7 +149,8 @@ struct IndividualPostView: View {
         }
         .padding(.horizontal, 16)
     }
-    
+
+     // Description of the post
     private var descriptionSection: some View {
         Text(viewModel.post.description)
             .font(.system(size: 15))
@@ -149,7 +159,8 @@ struct IndividualPostView: View {
             .padding(16)
             .background(AppTheme.background)
     }
-    
+
+    // Section displaying comments
     private var commentsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack {
@@ -163,12 +174,14 @@ struct IndividualPostView: View {
             .padding(.horizontal, 16)
             
             if viewModel.comments.isEmpty {
+                // Placeholder for empty comments
                 Text("No comments yet")
                     .font(.system(size: 14))
                     .foregroundColor(AppTheme.secondaryText)
                     .padding(.horizontal, 16)
                     .padding(.top, 8)
             } else {
+                // List of comments
                 ForEach(viewModel.comments) { comment in
                     CommentRow(comment: comment,
                                userData: viewModel.userData[comment.userID],
@@ -179,7 +192,8 @@ struct IndividualPostView: View {
         }
         .padding(.bottom, 60)
     }
-    
+
+    // Section for adding comments
     private var commentInputSection: some View {
         VStack(spacing: 0) {
             Divider()
@@ -223,6 +237,7 @@ struct IndividualPostView: View {
             .padding(.vertical, 12)
             
             if viewModel.showEmojiPicker {
+                // Emoji picker view for comments
                 EmojiPickerView(text: $viewModel.commentText, showPicker: $viewModel.showEmojiPicker)
                     .transition(.identity)
             }
@@ -230,6 +245,7 @@ struct IndividualPostView: View {
     }
     
     // MARK: - Supporting Views
+
     // View for each individual comment displayed
     private struct CommentRow: View {
         let comment: Comment
