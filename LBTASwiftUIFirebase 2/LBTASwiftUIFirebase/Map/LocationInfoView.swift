@@ -290,7 +290,7 @@ class LocationInfoView: UIView {
                     let locationRef = locationDoc.reference
                     // Create a UIHostingController to present a SwiftUI view with the location's posts
                     let locationPostsPage = UIHostingController(rootView:
-                        LocationPostsPage(locationRef: locationRef)
+                        LocationPostsView(locationRef: locationRef)
                             .environmentObject(userManager) // Pass userManager as an environment object
                     )
 

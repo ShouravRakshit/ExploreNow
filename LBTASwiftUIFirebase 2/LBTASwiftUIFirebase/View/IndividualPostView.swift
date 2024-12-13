@@ -127,7 +127,7 @@ struct IndividualPostView: View {
                         .foregroundColor(AppTheme.secondaryText)
                 }
             }
-            NavigationLink(destination: LocationPostsPage(locationRef: viewModel.post.locationRef)) {
+            NavigationLink(destination: LocationPostsView(locationRef: viewModel.post.locationRef)) {
                 HStack(spacing: 6) {
                     Image(systemName: "mappin.circle.fill")
                         .font(.system(size: 22))
