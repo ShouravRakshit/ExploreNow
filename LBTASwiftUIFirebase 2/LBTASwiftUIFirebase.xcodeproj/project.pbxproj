@@ -89,6 +89,7 @@
 		B0F983952CC70D6F00E1CBE3 /* NavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983942CC70D6F00E1CBE3 /* NavBar.swift */; };
 		B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */; };
 		B0F9839B2CC7147A00E1CBE3 /* HomeViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */; };
+		B0FCF4C22D0D0EC8003DE558 /* EditViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0FCF4C12D0D0EC4003DE558 /* EditViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -171,6 +172,7 @@
 		B0F983942CC70D6F00E1CBE3 /* NavBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavBar.swift; sourceTree = "<group>"; };
 		B0F983982CC70DE500E1CBE3 /* ColorExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExtensions.swift; sourceTree = "<group>"; };
 		B0F9839A2CC7146E00E1CBE3 /* HomeViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewTest.swift; sourceTree = "<group>"; };
+		B0FCF4C12D0D0EC4003DE558 /* EditViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -321,6 +323,7 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				B0FCF4C12D0D0EC4003DE558 /* EditViewModel.swift */,
 				109ADA452D0C2EA10038E1C8 /* LocationViewModel.swift */,
 				6885725D2D0BF9B500775176 /* HomeViewModel.swift */,
 				2C05EDC52D0B6501003183CA /* AddPostViewModel.swift */,
@@ -490,6 +493,7 @@
 				2C132B7D2CC22A770087408A /* ContentView.swift in Sources */,
 				B0F0DEAE2D07B9FC00303B38 /* ProfileSettingsViewModel.swift in Sources */,
 				8148DC892CFFADD800D490A6 /* ChatMessage.swift in Sources */,
+				B0FCF4C22D0D0EC8003DE558 /* EditViewModel.swift in Sources */,
 				8148DC8D2CFFAE6700D490A6 /* ChatLogView.swift in Sources */,
 				2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */,
 				811CE2912D00EC4700DCC599 /* SuggestionPageView.swift in Sources */,

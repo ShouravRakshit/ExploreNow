@@ -15,7 +15,7 @@ struct EditView: View {
     @State private var fieldValue: String = "" // State variable to store the value of the field being edited (starts empty)
     @State private var username_available = true // State variable to track if the username is available (initially true)
     @State private var username_edited = false // State variable to track if the username has been edited (initially false)
-
+    @StateObject private var viewModel = EditViewModel() // Initialize without parameters
 
     var body: some View {
         VStack {  // Vertical stack to arrange UI elements vertically
@@ -57,7 +57,7 @@ struct EditView: View {
                 .padding() // Adds padding around the text field, providing spacing from other UI elements
                 .autocapitalization(.none)  // Prevents the automatic capitalization of the first letter in the text field
                 .onChange(of: fieldValue) {  // Tracks changes to the text field and triggers the isUsernameAvailable function
-                    isUsernameAvailable () // Calls the function to check if the username is available whenever the field value changes
+                    self.username_available = viewModel.isUsernameAvailable (fieldValue: fieldValue) // Calls the function to check if the username is available whenever the field value changes
                 }
             Button("Save") {
                 // Handle saving the value here
@@ -94,37 +94,42 @@ struct EditView: View {
         .padding() // Adds padding around the entire VStack to ensure the content doesn’t touch the edges of the screen
         .navigationTitle("Edit \(fieldName)")  // Sets the navigation bar title dynamically to "Edit \(fieldName)", where fieldName could be "Username" or another value
         .onAppear(){
-            // This block of code is executed when the view appears on the screen.
-            if (fieldName == "Name")
-            {
-                // If the field being edited is "Name"
-                if let name = userManager.currentUser?.name
-                    {
-                    // If the current user has a name, set the fieldValue to the user's name
-                    fieldValue = name
-                    }
-            }
-            else if (fieldName == "Username")
-            {
-                // If the field being edited is "Username"
-                if let username = userManager.currentUser?.username
-                    {
-                    // If the current user has a username, set the fieldValue to the user's username
-                    fieldValue = username
-                    }
-            }
-            else if (fieldName == "Bio")
-            {
-                // If the field being edited is "Bio"
-                if let bio = userManager.currentUser?.bio
-                    {
-                    // If the current user has a bio, set the fieldValue to the user's bio
-                    fieldValue = bio
-                    }
-            }
+            viewModel.set_fieldName(fieldName: fieldName)
+            setTextField ()
         }
     }
     
+    private func setTextField ()
+    {
+        // This block of code is executed when the view appears on the screen.
+        if (fieldName == "Name")
+        {
+            // If the field being edited is "Name"
+            if let name = userManager.currentUser?.name
+                {
+                // If the current user has a name, set the fieldValue to the user's name
+                fieldValue = name
+                }
+        }
+        else if (fieldName == "Username")
+        {
+            // If the field being edited is "Username"
+            if let username = userManager.currentUser?.username
+                {
+                // If the current user has a username, set the fieldValue to the user's username
+                fieldValue = username
+                }
+        }
+        else if (fieldName == "Bio")
+        {
+            // If the field being edited is "Bio"
+            if let bio = userManager.currentUser?.bio
+                {
+                // If the current user has a bio, set the fieldValue to the user's bio
+                fieldValue = bio
+                }
+        }
+    }
     
     private func save_field ()
     {
@@ -150,40 +155,7 @@ struct EditView: View {
         }
     }
     
-    private func isUsernameAvailable()
-        {
-        // Check if the current user's username exists
-        if let username = userManager.currentUser?.username
-            {
-            // If the field being edited is "Username" and the new value is different from the current username
-            if fieldName == "Username" && !(username == fieldValue)
-                {
-                // Mark the username as edited
-                username_edited = true
-                // Get a reference to the Firestore database
-                let db = Firestore.firestore()
-                // Query Firestore for a user with the same username
-                db.collection("users").whereField("username", isEqualTo: fieldValue).getDocuments
-                { querySnapshot, error in
-                    // Handle any errors that occur during the query
-                    if let error = error
-                    {
-                        print("Error checking username: \(error)")
-                        self.username_available = false  // Set to false if there is an error
-                        return
-                    }
-                    
-                    // Check if the query returned any results, if empty, the username is available
-                    self.username_available = querySnapshot?.isEmpty ?? true // True if empty (available), false if taken
-                    print("Username availability updated: \(self.username_available)")
-                }
-                }
-            // If the field is "Username" and the current value is the same as the new value, mark it as not edited
-            else if fieldName == "Username" && (username == fieldValue){
-                username_edited = false
-                }
-            }
-        }
+
 }
 
 
