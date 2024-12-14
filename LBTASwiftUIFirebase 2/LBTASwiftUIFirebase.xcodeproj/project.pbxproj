@@ -26,6 +26,8 @@
 		2C1967AD2CE0405700765C63 /* SplashScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1967AC2CE0404E00765C63 /* SplashScreen.swift */; };
 		2C1967B02CE0478E00765C63 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 2C1967AF2CE0478E00765C63 /* Lottie */; };
 		2C1CDE7B2CC486A6007B711B /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1CDE7A2CC4869E007B711B /* ProfileView.swift */; };
+		2C4272432D0D3A3E0088F714 /* PostCardViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4272422D0D3A360088F714 /* PostCardViewModel.swift */; };
+		2C4272452D0D3B590088F714 /* PostCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C4272442D0D3B560088F714 /* PostCardView.swift */; };
 		2CAC87982D0692A40065B16D /* PixabayImagePickerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */; };
 		2CAC879C2D069DB60065B16D /* SuggestProfilePicViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */; };
 		2CD3C7DC2CEDBCB200D21855 /* AllUsersSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */; };
@@ -111,6 +113,8 @@
 		2C132B7C2CC22A700087408A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		2C1967AC2CE0404E00765C63 /* SplashScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreen.swift; sourceTree = "<group>"; };
 		2C1CDE7A2CC4869E007B711B /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		2C4272422D0D3A360088F714 /* PostCardViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCardViewModel.swift; sourceTree = "<group>"; };
+		2C4272442D0D3B560088F714 /* PostCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCardView.swift; sourceTree = "<group>"; };
 		2CAC87972D0692A10065B16D /* PixabayImagePickerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayImagePickerViewModel.swift; sourceTree = "<group>"; };
 		2CAC879B2D069DB50065B16D /* SuggestProfilePicViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestProfilePicViewModel.swift; sourceTree = "<group>"; };
 		2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AllUsersSearchView.swift; sourceTree = "<group>"; };
@@ -287,6 +291,7 @@
 		8148DC862CFFADB500D490A6 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				2C4272442D0D3B560088F714 /* PostCardView.swift */,
 				109ADA472D0C2EB80038E1C8 /* LocationPostsView.swift */,
 				2C1967AC2CE0404E00765C63 /* SplashScreen.swift */,
 				2CD3C7E22CEDBD3D00D21855 /* UserRow.swift */,
@@ -323,6 +328,7 @@
 		8148DC872CFFADBB00D490A6 /* ViewModel */ = {
 			isa = PBXGroup;
 			children = (
+				2C4272422D0D3A360088F714 /* PostCardViewModel.swift */,
 				B0FCF4C12D0D0EC4003DE558 /* EditViewModel.swift */,
 				109ADA452D0C2EA10038E1C8 /* LocationViewModel.swift */,
 				6885725D2D0BF9B500775176 /* HomeViewModel.swift */,
@@ -437,6 +443,7 @@
 			files = (
 				B0F30F2A2CE9863400F4EFE4 /* FriendsView.swift in Sources */,
 				8148DC972CFFB18B00D490A6 /* CreateNewMessageViewModel.swift in Sources */,
+				2C4272452D0D3B590088F714 /* PostCardView.swift in Sources */,
 				B0F983992CC70DEB00E1CBE3 /* ColorExtensions.swift in Sources */,
 				109ADA462D0C2EA10038E1C8 /* LocationViewModel.swift in Sources */,
 				B022884E2CEE520C0089FB7A /* BlockedUsersView.swift in Sources */,
@@ -500,6 +507,7 @@
 				2CD3C7E12CEDBD1200D21855 /* AllUsersSearchViewModel.swift in Sources */,
 				2CD5E2822CF01ED40024B502 /* PixabayImagePickerView.swift in Sources */,
 				10B59CC92CEA7B9000306357 /* PostCard.swift in Sources */,
+				2C4272432D0D3A3E0088F714 /* PostCardViewModel.swift in Sources */,
 				811CE2952D00F1AD00DCC599 /* SuggestionPageViewModel.swift in Sources */,
 				68A04D762CCA0CFD00BCA36E /* AddPostView.swift in Sources */,
 				811CE2972D00FA5200DCC599 /* WeatherViewModel.swift in Sources */,

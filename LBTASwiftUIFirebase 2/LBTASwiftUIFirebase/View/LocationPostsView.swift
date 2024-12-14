@@ -209,7 +209,7 @@ struct LocationPostsView: View {
                 // Lazy loading list of posts
                 LazyVStack(spacing: 16) {
                     ForEach(viewModel.locationPosts) { post in
-                        PostCard(post: post)
+                        PostCardView(post: post)
                             .environmentObject(userManager)
                             .padding(.horizontal)
                     }

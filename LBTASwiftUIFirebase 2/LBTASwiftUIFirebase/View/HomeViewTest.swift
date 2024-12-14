@@ -147,7 +147,7 @@ struct HomeViewTest: View {
                 LazyVStack(spacing: 20) {
                     // Iterate through and display each post
                     ForEach(posts) { post in
-                        PostCard(post: post)    // Custom view for a single post
+                        PostCardView(post: post)    // Custom view for a single post
                             .environmentObject(userManager)
                             .padding(.horizontal)
                     }

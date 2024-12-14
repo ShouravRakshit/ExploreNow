@@ -379,7 +379,7 @@ struct ProfileView: View {
                     else if (viewModel.isFriends || viewModel.isPublic) || !viewModel.viewingOtherProfile {
                             LazyVStack {
                                 ForEach(viewModel.userPosts) { post in
-                                    PostCard(post: post, onDelete: { selectedPost in
+                                    PostCardView(post: post, onDelete: { selectedPost in
                                         viewModel.selectedPost = selectedPost
                                         self.showDeleteConfirmation = true
                                     })
