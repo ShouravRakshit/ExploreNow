@@ -36,6 +36,7 @@
 		2CD5E2802CF01EC90024B502 /* PixabayImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD5E27F2CF01EC90024B502 /* PixabayImage.swift */; };
 		2CD5E2822CF01ED40024B502 /* PixabayImagePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */; };
 		2CDC81872CF1538E0021398A /* Secrets.template.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2CDC81862CF153810021398A /* Secrets.template.plist */; };
+		2CFE00AE2D0D4D04002DD5FE /* SearchUserRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CFE00AD2D0D4D04002DD5FE /* SearchUserRowView.swift */; };
 		684A510B2CE1D0AC00383B08 /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510A2CE1D0AC00383B08 /* Comment.swift */; };
 		684A510D2CE1D0D500383B08 /* IndividualPostView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 684A510C2CE1D0D500383B08 /* IndividualPostView.swift */; };
 		6885725E2D0BF9B500775176 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6885725D2D0BF9B500775176 /* HomeViewModel.swift */; };
@@ -62,7 +63,6 @@
 		8148DC8F2CFFAE9500D490A6 /* MessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC8E2CFFAE9500D490A6 /* MessageView.swift */; };
 		8148DC912CFFAF6A00D490A6 /* SearchUserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC902CFFAF6A00D490A6 /* SearchUserViewModel.swift */; };
 		8148DC932CFFAF8200D490A6 /* SearchUserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC922CFFAF8200D490A6 /* SearchUserView.swift */; };
-		8148DC952CFFAFC400D490A6 /* UserRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC942CFFAFC400D490A6 /* UserRowView.swift */; };
 		8148DC972CFFB18B00D490A6 /* CreateNewMessageViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC962CFFB18B00D490A6 /* CreateNewMessageViewModel.swift */; };
 		8148DC992CFFB1A400D490A6 /* CreateNewMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DC982CFFB1A400D490A6 /* CreateNewMessageView.swift */; };
 		8148DCA12CFFB70100D490A6 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8148DCA02CFFB70100D490A6 /* LoginView.swift */; };
@@ -122,6 +122,7 @@
 		2CD5E27F2CF01EC90024B502 /* PixabayImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayImage.swift; sourceTree = "<group>"; };
 		2CD5E2812CF01ED40024B502 /* PixabayImagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PixabayImagePickerView.swift; sourceTree = "<group>"; };
 		2CDC81862CF153810021398A /* Secrets.template.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Secrets.template.plist; sourceTree = "<group>"; };
+		2CFE00AD2D0D4D04002DD5FE /* SearchUserRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserRowView.swift; sourceTree = "<group>"; };
 		684A510A2CE1D0AC00383B08 /* Comment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		684A510C2CE1D0D500383B08 /* IndividualPostView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndividualPostView.swift; sourceTree = "<group>"; };
 		6885725D2D0BF9B500775176 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
@@ -145,7 +146,6 @@
 		8148DC8E2CFFAE9500D490A6 /* MessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageView.swift; sourceTree = "<group>"; };
 		8148DC902CFFAF6A00D490A6 /* SearchUserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserViewModel.swift; sourceTree = "<group>"; };
 		8148DC922CFFAF8200D490A6 /* SearchUserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchUserView.swift; sourceTree = "<group>"; };
-		8148DC942CFFAFC400D490A6 /* UserRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRowView.swift; sourceTree = "<group>"; };
 		8148DC962CFFB18B00D490A6 /* CreateNewMessageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewMessageViewModel.swift; sourceTree = "<group>"; };
 		8148DC982CFFB1A400D490A6 /* CreateNewMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateNewMessageView.swift; sourceTree = "<group>"; };
 		8148DCA02CFFB70100D490A6 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
@@ -288,6 +288,7 @@
 		8148DC862CFFADB500D490A6 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				2CFE00AD2D0D4D04002DD5FE /* SearchUserRowView.swift */,
 				2C4272442D0D3B560088F714 /* PostCardView.swift */,
 				109ADA472D0C2EB80038E1C8 /* LocationPostsView.swift */,
 				2C1967AC2CE0404E00765C63 /* SplashScreen.swift */,
@@ -299,7 +300,6 @@
 				811CE28E2D00EC2D00DCC599 /* HotspotsView.swift */,
 				2CD3C7DB2CEDBCAA00D21855 /* AllUsersSearchView.swift */,
 				8148DC922CFFAF8200D490A6 /* SearchUserView.swift */,
-				8148DC942CFFAFC400D490A6 /* UserRowView.swift */,
 				B022884D2CEE52070089FB7A /* BlockedUsersView.swift */,
 				8148DC982CFFB1A400D490A6 /* CreateNewMessageView.swift */,
 				68D3B3972CCA37A200166069 /* AddPhotos.swift */,
@@ -448,7 +448,6 @@
 				8148DCCD2D00A66200D490A6 /* MainMessagesView.swift in Sources */,
 				8177CD9F2D00D2E70043BC92 /* WeatherModels.swift in Sources */,
 				109ADA482D0C2EB80038E1C8 /* LocationPostsView.swift in Sources */,
-				8148DC952CFFAFC400D490A6 /* UserRowView.swift in Sources */,
 				81447E822CB42371005BE180 /* ChatUser.swift in Sources */,
 				8148DCA32CFFB72F00D490A6 /* LoginViewModel.swift in Sources */,
 				B0F0DEA82D06A84B00303B38 /* NotificationViewModel.swift in Sources */,
@@ -467,6 +466,7 @@
 				2CD5E27E2CF01EBA0024B502 /* PixabayAPI.swift in Sources */,
 				B01DE7112CC1587400C158DD /* SuggestProfilePicView.swift in Sources */,
 				B0F0DEB02D07C22E00303B38 /* ProfileViewModel.swift in Sources */,
+				2CFE00AE2D0D4D04002DD5FE /* SearchUserRowView.swift in Sources */,
 				8148DCBF2CFFCD6200D490A6 /* SignUpView.swift in Sources */,
 				B0F8B6AE2CC8961E00E220B6 /* ChangePasswordView.swift in Sources */,
 				8148DC8B2CFFAE0200D490A6 /* ChatLogViewModel.swift in Sources */,

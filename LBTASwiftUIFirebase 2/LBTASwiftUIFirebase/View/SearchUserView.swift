@@ -40,7 +40,7 @@ struct SearchUserView: View {
                         Button(action: {
                             didSelectUser(user) // Call the didSelectUser closure when a user is selected
                         }) {
-                            UserRowView(user: user) // Custom view for displaying individual user row
+                            SearchUserRowView(user: user) // Custom view for displaying individual user row
                         }
                     }
                 }

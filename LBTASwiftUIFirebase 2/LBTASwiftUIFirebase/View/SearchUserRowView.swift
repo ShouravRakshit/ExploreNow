@@ -1,5 +1,5 @@
 //
-//  UserRowView.swift
+//  SearchUserRowView.swift
 //  LBTASwiftUIFirebase
 //
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
@@ -8,8 +8,8 @@
 import SwiftUI
 import SDWebImageSwiftUI // Used for loading images asynchronously from URLs
 
-// UserRowView is a custom view that displays information about a single user
-struct UserRowView: View {
+// SearchUserRowView is a custom view that displays information about a single user
+struct SearchUserRowView: View {
     let user: ChatUser // The user object that contains the user data (e.g., profile image, name, email)
     
     var body: some View {
