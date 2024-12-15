@@ -45,6 +45,15 @@ At its core, Explore Now simplifies the travel experience by empowering users to
 - Stay Inspired on the Home Page
   - Scroll through your friends' posts to stay updated.
   - Easily search for and connect with new travelers.
+  
+- Top 10 Trending Locations to Visit 
+- Be Inspired by Stunning Photos 
+
+- Dive into breathtaking images of the world’s most exciting destinations. From majestic mountains to bustling cityscapes, each photo is crafted to fuel your wanderlust and spark your next adventure. 
+
+- Stay Ready with Live Weather Updates 
+
+- Never be caught off guard! With real-time weather information for every trending location, you’ll be prepared for anything—whether you’re planning for sunny days or glittering snow. Stay informed and travel with confidence!
 
 # **Setup**
 No additional setup is required. Simply open the project in Xcode and build it.

@@ -17,7 +17,7 @@ struct FriendsView: View {
     
     @StateObject private var friendManager = FriendManager()
     
-    @State private var showingAlert = false
+    @State private var showingAlert = false          //Alert for removing friend
     @State private var friendToUnfriend: User? = nil // Store the user being unfriended
     
     @State private var navigateToProfile = false // State to manage the full screen cover
