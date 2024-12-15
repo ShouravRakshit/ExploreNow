@@ -9,6 +9,8 @@
 //  can be displayed (similar to how it is displayed in the Explore page),
 //  so that the user can view all posts present in that location.
 
+// Unfinished implementation-  What still needs to be done: View all posts present in that location
+
 
 import SwiftUI
 import Combine
