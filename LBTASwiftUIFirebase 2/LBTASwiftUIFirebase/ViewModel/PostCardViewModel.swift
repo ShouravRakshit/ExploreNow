@@ -11,39 +11,45 @@ import SwiftUI
 import FirebaseFirestore
 import Firebase
 
+// ViewModel for managing the state and logic of a PostCard
 class PostCardViewModel: ObservableObject {
-    @Published var currentImageIndex = 0
-    @Published var comments: [Comment] = []
-    @Published var commentCount: Int = 0
-    @Published var likesCount: Int = 0
-    @Published var likedByUserIds: [String] = []
-    @Published var liked: Bool = false
-    @Published var isCurrentUserPost: Bool = false
-    @Published var showDeleteConfirmation = false
-    @Published var blockedUserIds: Set<String> = []
-    @Published var blockedByIds: Set<String> = []
+    // Published properties to update the UI when changes occur
+    @Published var currentImageIndex = 0 // Index for post image carousel
+    @Published var comments: [Comment] = [] // List of comments on the post
+    @Published var commentCount: Int = 0 // Total count of comments
+    @Published var likesCount: Int = 0 // Total count of likes
+    @Published var likedByUserIds: [String] = [] // List of user IDs who liked the post
+    @Published var liked: Bool = false // Indicates if the current user liked the post
+    @Published var isCurrentUserPost: Bool = false // Indicates if the post belongs to the current user
+    @Published var showDeleteConfirmation = false // Toggles the delete confirmation alert
+    @Published var blockedUserIds: Set<String> = [] // Set of user IDs blocked by the current user
+    @Published var blockedByIds: Set<String> = [] // Set of user IDs who blocked the current user
+
+    let post: Post // The post being managed
+    private let userManager: UserManager // Handles user-related operations
     
-    let post: Post
-    private let userManager: UserManager
-    
+    // Initializer
     init(post: Post) {
         self.post = post
         self.userManager = UserManager()
         setupInitialState()
     }
     
+    // Sets up the initial state of the ViewModel
     private func setupInitialState() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         isCurrentUserPost = post.uid == currentUserId
     }
     
+    // Sets up listeners for real-time updates
     func setupListeners() {
-        setupBlockedUsersListener()
-        fetchBlockedByUsers()
-        fetchLikes()
-        fetchComments()
+        setupBlockedUsersListener() // Listen for changes to blocked users
+        fetchBlockedByUsers() // Fetch users who blocked the current user
+        fetchLikes() // Fetch likes on the post
+        fetchComments() // Fetch comments on the post
     }
     
+    // Deletes the current post
     func deletePost() {
         let db = Firestore.firestore()
         db.collection("user_posts").document(post.id).delete { error in
@@ -57,6 +63,7 @@ class PostCardViewModel: ObservableObject {
         }
     }
     
+    // Fetches the list of users who blocked the current user
     private func fetchBlockedByUsers() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -76,6 +83,7 @@ class PostCardViewModel: ObservableObject {
             }
     }
     
+    // Sets up a listener for blocked users
     private func setupBlockedUsersListener() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -97,6 +105,7 @@ class PostCardViewModel: ObservableObject {
             }
     }
     
+    // Fetches total number of likes for the post
     private func fetchLikes() {
         let db = FirebaseManager.shared.firestore
         db.collection("likes")
@@ -128,6 +137,7 @@ class PostCardViewModel: ObservableObject {
             }
     }
     
+    //Likes/unlikes the post depending on previous state
     func toggleLike() {
         guard let currentUserId = FirebaseManager.shared.auth.currentUser?.uid else { return }
         
@@ -183,6 +193,7 @@ class PostCardViewModel: ObservableObject {
         }
     }
     
+    //Fetches all comments for a post
     private func fetchComments() {
         let db = FirebaseManager.shared.firestore
         db.collection("comments")
@@ -209,12 +220,14 @@ class PostCardViewModel: ObservableObject {
             }
     }
     
+    // Formats a date into a relative time string
     func formatDate(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: Date())
     }
     
+    // Updates the average rating for a location based on its posts
     private func updateLocationRating(locationRef: DocumentReference) {
         let db = FirebaseManager.shared.firestore
         
