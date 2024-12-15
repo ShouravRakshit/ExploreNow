@@ -36,38 +36,39 @@ struct ChangePasswordView: View
     @State private var password_changed_success : Bool = false  // Declares a state variable to track if the password change was successful. Initially set to `false`.
     
     
-    var body: some View
+    var body: some View         // Defines the main body of the SwiftUI view.
         {
-            VStack
+            VStack              // Arranges the elements vertically in a stack.
                 {
-                HStack
+                HStack      // Arranges the elements horizontally in a stack.
                     {
-                    Image(systemName: "chevron.left")
+                        Image(systemName: "chevron.left")        // Displays a left arrow icon.
                         .resizable() // Make the image resizable
-                        .aspectRatio(contentMode: .fit) // Maintain the aspect ratio
-                        .frame(width: 30, height: 30) // Set size
-                        .padding()
-                        .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF
-                        .onTapGesture
+                        .aspectRatio(contentMode: .fit)  // Ensures the image maintains its aspect ratio.
+                        .frame(width: 30, height: 30) // Sets the size of the image to 30x30.
+                        .padding()      // Adds padding around the image.
+                        .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Sets the image color to a purple shade (#8C52FF).
+                        .onTapGesture           // Adds a tap gesture to the image.
                             {
-                            // Go back to profile page
-                            presentationMode.wrappedValue.dismiss()
+                                // Action when the image is tapped.
+                                presentationMode.wrappedValue.dismiss()  // Dismisses the current view to go back to the previous page.
                             }
                     Spacer() // Pushes the text to the center
-                    Text ("Change Password")
-                        .font(.custom("Sansation-Regular", size: 30))
+                    Text ("Change Password")    // Displays the title text.
+                            .font(.custom("Sansation-Regular", size: 30))    // Sets a custom font and size for the text.
                         .foregroundColor(Color(red: 140/255, green: 82/255, blue: 255/255)) // Set color to #8C52FF
-                        .offset(x:-30)
-                    Spacer() // Pushes the text to the center
+                        .offset(x:-30)      // Moves the text slightly to the left by 30 points.
+                    Spacer() // Adds space to balance the layout and keep the title centered.
                     }
                     
-                ZStack(alignment: .trailing) {
+                    ZStack(alignment: .trailing)     // Checks if the password visibility toggle is on.
+                    {
                     if isPasswordVisible {
-                        TextField("Enter Current Password", text: $entered_password)
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(15)
-                            .overlay(
+                        TextField("Enter Current Password", text: $entered_password)    // A plain text field for entering the current password.
+                            .padding(12)        // Adds padding inside the text field.
+                            .background(Color.white)        // Sets the background color of the text field to white.
+                            .cornerRadius(15)       // Rounds the corners of the text field with a radius of 15.
+                            .overlay(       // Adds a border overlay to the text field.
                                 RoundedRectangle(cornerRadius: 15) // Rounded border
                                     .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
                             )
@@ -76,9 +77,9 @@ struct ChangePasswordView: View
                             .autocapitalization(.none) // Prevent first letter from being capitalized
                     } else {
                         SecureField("Enter Current Password", text: $entered_password) // Use SecureField for hidden password
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(8)
+                            .padding(12)        // Adds padding inside the secure text field.
+                            .background(Color.white)        // Sets the background color of the secure text field to white.
+                            .cornerRadius(8)    // Rounds the corners of the secure text field with a radius of 8.
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15) // Rounded border
                                     .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
@@ -99,36 +100,36 @@ struct ChangePasswordView: View
                     }
                 }
                     
-                ZStack(alignment: .trailing) {
-                    if isNewPasswordVisible {
-                        TextField("Enter New Password", text: $new_password)
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(15)
-                            .overlay(
+                ZStack(alignment: .trailing) {  // Stacks elements on top of each other, aligning them to the trailing (right) edge.
+                    if isNewPasswordVisible {   // Checks if the new password visibility toggle is on.
+                        TextField("Enter New Password", text: $new_password)     // A plain text field for entering the new password.
+                            .padding(12)    // Adds padding inside the text field.
+                            .background(Color.white)        // Sets the background color of the text field to white.
+                            .cornerRadius(15)    // Rounds the corners of the text field with a radius of 15.
+                            .overlay(   // Adds a border overlay to the text field.
                                 RoundedRectangle(cornerRadius: 15) // Rounded border
                                     .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
                             )
                             .frame(width: 335) // Set a fixed width for the TextField
                             .padding(.top, 20) // Space above the text field
                             .autocapitalization(.none) // Prevent first letter from being capitalized
-                            .onChange(of: new_password) { newValue in
-                                validatePassword(newValue)
+                            .onChange(of: new_password) { newValue in   // Observes changes to the new password.
+                                validatePassword(newValue)  // Calls the `validatePassword` function to validate the new password as it is typed.
                             }
-                    } else {
+                    } else {    // Executes when `isNewPasswordVisible` is false, meaning the password input should be hidden.
                         SecureField("Enter New Password", text: $new_password) // Use SecureField for hidden password
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .overlay(
+                            .padding(12)    // Adds 12 points of padding inside the secure text field.
+                            .background(Color.white)    // Sets the background color of the secure text field to white.
+                            .cornerRadius(8)    // Rounds the corners of the secure text field with a radius of 8.
+                            .overlay(    // Adds an overlay to the secure text field.
                                 RoundedRectangle(cornerRadius: 15) // Rounded border
                                     .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
                             )
                             .frame(width: 335) // Set a fixed width for the TextField
                             .padding(.top, 20) // Space above the text field
                             .autocapitalization(.none) // Prevent first letter from being capitalized
-                            .onChange(of: new_password) { newValue in
-                                validatePassword(newValue)
+                            .onChange(of: new_password) { newValue in   // Observes changes to the `new_password` state variable.
+                                validatePassword(newValue)   // Calls the `validatePassword` function whenever the password is updated, allowing for real-time validation.
                             }
                     }
                     
@@ -143,44 +144,44 @@ struct ChangePasswordView: View
                     }
                 }
                     
-                VStack {
-                    HStack {
-                        Text(isLengthValid ? "✅" : "❌")
-                            .foregroundColor(isLengthValid ? .green : .red)
-                        Text("Must be 8 characters long")
-                            .foregroundColor(.black)
-                            .frame(width: 250, alignment: .leading) // Fixed width for text
+                VStack {    // Creates a vertical stack to arrange the password validation messages vertically.
+                    HStack {    // Creates a horizontal stack to arrange the checkmark or cross symbol and validation text side by side.
+                        Text(isLengthValid ? "✅" : "❌") // Displays a green checkmark (✅) if `isLengthValid` is true, otherwise displays a red cross (❌).
+                            .foregroundColor(isLengthValid ? .green : .red) // Sets the color of the symbol to green if valid, otherwise red for invalid.
+                        Text("Must be 8 characters long")    // Displays the password validation message for minimum length.
+                            .foregroundColor(.black)     // Sets the text color to black for readability.
+                            .frame(width: 250, alignment: .leading) // Sets a fixed width of 250 points for the text and aligns it to the left within the frame.
                     }
-                    .padding(.top, 10)
+                    .padding(.top, 10)  // Adds 10 points of padding above the HStack to create spacing from the previous element.
                     
-                    HStack {
-                        Text(hasUppercase ? "✅" : "❌")
-                            .foregroundColor(hasUppercase ? .green : .red)
-                        Text("Must have 1 uppercase letter")
-                            .foregroundColor(.black)
-                            .frame(width: 250, alignment: .leading) // Fixed width for text
+                    HStack {    // Creates another horizontal stack for the next validation message.
+                        Text(hasUppercase ? "✅" : "❌")  // Displays a green checkmark (✅) if `hasUppercase` is true, otherwise displays a red cross (❌).
+                            .foregroundColor(hasUppercase ? .green : .red)   // Sets the color of the symbol to green if valid, otherwise red for invalid.
+                        Text("Must have 1 uppercase letter")    // Displays the password validation message for the presence of at least one uppercase letter.
+                            .foregroundColor(.black)     // Sets the text color to black for readability.
+                            .frame(width: 250, alignment: .leading) // Sets a fixed width of 250 points for the text and aligns it to the left within the frame.
                     }
-                    .padding(.top, 5)
+                    .padding(.top, 5)   // Adds 5 points of padding above this HStack to create spacing from the previous validation message.
                     
-                    HStack {
-                        Text(hasSpecialCharacter ? "✅" : "❌")
-                            .foregroundColor(hasSpecialCharacter ? .green : .red)
-                        Text("Must have 1 special character")
-                            .foregroundColor(.black)
-                            .frame(width: 250, alignment: .leading) // Fixed width for text
+                    HStack {    // Creates a horizontal stack to display the special character validation message.
+                        Text(hasSpecialCharacter ? "✅" : "❌")   // Displays a green checkmark (✅) if `hasSpecialCharacter` is true, otherwise a red cross (❌).
+                            .foregroundColor(hasSpecialCharacter ? .green : .red)   // Sets the color to green if valid, otherwise red for invalid.
+                        Text("Must have 1 special character")   // Describes the validation rule for at least one special character in the password.
+                            .foregroundColor(.black)    // Ensures the text color is black for readability.
+                            .frame(width: 250, alignment: .leading)  // Sets the text to have a fixed width of 250 points and aligns it to the left.
                     }
-                    .padding(.top, 5)
+                    .padding(.top, 5)   // Adds a 5-point vertical padding above the HStack for spacing from the previous message.
                 }
                 .frame(maxWidth: .infinity, alignment: .center) // Center the entire VStack
                     
                     
-                ZStack(alignment: .trailing) {
-                    if isConfirmNewPasswordVisible {
-                        TextField("Confirm New Password", text: $confirm_new_password)
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(15)
-                            .overlay(
+                ZStack(alignment: .trailing) {  // Creates a ZStack for layering the password confirmation field and its visibility toggle button.
+                    if isConfirmNewPasswordVisible {     // Checks whether the confirmation password should be visible.
+                        TextField("Confirm New Password", text: $confirm_new_password)  // Displays a regular `TextField` for entering the confirmation password if visibility is enabled.
+                            .padding(12)    // Adds internal padding inside the text field for better spacing.
+                            .background(Color.white)     // Sets the background color of the text field to white for visibility.
+                            .cornerRadius(15)    // Adds rounded corners to the text field with a radius of 15 points.
+                            .overlay(   // Adds a border overlay around the text field.
                                 RoundedRectangle(cornerRadius: 15) // Rounded border
                                     .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
                             )
@@ -189,11 +190,11 @@ struct ChangePasswordView: View
                             .autocapitalization(.none) // Prevent first letter from being capitalized
                         
                     } else {
-                        SecureField("Confirm New Password", text: $confirm_new_password) // Use SecureField for hidden password
-                            .padding(12)
-                            .background(Color.white)
-                            .cornerRadius(8)
-                            .overlay(
+                        SecureField("Confirm New Password", text: $confirm_new_password) // Use SecureField for hidden password entry to ensure confidentiality.
+                            .padding(12)     // Adds 12 points of internal padding inside the field for better spacing and a comfortable appearance.
+                            .background(Color.white)    // Sets the background color of the SecureField to white for visibility and contrast against other UI elements.
+                            .cornerRadius(8)    // Applies rounded corners with a radius of 8 points to give the field a modern, softer design.
+                            .overlay(   // Adds a border overlay to the field for enhanced visual clarity.
                                 RoundedRectangle(cornerRadius: 15) // Rounded border
                                     .stroke(Color(red: 140/255, green: 82/255, blue: 255/255), lineWidth: 2) // Border color and width
                             )
@@ -218,18 +219,18 @@ struct ChangePasswordView: View
                     }
                 }
 
-                if confirm_new_password.count > 0
+                if confirm_new_password.count > 0   // Checks if the user has entered any text in the "Confirm New Password" field.
                     {
-                    HStack
+                    HStack   // Arranges the checkmark (or cross) and text in a horizontal layout.
                         {
-                            Text(passwordsMatch() ? "✅" : "❌")
-                                .foregroundColor(passwordsMatch() ? .green : .red)
-                            Text(passwordsMatch() ? "Passwords Match" : "Passwords do not match")
-                                .foregroundColor(.black)
-                                .frame(width: 250, alignment: .leading) // Fixed width for text
+                            Text(passwordsMatch() ? "✅" : "❌")   // Displays a green checkmark if passwords match, otherwise a red cross.
+                                .foregroundColor(passwordsMatch() ? .green : .red)  // Sets the color based on whether the passwords match or not.
+                            Text(passwordsMatch() ? "Passwords Match" : "Passwords do not match")   // Dynamically displays appropriate feedback text.
+                                .foregroundColor(.black)    // Sets the text color to black for readability.
+                                .frame(width: 250, alignment: .leading) // Ensures the text has a fixed width and aligns to the left for consistency.
                         }
-                        .frame(maxWidth: .infinity, alignment: .center) // Center the entire VStack
-                        .padding(.top, 10)
+                        .frame(maxWidth: .infinity, alignment: .center)  // Centers the entire HStack horizontally within its parent container
+                        .padding(.top, 10)  // Adds 10 points of padding above the HStack for spacing from the previous element.
                     }
                     
                 Button("Save") {
@@ -238,48 +239,49 @@ struct ChangePasswordView: View
                         save_password ()
                         // Go back to profile settings page
                     }
-                    .font(.custom("Sansation-Regular", size: 23))
+                    .font(.custom("Sansation-Regular", size: 23))   // Applies a custom font "Sansation-Regular" with a size of 23 to the button text.
                     .foregroundColor(.white) // Set text color to black
-                    .padding()
+                    .padding()  // Adds padding around the button's text to increase clickable area and improve layout.
                     .frame(width: 350) // Same width as TextField
                     .background(Color(red: 140/255, green: 82/255, blue: 255/255)) // Button color
                     .cornerRadius(15) // Rounded corners
-                    .padding(.top, (confirm_new_password.count > 0) ? 10 : 30)
+                    .padding(.top, (confirm_new_password.count > 0) ? 10 : 30)   // Dynamically adjusts the top padding: 10 if `confirm_new_password` has input, otherwise 30 for spacing.
                     
-                if entered_password.count > 0 && new_password.count > 0 && entered_password == new_password
+                    if entered_password.count > 0 && new_password.count > 0 && entered_password == new_password  // Checks if both fields have input and the entered password matches the new password.
                     {
-                    Text ("Password and New Password Must be Different!")
-                        .font(.custom("Sansation-Regular", size: 18))
-                        .foregroundColor(.red)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding ()
+                        Text ("Password and New Password Must be Different!")    // Displays a warning message if the old and new passwords are identical.
+                        .font(.custom("Sansation-Regular", size: 18))   // Uses a smaller custom font for the warning message.
+                        .foregroundColor(.red)  // Sets the message text color to red to indicate an error or warning.
+                        .frame(maxWidth: .infinity, alignment: .center)  // Centers the text horizontally within its parent container.
+                        .padding ()  // Adds padding around the message for spacing from other elements.
                     }
-                Spacer()
+                Spacer()    // Adds flexible space below the content to push other elements upward, ensuring a balanced layout.
                 }
                 //Updates user on success or failure of changing password
-                .alert(isPresented: $showAlert) {
+                .alert(isPresented: $showAlert) {   // Triggers an alert when `showAlert` is true.
                     Alert(
-                        title: Text(alertTitle),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("OK")) {
+                        title: Text(alertTitle),     // Displays a dynamic title for the alert (e.g., "Success" or "Error").
+                        message: Text(alertMessage),    // Shows a detailed message explaining the success or failure.
+                        dismissButton: .default(Text("OK")) {   // Provides a default dismiss button labeled "OK."
                             // Dismiss the view when the alert is dismissed
-                            print ("Dismissing change profile view")
-                            if self.password_changed_success{
-                                presentationMode.wrappedValue.dismiss()
+                            print ("Dismissing change profile view")    // Debug statement to log the dismissal.
+                            if self.password_changed_success{    // Checks if the password change was successful.
+                                presentationMode.wrappedValue.dismiss() // Dismisses the current view if the password change succeeded.
                             }
                         }
                     )
                 }
         }
     
-    private func save_password ()
+    private func save_password ()   // Declares a private function named `save_password` for encapsulated functionality.
         {
         //if entered password is correct, save password
-        if isValidPassword (new_password)
+        if isValidPassword (new_password)   // Checks if the new password meets validation criteria (e.g., length, characters).
             {
-            if (passwordsMatch ())
+            if (passwordsMatch ())  // Checks if the new password and confirmation password match.
                 {
                 update_password (currentPassword: entered_password, newPassword: new_password)
+                // Calls a function to update the password, passing the current password and the new password as arguments.
                 }
             }
         }
