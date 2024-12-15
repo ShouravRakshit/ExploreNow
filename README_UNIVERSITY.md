@@ -46,14 +46,13 @@ At its core, Explore Now simplifies the travel experience by empowering users to
   - Scroll through your friends' posts to stay updated.
   - Easily search for and connect with new travelers.
   
-- Top 10 Trending Locations to Visit 
-- Be Inspired by Stunning Photos 
 
-- Dive into breathtaking images of the world’s most exciting destinations. From majestic mountains to bustling cityscapes, each photo is crafted to fuel your wanderlust and spark your next adventure. 
+- Top 10 Trending Locations to Visit 
+    - Be Inspired by Stunning Photos 
+    - Dive into breathtaking images of the world’s most exciting destinations. From majestic mountains to bustling cityscapes, each photo is crafted to fuel your wanderlust and spark your next adventure. 
 
 - Stay Ready with Live Weather Updates 
-
-- Never be caught off guard! With real-time weather information for every trending location, you’ll be prepared for anything—whether you’re planning for sunny days or glittering snow. Stay informed and travel with confidence!
+    - Never be caught off guard! With real-time weather information for every trending location, you’ll be prepared for anything—whether you’re planning for sunny days or glittering snow. Stay informed and travel with confidence!
 
 # **Setup**
 No additional setup is required. Simply open the project in Xcode and build it.
@@ -83,13 +82,13 @@ The API key for [PixaBay](https://pixabay.com/) and [OpenWeather](https://openwe
 
 # **Contributors**
 - Shourav Rakshit Ivan, Email: shouravrakshit.ivan@ucalgary.ca  (UCID: 30131085)
-- Alisha Lalani, Email: alisha.lalani@ucalgary.ca
-- Alina Mansuri, Email: alina.mansuri@ucalgary.ca	(UCID: 30008370)
-- Saadman Rahman, Email: saadman.rahman1@ucalgary.ca	(UCID: 30153482)
-- Vidhi Soni, Email: vidhi.soni1@ucalgary.ca (UCID: 30117504)
-- Manvi Juneja, Email: manvi.juneja@ucalgary.ca	(UCID: 30153525)
+- Alisha Lalani, Email: alisha.lalani@ucalgary.ca               (UCID: 30123098)
+- Alina Mansuri, Email: alina.mansuri@ucalgary.ca	            (UCID: 30008370)
+- Saadman Rahman, Email: saadman.rahman1@ucalgary.ca	        (UCID: 30153482)
+- Vidhi Soni, Email: vidhi.soni1@ucalgary.ca                    (UCID: 30117504)
+- Manvi Juneja, Email: manvi.juneja@ucalgary.ca	                (UCID: 30153525)
 - Shree PATEL, Email: shree.patel@ucalgary.ca	
 - Zaid Nissar, Email: zaid.nissar@ucalgary.ca	
-- Qusai Dahodwalla, Email: qusai.dahodwalla@ucalgary.ca (UCID: 30193962)
+- Qusai Dahodwalla, Email: qusai.dahodwalla@ucalgary.ca         (UCID: 30193962)
 
 University of Calgary
