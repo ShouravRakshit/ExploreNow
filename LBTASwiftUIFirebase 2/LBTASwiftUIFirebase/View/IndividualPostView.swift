@@ -207,52 +207,52 @@ struct IndividualPostView: View {
     }
 
     // Section for adding comments
-    private var commentInputSection: some View {
-        VStack(spacing: 0) {
-            Divider()
-            HStack(spacing: 12) {
-                Group {
-                    if let imageUrl = viewModel.currentUserProfileImageUrl,
-                       let url = URL(string: imageUrl),
-                       !imageUrl.isEmpty {
-                        WebImage(url: url)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 32, height: 32)
-                            .clipShape(Circle())
-                    } else {
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 32, height: 32)
-                            .foregroundColor(AppTheme.secondaryText)
-                            .clipShape(Circle())
+    private var commentInputSection: some View {     // Declares a computed property that returns a View, used for the comment input section.
+        VStack(spacing: 0) {         // A vertical stack (VStack) to arrange the following views vertically, with no space between them.
+            Divider()        // Adds a horizontal divider line to separate sections visually.
+            HStack(spacing: 12) {       // A horizontal stack (HStack) to arrange the following views horizontally with 12 points of space between them.
+                Group {         // Group is used to group multiple views together, allowing you to apply modifiers collectively.
+                    if let imageUrl = viewModel.currentUserProfileImageUrl,     // If `currentUserProfileImageUrl` has a valid URL string...
+                       let url = URL(string: imageUrl),     // Convert the string to a URL object.
+                       !imageUrl.isEmpty {           // Ensure the image URL is not empty.
+                        WebImage(url: url)           // Use a custom `WebImage` component to load and display the image from the URL.
+                            .resizable()              // Makes the image resizable to fit within a defined frame.
+                            .scaledToFill()          // Ensures the image fills the frame and may be cropped if needed.
+                            .frame(width: 32, height: 32)        // Sets the image frame size to 32x32 points.
+                            .clipShape(Circle())          // Clips the image into a circular shape.
+                    } else {      // If no valid image URL exists...
+                        Image(systemName: "person.circle.fill")      // Use a default system image, "person.circle.fill", to represent the user profile.
+                            .resizable()             // Makes the default image resizable to fit within a defined frame.
+                            .scaledToFill()     // Ensures the image fills the frame and may be cropped if needed
+                            .frame(width: 32, height: 32)        // Sets the image frame size to 32x32 points.
+                            .foregroundColor(AppTheme.secondaryText)    // Sets the image color using a custom theme color (`secondaryText`).
+                            .clipShape(Circle())         // Clips the default image into a circular shape.
                     }
                 }
-                TextField("Add a comment...", text: $viewModel.commentText)
-                    .textFieldStyle(.plain)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
-                    .background(AppTheme.secondaryBackground)
-                    .cornerRadius(20)
-                Button(action: { viewModel.showEmojiPicker.toggle() }) {
-                    Image(systemName: "face.smiling")
-                        .font(.system(size: 20))
-                        .foregroundColor(AppTheme.secondaryText)
+                TextField("Add a comment...", text: $viewModel.commentText)   // Creates a text field with the placeholder "Add a comment..." and binds its text value to `viewModel.commentText`.
+                    .textFieldStyle(.plain)     // Applies a plain text field style (no background or borders).
+                    .padding(.vertical, 8)      // Adds vertical padding (8 points) inside the text field, creating space above and below the text.
+                    .padding(.horizontal, 12)       // Adds horizontal padding (12 points) inside the text field, creating space on the left and right sides of the text.
+                    .background(AppTheme.secondaryBackground)       // Sets the background color of the text field to a custom secondary background color defined in `AppTheme`.
+                    .cornerRadius(20)       // Rounds the corners of the text field with a radius of 20 points, giving it a smooth, rounded appearance.
+                Button(action: { viewModel.showEmojiPicker.toggle() }) {     // Creates a button that toggles the visibility of the emoji picker when pressed.
+                    Image(systemName: "face.smiling")        // Displays a smiling face emoji as the button's icon, using a system image
+                        .font(.system(size: 20))    // Sets the font size of the emoji to 20 points.
+                        .foregroundColor(AppTheme.secondaryText)        // Sets the color of the emoji icon using the custom secondary text color from `AppTheme`.
                 }
-                Button(action: viewModel.addComment) {
-                    Text("Post")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppTheme.primaryPurple)
+                Button(action: viewModel.addComment) {   // Creates a button that, when pressed, triggers the `addComment` method in the `viewModel`.
+                    Text("Post")        // The button displays the text "Post".
+                        .font(.system(size: 14, weight: .semibold)) // Sets the font size of the text to 14 points with a semibold weight.
+                        .foregroundColor(AppTheme.primaryPurple)    // Sets the color of the text to a custom primary purple color from `AppTheme`.
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 12)
+            .padding(.horizontal, 16)   // Adds horizontal padding (16 points) around the entire HStack, providing space between the buttons/text field and the container's edges.
+            .padding(.vertical, 12) // Adds vertical padding (12 points) around the entire HStack, providing space between the buttons/text field and the container's top and bottom edges
             
-            if viewModel.showEmojiPicker {
+            if viewModel.showEmojiPicker {       // Conditional check: if `showEmojiPicker` is true in the `viewModel`, display the emoji picker.
                 // Emoji picker view for comments
-                EmojiPickerView(text: $viewModel.commentText, showPicker: $viewModel.showEmojiPicker)
-                    .transition(.identity)
+                EmojiPickerView(text: $viewModel.commentText, showPicker: $viewModel.showEmojiPicker)       // Displays the `EmojiPickerView`, passing in bindings to the comment text and picker visibility.
+                    .transition(.identity)  // Defines a transition effect (no change in view appearance in this case) when the emoji picker is shown or hidden.
             }
         }
     }
@@ -260,73 +260,75 @@ struct IndividualPostView: View {
     // MARK: - Supporting Views
 
     // View for each individual comment displayed
-    private struct CommentRow: View {
-        let comment: Comment
-        let userData: (username: String, profileImageUrl: String?)?
-        let onDelete: () -> Void
-        let onLike: () -> Void
+    private struct CommentRow: View {       // Declares a private struct `CommentRow` that conforms to the `View` protocol. This will be used to display individual comments.
+        let comment: Comment        // A constant property representing the `Comment` object for this row.
+        let userData: (username: String, profileImageUrl: String?)? // A constant property that contains the user's username and an optional URL for their profile image.
+        let onDelete: () -> Void         // A closure property that is called when the delete action for the comment is triggered.
+        let onLike: () -> Void      // A closure property that is called when the like action for the comment is triggered.
         
-        var body: some View {
-            HStack(alignment: .top, spacing: 12) {
+        var body: some View {       // The body property that defines the view to display for each individual comment.
+            HStack(alignment: .top, spacing: 12) {        // A horizontal stack (HStack) to arrange the views for the comment. The alignment is at the top, and there is 12 points of spacing between the views.
                 // User Image
-                Group {
-                    if let profileUrl = userData?.profileImageUrl,
-                       let url = URL(string: profileUrl),
-                       !profileUrl.isEmpty {
-                        WebImage(url: url)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 32, height: 32)
-                            .clipShape(Circle())
-                    } else {
-                        Image(systemName: "person.circle.fill")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: 32, height: 32)
-                            .foregroundColor(AppTheme.secondaryText)
-                            .clipShape(Circle())
+                Group {     // A Group is used to group multiple views together for easier modifiers.
+                    if let profileUrl = userData?.profileImageUrl,   // If the user has a valid profile image URL...
+                       let url = URL(string: profileUrl),    // Convert the profile URL string into a valid URL object.
+                       !profileUrl.isEmpty {         // Check that the URL string is not empty.
+                        WebImage(url: url)       // Use the `WebImage` view to load the image from the URL asynchronously.
+                            .resizable()         // Allows the image to be resized.
+                            .scaledToFill()  // Ensures the image fills the designated space and may crop if necessary.
+                            .frame(width: 32, height: 32)   // Sets the image's width and height to 32 points, making it a small circle.
+                            .clipShape(Circle())    // Clips the image into a circular shape.
+                    } else {            // If no valid profile image URL is found...
+                        Image(systemName: "person.circle.fill")  // Use a system image of a filled person icon as a placeholder for the user's profile image.
+                            .resizable()         // Makes the placeholder image resizable.
+                            .scaledToFill()     // Ensures the placeholder fills the frame and may be cropped if necessary.
+                            .frame(width: 32, height: 32)         // Sets the width and height of the placeholder image to 32 points.
+                            .foregroundColor(AppTheme.secondaryText)    // Applies the custom secondary text color from `AppTheme` to the placeholder image.
+                            .clipShape(Circle())     // Clips the placeholder image into a circular shape.
                     }
                 }
                 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 4) {   // A vertical stack (VStack) that arranges its children views vertically, aligned to the leading edge, with 4 points of spacing between the views.
                     
-                    Text(userData?.username ?? "Unknown User")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(AppTheme.primaryText)
+                    Text(userData?.username ?? "Unknown User")  // Displays the username of the user from `userData`. If `userData` is nil or the `username` is missing, "Unknown User" is shown instead.
+                        .font(.system(size: 14, weight: .semibold))  // Sets the font of the username text to a system font with a size of 14 points and a semibold weight.
+                        .foregroundColor(AppTheme.primaryText)  // Applies the primary text color defined in `AppTheme` to the username text.
                     
-                    Text(comment.text)
-                        .font(.system(size: 14))
-                        .foregroundColor(AppTheme.primaryText)
+                    Text(comment.text)       // Displays the comment text from the `comment` object.
+                        .font(.system(size: 14))     // Sets the font size of the comment text to 14 points using the system font.
+                        .foregroundColor(AppTheme.primaryText)  // Applies the primary text color defined in `AppTheme` to the comment text.
                     
-                    Text(comment.timestampString ?? "")
-                        .font(.system(size: 12))
-                        .foregroundColor(AppTheme.secondaryText)
+                    Text(comment.timestampString ?? "")  // Displays the timestamp of the comment. If the timestamp is nil, it shows an empty string instead.
+                        .font(.system(size: 12))    // Sets the font size of the timestamp to 12 points using the system font.
+                        .foregroundColor(AppTheme.secondaryText)    // Applies the secondary text color defined in `AppTheme` to the timestamp text.
                 }
                 
-                Spacer()
+                Spacer()     // Adds a spacer that pushes any content below it towards the top of the view, effectively filling any available vertical space. This is useful for creating space between the comment and any other content.
                 
                 // Like and Delete buttons
-                HStack(spacing: 12) {
-                    Button(action: onLike) {
-                        HStack(spacing: 4) {
-                            Image(systemName: comment.likedByCurrentUser ? "heart.fill" : "heart")
-                                .foregroundColor(comment.likedByCurrentUser ? .red : AppTheme.secondaryText)
-                            Text("\(comment.likeCount)")
-                                .font(.system(size: 12))
-                                .foregroundColor(AppTheme.secondaryText)
+                HStack(spacing: 12) {    // A horizontal stack (HStack) that arranges its child views horizontally with 12 points of spacing between them.
+                    Button(action: onLike) {    // A button that triggers the `onLike` action when pressed. It will handle the like functionality for the comment.
+                        HStack(spacing: 4) {    // A nested horizontal stack for the contents inside the button. This aligns the heart icon and like count horizontally with 4 points of spacing.
+                            Image(systemName: comment.likedByCurrentUser ? "heart.fill" : "heart")   // Displays a filled heart icon if the comment is liked by the current user, otherwise displays an empty heart icon.
+                                .foregroundColor(comment.likedByCurrentUser ? .red : AppTheme.secondaryText)    // Changes the color of the heart icon to red if liked by the user, otherwise applies the secondary text color from `AppTheme`.
+                            Text("\(comment.likeCount)")     // Displays the like count of the comment. The count is formatted as a string and passed to the `Text` view.
+                                .font(.system(size: 12))        // Sets the font size of the like count to 12 points
+                                .foregroundColor(AppTheme.secondaryText)    // Applies the secondary text color from `AppTheme` to the like count text.
                         }
                     }
                     
-                    if comment.userID == FirebaseManager.shared.auth.currentUser?.uid {
+                    if comment.userID == FirebaseManager.shared.auth.currentUser?.uid { // Checks if the userID of the comment matches the current user's ID. This condition determines if the current user is the author of the comment.
                         Button(action: onDelete) {
-                            Image(systemName: "trash")
-                                .foregroundColor(.red)
+                            // A button that triggers the `onDelete` action when pressed. This button will only be shown if the current user is the comment's author.
+                            Image(systemName: "trash")  // Displays a trash can icon to represent the delete action.
+                                .foregroundColor(.red)  // Sets the color of the trash can icon to red, indicating the delete action.
                         }
                     }
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 16)   // Adds 16 points of horizontal padding around the entire `HStack`, ensuring there is space between the content and the edges of the parent view.
+
+            .padding(.vertical, 8)   // Adds 8 points of vertical padding around the `HStack`, ensuring there is space between the content and the top/bottom edges of the parent view.
         }
     }
 

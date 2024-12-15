@@ -12,28 +12,28 @@ import Firebase
 //------------------------------------------------------------------------------------
 struct ChangePasswordView: View
     {
-    @Environment(\.presentationMode) var presentationMode
-    @EnvironmentObject var userManager: UserManager
+    @Environment(\.presentationMode) var presentationMode     // Accesses the presentation mode environment variable, allowing control over the view's navigation stack (e.g., to dismiss the current view).
+    @EnvironmentObject var userManager: UserManager  // Accesses a shared instance of `UserManager` from the environment, allowing interaction with user management logic (e.g., fetching or updating user data).
     
-    @State var entered_password    : String = ""
-    @State var new_password        : String = ""
-    @State var confirm_new_password: String = ""
+    @State var entered_password    : String = ""   // Declares a state variable to store the entered current password, initially set to an empty string. This is used for user input.
+    @State var new_password        : String = ""     // Declares a state variable to store the new password entered by the user, initially set to an empty string.
+    @State var confirm_new_password: String = ""    // Declares a state variable to store the confirmed new password, initially set to an empty string.
 
     //State for toggling password visibility
-    @State private var isPasswordVisible           = false
-    @State private var isNewPasswordVisible        = false
-    @State private var isConfirmNewPasswordVisible = false
+    @State private var isPasswordVisible           = false  // Declares a state variable to toggle the visibility of the current password. Initially set to `false` (hidden).
+    @State private var isNewPasswordVisible        = false  // Declares a state variable to toggle the visibility of the new password. Initially set to `false` (hidden).
+    @State private var isConfirmNewPasswordVisible = false   // Declares a state variable to toggle the visibility of the confirm new password. Initially set to `false` (hidden).
     
-    @State private var showAlert   : Bool = false
-    @State private var alertMessage: String = ""
-    @State private var alertTitle  : String = ""
+    @State private var showAlert   : Bool = false        // Declares a state variable to control the display of alerts. Initially set to `false`, meaning no alert is shown.
+    @State private var alertMessage: String = ""        // Declares a state variable to store the message to be displayed in the alert. Initially set to an empty string.
+    @State private var alertTitle  : String = ""        // Declares a state variable to store the title of the alert. Initially set to an empty string.
 
     // State variables for new password validation
-    @State private var isLengthValid      : Bool = false
-    @State private var hasUppercase       : Bool = false
-    @State private var hasSpecialCharacter: Bool = false
+    @State private var isLengthValid      : Bool = false     // Declares a state variable to track if the new password meets the length requirement (e.g., at least 8 characters). Initially set to `false`.
+    @State private var hasUppercase       : Bool = false      // Declares a state variable to track if the new password contains at least one uppercase letter. Initially set to `false`.
+    @State private var hasSpecialCharacter: Bool = false    // Declares a state variable to track if the new password contains at least one special character. Initially set to `false`.
     
-    @State private var password_changed_success : Bool = false
+    @State private var password_changed_success : Bool = false  // Declares a state variable to track if the password change was successful. Initially set to `false`.
     
     
     var body: some View
@@ -285,26 +285,31 @@ struct ChangePasswordView: View
         }
     
     func update_password (currentPassword: String, newPassword: String) {
+        // Calls FirebaseManager to reauthenticate the user using their current password.
         FirebaseManager.shared.reauthenticateUser(currentPassword: currentPassword) { success in
             if success {
+                // If reauthentication is successful, attempts to change the password to the new one.
                 FirebaseManager.shared.changePassword(newPassword: newPassword) { success in
                     if success {
-                        self.password_changed_success = true
-                        showAlert = true
-                        alertTitle = "Success"
-                        alertMessage = "Password updated successfully!"
-                        print(alertMessage)
+                        // If the password change is successful:
+                        self.password_changed_success = true    // Sets a flag to indicate success.
+                        showAlert = true         // Triggers the display of an alert.
+                        alertTitle = "Success"      // Sets the alert title to "Success".
+                        alertMessage = "Password updated successfully!" // Sets the success message for the alert.
+                        print(alertMessage)     // Logs the success message to the console.
                     } else {
-                        showAlert = true
-                        alertTitle = "Error"
-                        alertMessage = "Failed to update password."
-                        print(alertMessage)
+                        // If the password change fails:
+                        showAlert = true             // Triggers the display of an alert.
+                        alertTitle = "Error"        // Sets the alert title to "Error".
+                        alertMessage = "Failed to update password."  // Sets the error message for the alert.
+                        print(alertMessage)     // Logs the error message to the console.
                     }
                 }
             } else {
-                showAlert = true
-                alertMessage = "Incorrect password entered. Try again"
-                print(alertMessage)
+                // If reauthentication fails:
+                showAlert = true         // Triggers the display of an alert.
+                alertMessage = "Incorrect password entered. Try again"      // Sets the error message for the alert.
+                print(alertMessage)     // Logs the error message to the console.
             }
         }
     }
@@ -312,27 +317,34 @@ struct ChangePasswordView: View
     
     private func passwordsMatch() -> Bool
         {
+        // Checks if the new password matches the confirmed new password.
         if !(new_password == confirm_new_password)
             {
-            return false
+            return false        // Returns false if the passwords do not match.
             }
             
-        return true
+        return true     // Returns true if the passwords match.
         }
     
     private func validatePassword(_ newValue: String)
         {
+        // Checks if the password length is at least 8 characters.
         isLengthValid = newValue.count >= 8
+        // Checks if the password contains at least one uppercase letter using a regular expression.
         hasUppercase = newValue.range(of: "[A-Z]", options: .regularExpression) != nil
+        // Checks if the password contains at least one special character using a regular expression.
         hasSpecialCharacter = newValue.range(of: "[^A-Za-z0-9]", options: .regularExpression) != nil
         }
     
     private func isValidPassword(_ password: String) -> Bool
         {
-        // Check for at least 6 characters, at least one number, and at least one special character
+        // Check if the password meets the length requirement (at least 8 characters).
         isLengthValid = password.count >= 8
+        // Check if the password contains at least one uppercase letter using a regular expression.
         hasUppercase = password.range(of: "[A-Z]", options: .regularExpression) != nil
+        // Check if the password contains at least one special character using a regular expression.
         hasSpecialCharacter = password.range(of: "[^A-Za-z0-9]", options: .regularExpression) != nil
+            // Return true if all conditions are met; otherwise, return false.
         return isLengthValid && hasUppercase && hasSpecialCharacter
         }
     
