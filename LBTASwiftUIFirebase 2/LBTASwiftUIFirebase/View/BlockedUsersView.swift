@@ -3,23 +3,30 @@
 //  LBTASwiftUIFirebase
 //
 //  Shourav Rakshit Ivan, Alisha Lalani, Saadman Rahman, Alina Mansuri, Manvi Juneja,
-//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni 
+//  Zaid Nissar, Qusai Dahodwalla, Shree Patel, Vidhi Soni
 
 import SwiftUI
 import Firebase
 import SDWebImageSwiftUI
 
 struct BlockedUsersView: View {
+    // EnvironmentObject to access the global user manager
     @EnvironmentObject var userManager: UserManager
+    
+    // Environment variable for dismissing the view
     @Environment(\.presentationMode) var presentationMode
+    
+    // StateObject to manage the blocked users data
     @StateObject private var blockedManager = BlockedManager()
     
+    // State variables for unblocking functionality
     @State private var friendToUnblock: User? = nil // Store the user being unblocked
-    @State private var showingAlert = false
+    @State private var showingAlert = false // Show/hide the unblock confirmation alert
     
     var body: some View {
         VStack {
             //----- TOP ROW --------------------------------------
+            // Navigation bar-like top row with a back button and title
             HStack {
                 Image(systemName: "chevron.left")
                     .resizable()
@@ -35,73 +42,79 @@ struct BlockedUsersView: View {
                 Text("Blocked Users")
                     .font(.custom("Sansation-Regular", size: 20))
                     .foregroundColor(Color.customPurple)
-                    .offset(x: -30)
+                    .offset(x: -30) // Center the title
                 Spacer()
             }
             //------------------------------------------------
             
+            // Show loading indicator, error message, or blocked users list
             if blockedManager.isLoading {
-                ProgressView()  // Show loading spinner while fetching friends
+                // Display a loading spinner while fetching data
+                ProgressView()
                     .progressViewStyle(CircularProgressViewStyle())
                     .padding()
             }
             else if let error = blockedManager.error {
-                Text("Error: \(error.localizedDescription)")  // Display error if any
+                // Display an error message if fetching data failed
+                Text("Error: \(error.localizedDescription)")
                     .foregroundColor(.red)
                     .padding()
             }
-            else if blockedManager.filteredUsers.count == 0{
-                Spacer ()
-                Text ("No Blocked Users.")
+            else if blockedManager.filteredUsers.isEmpty {
+                // Show a message if there are no blocked users
+                Spacer()
+                Text("No Blocked Users.")
                     .bold()
                     .padding(.top, 10)
                     .font(.custom("Sansation-Regular", size: 25))
                     .foregroundColor(.black)
             }
             else {
+                // Display the list of blocked users
                 List(blockedManager.filteredUsers) { friend in
-                    // Row content for each friend
-                    row(for: friend)
+                    row(for: friend) // Custom row for each user
                 }
-                .listStyle(PlainListStyle()) // Ensure list style is plain (no separators, no extra padding)
-                .padding (.top, 10)
+                .listStyle(PlainListStyle()) // Plain style for the list
+                .padding(.top, 10)
             }
             
-            Spacer ()
-   
+            Spacer()
         }
+        // Alert for confirming the unblock action
         .alert(isPresented: $showingAlert) {
              Alert(
                  title: Text("Unblock \(friendToUnblock?.username ?? "")?"),
                  message: Text("Are you sure you want to unfriend this person?"),
                  primaryButton: .destructive(Text("Unblock")) {
+                     // Unblock the user if confirmed
                      if let friendToUnblock = friendToUnblock {
-                         blockedManager.unblockUser (userId: friendToUnblock.uid)
+                         blockedManager.unblockUser(userId: friendToUnblock.uid)
                      }
                  },
                  secondaryButton: .cancel {
-                     print("Unfriend canceled.")
+                     print("Unfriend canceled.") // Log when unblock is canceled
                  }
              )
          }
-        .onAppear(){
+        // Fetch blocked users when the view appears
+        .onAppear {
             blockedManager.isLoading = true
             blockedManager.fetchBlockedUsers(forUserUID: userManager.currentUser?.uid ?? "") { success in
+                blockedManager.isLoading = false
                 if success {
-                    blockedManager.isLoading = false
                     print("Blocked users fetched successfully!")
                 } else {
                     print("Failed to fetch blocked users.")
                 }
             }
-            print ("fetched blocked users length: \(blockedManager.blocked_users)")
+            print("Fetched blocked users count: \(blockedManager.blocked_users)")
         }
     }
     
-    // Defining a variable for the row content, which will display each friend's information
+    // Define the row view for each blocked user
     private func row(for friend: User) -> some View {
         HStack(alignment: .top, spacing: 15) {
-            // Profile Image
+            // Display the user's profile image
             if let profileImageUrl = friend.profileImageUrl,
                let url = URL(string: profileImageUrl) {
                 AsyncImage(url: url) { image in
@@ -116,13 +129,14 @@ struct BlockedUsersView: View {
                         .frame(width: 50, height: 50)
                 }
             } else {
+                // Default profile image if none exists
                 Image(systemName: "person.circle.fill")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 50, height: 50)
             }
             
-            // Text content: Username and Name
+            // Display the username and full name
             VStack(alignment: .leading) {
                 Text("@\(friend.username)")
                     .font(.headline)
@@ -132,13 +146,13 @@ struct BlockedUsersView: View {
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
-            .padding (.leading, 15)
+            .padding(.leading, 15)
             
             Spacer()
 
-            // Friends button
+            // Button for unblocking the user
             Button(action: {
-                // Trigger the alert and set the user to unfriend
+                // Trigger the alert and set the user to unblock
                 friendToUnblock = friend
                 showingAlert = true
             }) {
@@ -150,9 +164,7 @@ struct BlockedUsersView: View {
                     .foregroundColor(.red)
                     .cornerRadius(8)
             }
-            .buttonStyle(PlainButtonStyle()) // Use PlainButtonStyle to ensure no default List row interactions
-
+            .buttonStyle(PlainButtonStyle()) // Ensure no default List row interactions
         }
     }
-    
 }
