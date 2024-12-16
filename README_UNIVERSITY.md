@@ -88,7 +88,7 @@ The API key for [PixaBay](https://pixabay.com/) and [OpenWeather](https://openwe
 - Vidhi Soni, Email: vidhi.soni1@ucalgary.ca                    (UCID: 30117504)
 - Manvi Juneja, Email: manvi.juneja@ucalgary.ca	                (UCID: 30153525)
 - Shree Patel, Email: shree.patel@ucalgary.ca	                  (UCID: 30185055)
-- Zaid Nissar, Email: zaid.nissar@ucalgary.ca	
+- Zaid Nissar, Email: zaid.nissar@ucalgary.ca	                  (UCID: 30198174)
 - Qusai Dahodwalla, Email: qusai.dahodwalla@ucalgary.ca         (UCID: 30193962)
 
 University of Calgary
