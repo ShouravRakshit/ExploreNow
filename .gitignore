@@ -21,9 +21,4 @@ contents.xcworkspacedata
 IDEWorkspaceChecks.plist
 LBTASwiftUIFirebase 2/LBTASwiftUIFirebase.xcodeproj/xcuserdata/ivan.xcuserdatad/xcdebugger/Breakpoints_v2.xcbkptlist
 
-# **/Secrets.plist
-LBTASwiftUIFirebase 2/LBTASwiftUIFirebase/Secrets.plist
-# Ignore specific Xcode project file
-
-# Ignore Secrets files
-# **/Secrets.plist
+ExploreNow/ExploreNow/Secrets.plist
