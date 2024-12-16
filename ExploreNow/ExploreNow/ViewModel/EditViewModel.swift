@@ -1,6 +1,6 @@
 //
 //  EditViewModel.swift
-//  LBTASwiftUIFirebase
+//  ExploreNow
 //
 //  Created by Alisha Lalani on 2024-12-13.
 //

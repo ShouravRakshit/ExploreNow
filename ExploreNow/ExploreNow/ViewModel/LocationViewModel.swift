@@ -1,6 +1,6 @@
 //
 //  LocationViewModel.swift
-//  LBTASwiftUIFirebase
+//  ExploreNow
 //
 //  Created by Saadman Rahman on 2024-12-13.
 //
