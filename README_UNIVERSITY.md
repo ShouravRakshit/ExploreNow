@@ -87,7 +87,7 @@ The API key for [PixaBay](https://pixabay.com/) and [OpenWeather](https://openwe
 - Saadman Rahman, Email: saadman.rahman1@ucalgary.ca	        (UCID: 30153482)
 - Vidhi Soni, Email: vidhi.soni1@ucalgary.ca                    (UCID: 30117504)
 - Manvi Juneja, Email: manvi.juneja@ucalgary.ca	                (UCID: 30153525)
-- Shree PATEL, Email: shree.patel@ucalgary.ca	
+- Shree Patel, Email: shree.patel@ucalgary.ca	                  (UCID: 30185055)
 - Zaid Nissar, Email: zaid.nissar@ucalgary.ca	
 - Qusai Dahodwalla, Email: qusai.dahodwalla@ucalgary.ca         (UCID: 30193962)
 
