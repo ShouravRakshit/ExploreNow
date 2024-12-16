@@ -134,7 +134,7 @@
 		811CE2922D00F01600DCC599 /* HotSpotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotSpotViewModel.swift; sourceTree = "<group>"; };
 		811CE2942D00F1AD00DCC599 /* SuggestionPageViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuggestionPageViewModel.swift; sourceTree = "<group>"; };
 		811CE2962D00FA5200DCC599 /* WeatherViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherViewModel.swift; sourceTree = "<group>"; };
-		81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LBTASwiftUIFirebase.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		81447E562CB31F12005BE180 /* ExploreNow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ExploreNow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		81447E592CB31F12005BE180 /* LBTASwiftUIFirebaseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LBTASwiftUIFirebaseApp.swift; sourceTree = "<group>"; };
 		81447E5D2CB31F14005BE180 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		81447E602CB31F14005BE180 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -221,7 +221,7 @@
 		81447E572CB31F12005BE180 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */,
+				81447E562CB31F12005BE180 /* ExploreNow.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -352,9 +352,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		81447E552CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
+		81447E552CB31F12005BE180 /* ExploreNow */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 81447E642CB31F14005BE180 /* Build configuration list for PBXNativeTarget "LBTASwiftUIFirebase" */;
+			buildConfigurationList = 81447E642CB31F14005BE180 /* Build configuration list for PBXNativeTarget "ExploreNow" */;
 			buildPhases = (
 				81447E522CB31F12005BE180 /* Sources */,
 				81447E532CB31F12005BE180 /* Frameworks */,
@@ -367,7 +367,7 @@
 			fileSystemSynchronizedGroups = (
 				B0F0DEA62D06A76900303B38 /* Managers */,
 			);
-			name = LBTASwiftUIFirebase;
+			name = ExploreNow;
 			packageProductDependencies = (
 				81447E712CB338C6005BE180 /* FirebaseAuth */,
 				81447E732CB338C6005BE180 /* FirebaseFirestore */,
@@ -376,7 +376,7 @@
 				2C1967AF2CE0478E00765C63 /* Lottie */,
 			);
 			productName = LBTASwiftUIFirebase;
-			productReference = 81447E562CB31F12005BE180 /* LBTASwiftUIFirebase.app */;
+			productReference = 81447E562CB31F12005BE180 /* ExploreNow.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -394,7 +394,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 81447E512CB31F12005BE180 /* Build configuration list for PBXProject "LBTASwiftUIFirebase" */;
+			buildConfigurationList = 81447E512CB31F12005BE180 /* Build configuration list for PBXProject "ExploreNow" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -412,7 +412,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				81447E552CB31F12005BE180 /* LBTASwiftUIFirebase */,
+				81447E552CB31F12005BE180 /* ExploreNow */,
 			);
 		};
 /* End PBXProject section */
@@ -699,7 +699,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		81447E512CB31F12005BE180 /* Build configuration list for PBXProject "LBTASwiftUIFirebase" */ = {
+		81447E512CB31F12005BE180 /* Build configuration list for PBXProject "ExploreNow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				81447E622CB31F14005BE180 /* Debug */,
@@ -708,7 +708,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		81447E642CB31F14005BE180 /* Build configuration list for PBXNativeTarget "LBTASwiftUIFirebase" */ = {
+		81447E642CB31F14005BE180 /* Build configuration list for PBXNativeTarget "ExploreNow" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				81447E652CB31F14005BE180 /* Debug */,
