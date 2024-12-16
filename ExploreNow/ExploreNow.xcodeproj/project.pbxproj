@@ -213,7 +213,7 @@
 		81447E4D2CB31F12005BE180 = {
 			isa = PBXGroup;
 			children = (
-				81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */,
+				81447E582CB31F12005BE180 /* ExploreNow */,
 				81447E572CB31F12005BE180 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -226,7 +226,7 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		81447E582CB31F12005BE180 /* LBTASwiftUIFirebase */ = {
+		81447E582CB31F12005BE180 /* ExploreNow */ = {
 			isa = PBXGroup;
 			children = (
 				B0F0DEA62D06A76900303B38 /* Managers */,
@@ -245,7 +245,7 @@
 				81447E5F2CB31F14005BE180 /* Preview Content */,
 				B02392902CBDD511007CC920 /* GoogleService-Info.plist */,
 			);
-			path = LBTASwiftUIFirebase;
+			path = ExploreNow;
 			sourceTree = "<group>";
 		};
 		81447E5F2CB31F14005BE180 /* Preview Content */ = {
