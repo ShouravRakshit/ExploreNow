@@ -99,7 +99,7 @@ After checking the appropriate boxes in the Target Membership, save your changes
 # **Contributors**
 - Shourav Rakshit Ivan, Email: shouravrakshit.ivan@ucalgary.ca  (UCID: 30131085)
 - Alisha Lalani, Email: alisha.lalani@ucalgary.ca               (UCID: 30123098)
-- AAA , Email: alina.mansuri@ucalgary.ca	              (UCID: 30008370)
+- AAA , Email: alina.mansuri@ucalgary.ca	              (UCID: ********)
 - Saadman Rahman, Email: saadman.rahman1@ucalgary.ca	          (UCID: 30153482)
 - Vidhi Soni, Email: vidhi.soni1@ucalgary.ca                    (UCID: 30117504)
 - Manvi Juneja, Email: manvi.juneja@ucalgary.ca	                (UCID: 30153525)
