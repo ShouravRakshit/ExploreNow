@@ -83,7 +83,7 @@ The API key for [PixaBay](https://pixabay.com/) and [OpenWeather](https://openwe
 # **Contributors**
 - Shourav Rakshit Ivan, Email: shouravrakshit.ivan@ucalgary.ca  (UCID: 30131085)
 - Alisha Lalani, Email: alisha.lalani@ucalgary.ca               (UCID: 30123098)
-- Alina Mansuri, Email: alina.mansuri@ucalgary.ca	            (UCID: 30008370)
+- -----------------------------------------------------------------------------------
 - Saadman Rahman, Email: saadman.rahman1@ucalgary.ca	        (UCID: 30153482)
 - Vidhi Soni, Email: vidhi.soni1@ucalgary.ca                    (UCID: 30117504)
 - Manvi Juneja, Email: manvi.juneja@ucalgary.ca	                (UCID: 30153525)
